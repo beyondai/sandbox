@@ -1,0 +1,147 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Packaging / build tools
+pip-log.txt
+pip-delete-this-directory.txt
+.eggs/
+
+# Testing / coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Type checkers / linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# === Machine Learning ===
+# Data
+data/
+datasets/
+*.csv
+*.tsv
+*.parquet
+*.h5
+*.hdf5
+*.feather
+*.npy
+*.npz
+
+# Models / checkpoints
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pb
+*.h5
+*.pkl
+*.pickle
+*.joblib
+*.safetensors
+checkpoints/
+saved_models/
+models/
+runs/
+outputs/
+lightning_logs/
+
+# Experiment tracking
+mlruns/
+wandb/
+.neptune/
+tensorboard/
+tb_logs/
+
+# Hugging Face / caches
+.cache/
+.huggingface/
+
+# === Editors ===
+# Emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+.emacs.desktop.lock
+auto-save-list
+tramp
+.projectile
+.dir-locals.el
+
+# Neovim / Vim
+*.swp
+*.swo
+*.swn
+Session.vim
+.netrwhist
+tags
+.vim/
+
+# === macOS ===
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# === IDE (generic) ===
+.idea/
+.vscode/
+*.iml
