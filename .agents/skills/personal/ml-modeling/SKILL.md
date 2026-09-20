@@ -5,27 +5,50 @@ description: Use when executing the hands-on ML modeling workflow for a project 
 
 # ML Modeling
 
-Four sequential steps, each its own skill, chained by files under `ml-<topic>-<n>/modeling/` — not conversation memory, so any step can be invoked standalone in a fresh session:
+Four sequential steps, each its own skill, chained by files under
+`ml-<topic>-<n>/modeling/` — not conversation memory, so any step can be invoked
+standalone in a fresh session:
 
 1. `ml-modeling-data` — profile data → `modeling/01-data.md`
 2. `ml-modeling-features` — engineer features → `modeling/02-features.md`
-3. `ml-modeling-train` (sequential) **or** `ml-modeling-multiagent` (parallel, see below) — train → `modeling/03-train.md`
+3. `ml-modeling-train` (sequential) **or** `ml-modeling-multiagent` (parallel,
+   see below) — train → `modeling/03-train.md`
 4. `ml-modeling-evaluate` — evaluate → `modeling/04-evaluate.md`
 
-For the full chain, invoke each in order. For a single-step ask ("engineer features for this dataset"), invoke that skill directly — it reads whatever the previous step already wrote and continues from there.
+For the full chain, invoke each in order. For a single-step ask ("engineer
+features for this dataset"), invoke that skill directly — it reads whatever the
+previous step already wrote and continues from there.
 
 ## Required upstream dependency: `design/deep-dive.md`
 
-Every step here reads `<project-folder>/design/deep-dive.md`, written by `ml-system-design-deep-dive` — this is true in both Regular and Quick-POC mode. If it doesn't exist yet, don't invent a substitute: run `ml-system-design-deep-dive` first (POC mode if speed matters — see below), then come back. This is the one hard dependency that makes `ml-modeling-*` reliable — it grounds every step in real decisions instead of assumptions made up mid-chain.
+Every step here reads `<project-folder>/design/deep-dive.md`, written by
+`ml-system-design-deep-dive` — this is true in both Regular and Quick-POC mode.
+If it doesn't exist yet, don't invent a substitute: run
+`ml-system-design-deep-dive` first (POC mode if speed matters — see below), then
+come back. This is the one hard dependency that makes `ml-modeling-*` reliable —
+it grounds every step in real decisions instead of assumptions made up
+mid-chain.
 
-**`spec/<topic>.md`**: the first time any `ml-modeling-*` step runs against a project that has `design/deep-dive.md` but no `spec/<topic>.md` yet, synthesize one — `prd/` + `adr/` + `design/deep-dive.md` distilled into an implementation-ready doc: Problem Statement, Solution, Implementation Decisions, Testing Decisions, Out of Scope. Put `deep-dive-hash: <sha>` as the first line of the spec, where `<sha>` is the output of `git hash-object -w design/deep-dive.md` (the `-w` stores the blob so it stays diffable even if that version was never committed). This is the fork point between designing and executing; full rationale in `../adr/0001-ml-modeling-family-and-continuity.md`.
+**`spec/<topic>.md`**: the first time any `ml-modeling-*` step runs against a
+project that has `design/deep-dive.md` but no `spec/<topic>.md` yet, synthesize
+one — `prd/` + `adr/` + `design/deep-dive.md` distilled into an
+implementation-ready doc: Problem Statement, Solution, Implementation Decisions,
+Testing Decisions, Out of Scope. Put `deep-dive-hash: <sha>` as the first line
+of the spec, where `<sha>` is the output of `git hash-object -w
+design/deep-dive.md` (the `-w` stores the blob so it stays diffable even if that
+version was never committed). This is the fork point between designing and
+executing; full rationale in `../adr/0001-ml-modeling-family-and-continuity.md`.
 
 ## Regular vs. Quick-POC mode
 
 - **Regular**: full rigor at every step, ask when unknown.
-- **Quick POC**: a one-hour MVP, not lower documentation quality — favor speed once past the required `design/deep-dive.md` (itself produced fast via that skill's own POC mode): fewer clarifying questions, first-reasonable-choice over exhaustive comparison.
+- **Quick POC**: a one-hour MVP, not lower documentation quality — favor speed
+  once past the required `design/deep-dive.md` (itself produced fast via that
+  skill's own POC mode): fewer clarifying questions, first-reasonable-choice
+  over exhaustive comparison.
 
-Mode is chosen by keyword, not a flag, since this skill family has no structured argument syntax:
+Mode is chosen by keyword, not a flag, since this skill family has no structured
+argument syntax:
 
 | Words in the request | Mode |
 |---|---|
@@ -34,53 +57,113 @@ Mode is chosen by keyword, not a flag, since this skill family has no structured
 
 ## Sequential vs. parallel training
 
-Step 3 has two producers for the same `modeling/03-train.md` slot — pick one per run, same keyword mechanism:
+Step 3 has two producers for the same `modeling/03-train.md` slot — pick one per
+run, same keyword mechanism:
 
 | Words in the request | Skill |
 |---|---|
 | "parallel", "multiagent", "concurrent" | `ml-modeling-multiagent` |
 | "sequential", or no preference stated | `ml-modeling-train` (default) |
 
-`ml-modeling-multiagent` trains every candidate model type `design/deep-dive.md` named (or the algorithm-selection matrix's short-list, if none was specified) concurrently, each in its own `modeling/train-candidates/<model-type>/`, then compares and writes the winner to `03-train.md`. Full rationale for why this is safe without git worktrees (unlike mattpocock's `implement-spec`, which this pattern is adapted from) is in the ADR.
+`ml-modeling-multiagent` trains every candidate model type `design/deep-dive.md`
+named (or the algorithm-selection matrix's short-list, if none was specified)
+concurrently, each in its own `modeling/train-candidates/<model-type>/`, then
+compares and writes the winner to `03-train.md`. Full rationale for why this is
+safe without git worktrees (unlike mattpocock's `implement-spec`, which this
+pattern is adapted from) is in the ADR.
 
 ## Dashboard — deliberately narrow, Regular/Quick-POC only
 
-`ml-modeling-data` creates `dashboard/eda.ipynb` (real executed EDA) and bootstraps `dashboard/app.py` (Streamlit), launched as a background process. Only two sections: EDA (from `01-data.json`) and Final Results (from `04-evaluate.json`, written by `ml-modeling-evaluate`), plus an optional model-comparison section that reads `train-candidates/*/metrics.json` if `ml-modeling-multiagent` ran. `ml-modeling-features` and `ml-modeling-train`/`-multiagent` write nothing for the dashboard and are untouched by it — feature-engineering and training detail stay in their `.md` files, not duplicated onto a chart. `app.py` itself is written once and never edited by a later step; it just reads whatever JSON exists. Full rationale (why this scope and not a full per-step mirror) in `../adr/0002-modeling-dashboard.md`.
+`ml-modeling-data` creates `dashboard/eda.ipynb` (real executed EDA) and
+bootstraps `dashboard/app.py` (Streamlit), launched as a background process.
+Only two sections: EDA (from `01-data.json`) and Final Results (from
+`04-evaluate.json`, written by `ml-modeling-evaluate`), plus an optional
+model-comparison section that reads `train-candidates/*/metrics.json` if
+`ml-modeling-multiagent` ran. `ml-modeling-features` and
+`ml-modeling-train`/`-multiagent` write nothing for the dashboard and are
+untouched by it — feature-engineering and training detail stay in their `.md`
+files, not duplicated onto a chart. `app.py` itself is written once and never
+edited by a later step; it just reads whatever JSON exists. Full rationale (why
+this scope and not a full per-step mirror) in
+`../adr/0002-modeling-dashboard.md`.
 
-Never runs in monkey-mode — that family shares only the project-folder root and stays fully separate (see `ml-system-design-monkey-mode`).
+Never runs in monkey-mode — that family shares only the project-folder root and
+stays fully separate (see `ml-system-design-monkey-mode`).
 
 ## Optional follow-up: `ml-modeling-autoresearch`
 
-Once `modeling/04-evaluate.json` exists, `ml-modeling-autoresearch` (user-invoked only) becomes available — not a step in the chain above, an opt-in extra. A round: a couple of parallel candidates each try one change, the winner is kept if it beats the current best, promoted results flow straight into `04-evaluate.json` (the dashboard picks it up with zero code changes). Three modes, self-contained — no external scheduling: `/ml-modeling-autoresearch <project>` (one round), `... until plateau` (keeps going until a non-improvement streak or the round ceiling), `... for 20 minutes` (also bounded by a duration, stopping early on plateau). Works in Regular and Quick-POC mode; never in monkey-mode. Full usage and design rationale in `ml-modeling-autoresearch/SKILL.md`, `../adr/0003-autoresearch.md`, and `../adr/0005-autoresearch-self-contained-looping.md`.
+Once `modeling/04-evaluate.json` exists, `ml-modeling-autoresearch`
+(user-invoked only) becomes available — not a step in the chain above, an opt-in
+extra. A round: a couple of parallel candidates each try one change, the winner
+is kept if it beats the current best, promoted results flow straight into
+`04-evaluate.json` (the dashboard picks it up with zero code changes). Three
+modes, self-contained — no external scheduling: `/ml-modeling-autoresearch
+<project>` (one round), `... until plateau` (keeps going until a non-improvement
+streak or the round ceiling), `... for 20 minutes` (also bounded by a duration,
+stopping early on plateau). Works in Regular and Quick-POC mode; never in
+monkey-mode. Full usage and design rationale in
+`ml-modeling-autoresearch/SKILL.md`, `../adr/0003-autoresearch.md`, and
+`../adr/0005-autoresearch-self-contained-looping.md`.
 
 ## Bundled tools
 
-`scripts/experiment_tracker.py`, `scripts/feature_selector.py`, `scripts/hypothesis_tester.py` — stdlib-only, run with plain `python3`, no project venv needed. Referenced from the relevant step skills; shared here since `experiment_tracker.py` spans both train and evaluate.
+`scripts/experiment_tracker.py`, `scripts/feature_selector.py`,
+`scripts/hypothesis_tester.py` — stdlib-only, run with plain `python3`, no
+project venv needed. Referenced from the relevant step skills; shared here since
+`experiment_tracker.py` spans both train and evaluate.
 
 ## Closing the loop
 
-If executing a step reveals something that should change an earlier decision (e.g. feature engineering surfaces a feature `design/deep-dive.md` didn't list), flag it and offer to update `design/deep-dive.md` — don't silently drift from the recorded decisions. After such an update, rewrite the spec's `deep-dive-hash:` line with the new `git hash-object -w design/deep-dive.md` so the check below doesn't re-ask about a change this chain made itself.
+If executing a step reveals something that should change an earlier decision
+(e.g. feature engineering surfaces a feature `design/deep-dive.md` didn't list),
+flag it and offer to update `design/deep-dive.md` — don't silently drift from
+the recorded decisions. After such an update, rewrite the spec's
+`deep-dive-hash:` line with the new `git hash-object -w design/deep-dive.md` so
+the check below doesn't re-ask about a change this chain made itself.
 
 ### Deep-dive changed?
 
-The design session can keep editing `design/deep-dive.md` while modeling runs (the design path continues to delivery/post-delivery, or a forked session revises a decision). Every step skill runs this check first, before its own work, in both Regular and Quick-POC mode:
+The design session can keep editing `design/deep-dive.md` while modeling runs
+(the design path continues to delivery/post-delivery, or a forked session
+revises a decision). Every step skill runs this check first, before its own
+work, in both Regular and Quick-POC mode:
 
-1. `git hash-object design/deep-dive.md` vs. the spec's `deep-dive-hash:` line. Equal: proceed, say nothing.
-2. Different: show what changed — `git diff <recorded-hash> -- design/deep-dive.md`, summarized to which sections (Data / Features / Models / Training) moved and how — then ask two questions before doing the step:
-   - Re-synthesize `spec/<topic>.md` from the current deep-dive now, or keep the current spec?
-   - Apply the changed decisions in this step and later ones, or proceed on the previous decisions?
-3. Record the answer as one line in the step's output `.md` (e.g. `Deep-dive changed since spec (Features section); user chose: apply going forward, spec kept`) so a later session sees the choice. If the spec was re-synthesized, or the user chose to apply the change going forward, refresh `deep-dive-hash:` with `git hash-object -w` so the same change isn't asked about again. If the user chose to proceed on the previous decisions, leave the hash alone — the next step asks again, which is intended: each step is a fresh chance to pick the change up.
+1. `git hash-object design/deep-dive.md` vs. the spec's `deep-dive-hash:` line.
+   Equal: proceed, say nothing.
+2. Different: show what changed — `git diff <recorded-hash> --
+   design/deep-dive.md`, summarized to which sections (Data / Features / Models
+   / Training) moved and how — then ask two questions before doing the step:
+   - Re-synthesize `spec/<topic>.md` from the current deep-dive now, or keep the
+     current spec?
+   - Apply the changed decisions in this step and later ones, or proceed on the
+     previous decisions?
+3. Record the answer as one line in the step's output `.md` (e.g. `Deep-dive
+   changed since spec (Features section); user chose: apply going forward, spec
+   kept`) so a later session sees the choice. If the spec was re-synthesized, or
+   the user chose to apply the change going forward, refresh `deep-dive-hash:`
+   with `git hash-object -w` so the same change isn't asked about again. If the
+   user chose to proceed on the previous decisions, leave the hash alone — the
+   next step asks again, which is intended: each step is a fresh chance to pick
+   the change up.
 
-`ml-modeling-autoresearch` is autonomous and does not ask; on a mismatch it notes the change in `round-summary.md` and keeps running against the current file. The next interactive step surfaces the question.
+`ml-modeling-autoresearch` is autonomous and does not ask; on a mismatch it
+notes the change in `round-summary.md` and keeps running against the current
+file. The next interactive step surfaces the question.
 
 ## Skill improvement log
 
-Any `ml-modeling-*` skill, while it runs, may turn up something about the *skill itself* worth fixing — not the project it's working on. Two triggers:
+Any `ml-modeling-*` skill, while it runs, may turn up something about the *skill
+itself* worth fixing — not the project it's working on. Two triggers:
 
-1. **Agent-found**: a bug in this skill's own instructions, or a genuinely better way to do the step than what's written.
-2. **User-requested**: you ask to change how the skill behaves — as opposed to a one-off request specific to this project's data or model.
+1. **Agent-found**: a bug in this skill's own instructions, or a genuinely
+   better way to do the step than what's written.
+2. **User-requested**: you ask to change how the skill behaves — as opposed to a
+   one-off request specific to this project's data or model.
 
-Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry, appended to after) rather than editing the actual `SKILL.md` on the spot — keeps the skill files stable mid-run and gives you a batch to review later instead of drive-by edits:
+Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry,
+appended to after) rather than editing the actual `SKILL.md` on the spot — keeps
+the skill files stable mid-run and gives you a batch to review later instead of
+drive-by edits:
 
 ```markdown
 ## <date> — <skill-name>
@@ -90,8 +173,23 @@ Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry, appe
 - **Suggested change**: <the actual edit, concrete enough to apply as-is>
 ```
 
-**Review**: any skill in the family, at the end of a run (after doing the task actually asked for, never blocking it), checks this file for entries still marked `proposed`. If any exist, say so and offer to review them now. Per entry: ask adopt or decline; an adopted entry gets applied as a real edit to the corresponding skill file under `.agents/skills/personal/<skill>/SKILL.md`, then the entry's `Status` flips to `adopted` or `declined`. Never delete an entry — `SKILL-IMPROVEMENTS.md` stays a durable per-project record of what was proposed and decided. Same convention on the `ml-system-design-*` side; full rationale in `../adr/0004-skill-improvement-log.md`.
+**Review**: any skill in the family, at the end of a run (after doing the task
+actually asked for, never blocking it), checks this file for entries still
+marked `proposed`. If any exist, say so and offer to review them now. Per entry:
+ask adopt or decline; an adopted entry gets applied as a real edit to the
+corresponding skill file under `.agents/skills/personal/<skill>/SKILL.md`, then
+the entry's `Status` flips to `adopted` or `declined`. Never delete an entry —
+`SKILL-IMPROVEMENTS.md` stays a durable per-project record of what was proposed
+and decided. Same convention on the `ml-system-design-*` side; full rationale in
+`../adr/0004-skill-improvement-log.md`.
 
 ## Where this leads
 
-After step 4: iterate (rerun step 2 or 3), reach for `ml-modeling-autoresearch` to keep improving the model automatically while you do other analysis, hand `modeling/04-evaluate.md` to mattpocock's `implement` skill by hand to productionize, or — if this graduated from a Path A quick POC into a real project — backfill `prd/` and a full `adr/` via `ml-system-design-prd` / `ml-system-design-high-level`. Full usage-path tables (both the modeling-focused path and the whole-design path that forks into this one) are in `../adr/0001-ml-modeling-family-and-continuity.md`.
+After step 4: iterate (rerun step 2 or 3), reach for `ml-modeling-autoresearch`
+to keep improving the model automatically while you do other analysis, hand
+`modeling/04-evaluate.md` to mattpocock's `implement` skill by hand to
+productionize, or — if this graduated from a Path A quick POC into a real
+project — backfill `prd/` and a full `adr/` via `ml-system-design-prd` /
+`ml-system-design-high-level`. Full usage-path tables (both the modeling-focused
+path and the whole-design path that forks into this one) are in
+`../adr/0001-ml-modeling-family-and-continuity.md`.

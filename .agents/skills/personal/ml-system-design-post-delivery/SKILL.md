@@ -5,13 +5,26 @@ description: Use when writing or reviewing the Post-Delivery section of an ML sy
 
 # Post Delivery
 
-Draft (Regular): answer each item below in the user's own numbers/words; ask if unknown, never invent. Quick POC: state each item's most likely answer in one pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs. "regular"/nothing), see `../adr/0001-ml-modeling-family-and-continuity.md`. Review: check each item is actually answered, not just headed; flag gaps, don't rewrite what's solid.
+Draft (Regular): answer each item below in the user's own numbers/words; ask if
+unknown, never invent. Quick POC: state each item's most likely answer in one
+pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs.
+"regular"/nothing), see `../adr/0001-ml-modeling-family-and-continuity.md`.
+Review: check each item is actually answered, not just headed; flag gaps, don't
+rewrite what's solid.
 
-- **Analysis**: plan for the post-A/B deep-dive — not just what happened, but why.
-- **Explainability**: how model decisions become human-understandable (e.g. SHAP, LIME) — for debugging and stakeholder trust.
+- **Analysis**: plan for the post-A/B deep-dive — not just what happened, but
+  why.
+- **Explainability**: how model decisions become human-understandable (e.g.
+  SHAP, LIME) — for debugging and stakeholder trust.
 - **Iteration**: forward roadmap (V2, V3, ...) based on the analysis plan above.
-- **Democratize**: specific components (features, model architecture, platform pieces) other teams could reuse — name the team and the component, not "this could help others."
+- **Democratize**: specific components (features, model architecture, platform
+  pieces) other teams could reuse — name the team and the component, not "this
+  could help others."
 
-Done when Democratize names an actual team + component rather than staying generic, and Iteration lists concrete next-version items rather than "TBD based on results."
+Done when Democratize names an actual team + component rather than staying
+generic, and Iteration lists concrete next-version items rather than "TBD based
+on results."
 
-If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.
+If this run turns up a bug or a better design in this skill, or you ask for a
+change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
+improvement log.

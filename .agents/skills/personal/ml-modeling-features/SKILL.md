@@ -5,9 +5,14 @@ description: Use to engineer and select features for an ML model — numerical t
 
 # Engineer Features
 
-Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and `modeling/01-data.md` (the risk flags from the profiling step). Writes `<project-folder>/modeling/02-features.md`. First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
+Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and
+`modeling/01-data.md` (the risk flags from the profiling step). Writes
+`<project-folder>/modeling/02-features.md`. First, run the "Deep-dive changed?"
+check from `../ml-modeling/SKILL.md`.
 
-Mode: Regular tries the transforms `design/deep-dive.md` named and checks importance before finalizing. Quick POC picks the most obviously useful transforms and moves on — see `ml-modeling` router for the keyword rule.
+Mode: Regular tries the transforms `design/deep-dive.md` named and checks
+importance before finalizing. Quick POC picks the most obviously useful
+transforms and moves on — see `ml-modeling` router for the keyword rule.
 
 ## Numerical transforms
 
@@ -23,7 +28,8 @@ def engineer_numerical(df, col):
 
 ## Categorical encoding
 
-One-hot for low cardinality; target or frequency encoding for high-cardinality columns (e.g. `user_id`) — one-hot there would blow up dimensionality.
+One-hot for low cardinality; target or frequency encoding for high-cardinality
+columns (e.g. `user_id`) — one-hot there would blow up dimensionality.
 
 ## Time-based, with cyclical encoding
 
@@ -39,12 +45,21 @@ def engineer_time(df, col):
     })
 ```
 
-Sin/cos pair matters for anything cyclical (hour, day-of-week, month) — raw integer encoding tells the model 23:00 and 00:00 are far apart when they're adjacent.
+Sin/cos pair matters for anything cyclical (hour, day-of-week, month) — raw
+integer encoding tells the model 23:00 and 00:00 are far apart when they're
+adjacent.
 
 ## Selection
 
-Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col> --top <n>` — composite score across variance, correlation, cardinality, null rate. Use this to justify dropping features, not just to generate a top-N list.
+Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col>
+--top <n>` — composite score across variance, correlation, cardinality, null
+rate. Use this to justify dropping features, not just to generate a top-N list.
 
-Done when the feature set is a concrete list (not "relevant features"), each nontrivial transform is justified by something in `01-data.md` or `deep-dive.md` (not applied by default), and the file records what was tried and dropped, not just what survived.
+Done when the feature set is a concrete list (not "relevant features"), each
+nontrivial transform is justified by something in `01-data.md` or `deep-dive.md`
+(not applied by default), and the file records what was tried and dropped, not
+just what survived.
 
-If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.
+If this run turns up a bug or a better design in this skill, or you ask for a
+change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
+improvement log.

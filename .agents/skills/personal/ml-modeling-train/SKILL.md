@@ -5,9 +5,15 @@ description: Use to select and train one ML model candidate, sequentially — th
 
 # Train (sequential)
 
-Reads `<project-folder>/design/deep-dive.md`'s Models section (required) and `modeling/02-features.md`. Writes `<project-folder>/modeling/03-train.md`. First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
+Reads `<project-folder>/design/deep-dive.md`'s Models section (required) and
+`modeling/02-features.md`. Writes `<project-folder>/modeling/03-train.md`.
+First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
 
-One candidate, chosen and trained in this single pass — see `ml-modeling` router if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent, compared). Mode: Regular starts simple and upgrades only if the simple model underperforms; Quick POC goes straight to the workhorse row below unless `deep-dive.md` says otherwise — see `ml-modeling` router for the keyword rule.
+One candidate, chosen and trained in this single pass — see `ml-modeling` router
+if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent,
+compared). Mode: Regular starts simple and upgrades only if the simple model
+underperforms; Quick POC goes straight to the workhorse row below unless
+`deep-dive.md` says otherwise — see `ml-modeling` router for the keyword rule.
 
 ## Algorithm selection
 
@@ -29,8 +35,17 @@ python3 ../ml-modeling/scripts/experiment_tracker.py \
   log --name "<model>_v1" --params '{"lr":0.1,"depth":6}' --metrics '{"f1":0.87}'
 ```
 
-Every training run gets logged — this is what `ml-modeling-evaluate` and any later run compare against. Always pass `--log-file` with the project's path, and before the subcommand (`--log-file ... log ...`, not `log --log-file ...`, which argparse rejects): the script's default is `experiments.json` relative to whatever directory the agent happens to be in, which scatters logs across projects.
+Every training run gets logged — this is what `ml-modeling-evaluate` and any
+later run compare against. Always pass `--log-file` with the project's path, and
+before the subcommand (`--log-file ... log ...`, not `log --log-file ...`, which
+argparse rejects): the script's default is `experiments.json` relative to
+whatever directory the agent happens to be in, which scatters logs across
+projects.
 
-Done when `03-train.md` names the chosen model, states why it beat the alternatives in the matrix above (not just "it's the default"), and includes the training code actually run — not a template.
+Done when `03-train.md` names the chosen model, states why it beat the
+alternatives in the matrix above (not just "it's the default"), and includes the
+training code actually run — not a template.
 
-If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.
+If this run turns up a bug or a better design in this skill, or you ask for a
+change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
+improvement log.
