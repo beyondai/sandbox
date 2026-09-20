@@ -1,6 +1,11 @@
 ---
 name: ml-system-design-delivery
-description: Use when writing or reviewing the Delivery section of an ML system design doc — execution timeline, deployment/rollout/testing strategy, A/B test and offline eval methodology, production monitoring, or fallback plans. Trigger on requests to design a rollout/ramp plan, an A/B test, a monitoring dashboard, or a fallback/kill-switch for an ML system going to production.
+description: >-
+  Use when writing or reviewing the Delivery section of an ML system design doc
+  — execution timeline, deployment/rollout/testing strategy, A/B test and
+  offline eval methodology, production monitoring, or fallback plans. Trigger on
+  requests to design a rollout/ramp plan, an A/B test, a monitoring dashboard,
+  or a fallback/kill-switch for an ML system going to production.
 ---
 
 # Delivery

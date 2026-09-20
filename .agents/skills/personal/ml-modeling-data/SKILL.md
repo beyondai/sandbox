@@ -1,6 +1,12 @@
 ---
 name: ml-modeling-data
-description: Use to profile a dataset before feature engineering — row counts, null rates, class balance, feature distributions, data-quality flags. Also creates the project's EDA notebook and bootstraps its Streamlit dashboard. Step 1 of the ml-modeling-* chain (data → features → train → evaluate). Trigger on "profile this data," "check data quality," "set up a dashboard for this," or continuing modeling work in an existing ml-<topic>-<n>/ project.
+description: >-
+  Use to profile a dataset before feature engineering — row counts, null rates,
+  class balance, feature distributions, data-quality flags. Also creates the
+  project's EDA notebook and bootstraps its Streamlit dashboard. Step 1 of the
+  ml-modeling-* chain (data → features → train → evaluate). Trigger on "profile
+  this data," "check data quality," "set up a dashboard for this," or continuing
+  modeling work in an existing ml-<topic>-<n>/ project.
 ---
 
 # Profile Data
@@ -39,8 +45,10 @@ the `.md`):
 {
   "shape": {"rows": 0, "columns": 0, "memory_mb": 0.0},
   "nulls": {"<col>": 0.0},
-  "target": {"column": "<name>", "type": "classification|regression", "class_balance": {}, "distribution": {}},
-  "numeric_distributions": {"<col>": {"min": 0, "max": 0, "mean": 0, "std": 0, "skew": 0}},
+  "target": {"column": "<name>", "type": "classification|regression",
+             "class_balance": {}, "distribution": {}},
+  "numeric_distributions": {"<col>": {"min": 0, "max": 0, "mean": 0,
+                                      "std": 0, "skew": 0}},
   "categorical_distributions": {"<col>": {"cardinality": 0, "top_values": {}}},
   "quality_flags": ["<string>"]
 }

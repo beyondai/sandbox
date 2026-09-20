@@ -1,6 +1,12 @@
 ---
 name: ml-system-design
-description: Use when writing, structuring, or reviewing a full ML system design document, RFC, or ML system design interview answer for a machine learning product or feature (ranking, recommendation, search, fraud/risk, forecasting, NLP/LLM systems, etc). Entry point for the whole doc; for one section only, trigger that section's own skill directly instead. Trigger on "ML system design," "design doc for a model," "ML RFC," or ML system design interview prep.
+description: >-
+  Use when writing, structuring, or reviewing a full ML system design document,
+  RFC, or ML system design interview answer for a machine learning product or
+  feature (ranking, recommendation, search, fraud/risk, forecasting, NLP/LLM
+  systems, etc). Entry point for the whole doc; for one section only, trigger
+  that section's own skill directly instead. Trigger on "ML system design,"
+  "design doc for a model," "ML RFC," or ML system design interview prep.
 ---
 
 # ML System Design

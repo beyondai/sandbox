@@ -1,6 +1,13 @@
 ---
 name: ml-modeling-autoresearch
-description: Run automated improvement rounds on a model that already has results — dispatches a couple of parallel candidates (default 2, overridable), each trying one focused change, keeps the winner if it beats the current best. Three modes: one round, until plateau, or for a duration — self-contained, no external scheduling. Optional follow-up after ml-modeling-evaluate, not a step in the sequential chain. Run by hand only, e.g. /ml-modeling-autoresearch ml-churn-prediction-1 until plateau, 4 candidates.
+description: >-
+  Run automated improvement rounds on a model that already has results —
+  dispatches a couple of parallel candidates (default 2, overridable), each
+  trying one focused change, keeps the winner if it beats the current best.
+  Three modes: one round, until plateau, or for a duration — self-contained, no
+  external scheduling. Optional follow-up after ml-modeling-evaluate, not a step
+  in the sequential chain. Run by hand only, e.g. /ml-modeling-autoresearch
+  ml-churn-prediction-1 until plateau, 4 candidates.
 disable-model-invocation: true
 ---
 
@@ -103,14 +110,14 @@ invoke again. State this boundary in the first message of a multi-round run.
 
 ```
 modeling/autoresearch/
-  program.md              human-editable config + free-text guidance (below)
-  experiment.py            current best model's full train+eval code —
-                             the single file every round's candidates branch from
-  best_metrics.json         current best's metrics — the bar each round must clear
-  rounds/round-NNNN/         one folder per round ever run, kept whether kept
-                              or discarded
-    candidate-<id>/           each candidate's code + metrics + a one-line verdict
-    round-summary.md           which candidate (if any) won, and why
+  program.md            human-editable config + free-text guidance (below)
+  experiment.py         current best model's full train+eval code — the
+                        single file every round's candidates branch from
+  best_metrics.json     current best's metrics — the bar each round must clear
+  rounds/round-NNNN/    one folder per round ever run, kept whether kept
+                        or discarded
+    candidate-<id>/     each candidate's code + metrics + a one-line verdict
+    round-summary.md    which candidate (if any) won, and why
 ```
 
 Seed `experiment.py`/`best_metrics.json` from whichever of

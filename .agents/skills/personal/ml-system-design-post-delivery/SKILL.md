@@ -1,6 +1,12 @@
 ---
 name: ml-system-design-post-delivery
-description: Use when writing or reviewing the Post-Delivery section of an ML system design doc — post-launch result analysis, model explainability (SHAP/LIME), the next-iteration roadmap, or democratizing/reusing ML components across teams. Trigger on requests to plan A/B test result analysis, add model explainability, sketch a V2/V3 roadmap, or identify what an ML system's components let other teams reuse.
+description: >-
+  Use when writing or reviewing the Post-Delivery section of an ML system design
+  doc — post-launch result analysis, model explainability (SHAP/LIME), the
+  next-iteration roadmap, or democratizing/reusing ML components across teams.
+  Trigger on requests to plan A/B test result analysis, add model
+  explainability, sketch a V2/V3 roadmap, or identify what an ML system's
+  components let other teams reuse.
 ---
 
 # Post Delivery

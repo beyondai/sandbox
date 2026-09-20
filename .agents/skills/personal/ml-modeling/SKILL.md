@@ -1,6 +1,13 @@
 ---
 name: ml-modeling
-description: Use when executing the hands-on ML modeling workflow for a project that already has (or is about to get) an ml-system-design-deep-dive decision — profiling data, engineering features, training a model, and evaluating it. Entry point for the whole data-to-evaluated-model chain; for one step only, trigger that step's own skill directly instead. Trigger on "let's build/train/prototype a model for X," "quick ML POC," or continuing modeling work in an existing ml-<topic>-<n>/ project folder.
+description: >-
+  Use when executing the hands-on ML modeling workflow for a project that
+  already has (or is about to get) an ml-system-design-deep-dive decision —
+  profiling data, engineering features, training a model, and evaluating it.
+  Entry point for the whole data-to-evaluated-model chain; for one step only,
+  trigger that step's own skill directly instead. Trigger on "let's
+  build/train/prototype a model for X," "quick ML POC," or continuing modeling
+  work in an existing ml-<topic>-<n>/ project folder.
 ---
 
 # ML Modeling

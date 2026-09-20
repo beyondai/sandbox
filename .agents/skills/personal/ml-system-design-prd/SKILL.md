@@ -1,6 +1,10 @@
 ---
 name: ml-system-design-prd
-description: Grill the user on the Definition checklist (problem, requirements, metrics, team) for a specific ML system design topic, then write the resolved answers into a PRD. Run by hand only, e.g. /ml-system-design-prd design ecommerce product search.
+description: >-
+  Grill the user on the Definition checklist (problem, requirements, metrics,
+  team) for a specific ML system design topic, then write the resolved answers
+  into a PRD. Run by hand only, e.g. /ml-system-design-prd design ecommerce
+  product search.
 disable-model-invocation: true
 ---
 

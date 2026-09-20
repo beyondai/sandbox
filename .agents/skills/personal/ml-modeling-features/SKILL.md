@@ -1,6 +1,11 @@
 ---
 name: ml-modeling-features
-description: Use to engineer and select features for an ML model — numerical transforms, categorical encoding, time-based/cyclical features, importance-based selection. Step 2 of the ml-modeling-* chain (data → features → train → evaluate). Trigger on "engineer features for this," "encode these columns," or continuing modeling work in an existing ml-<topic>-<n>/ project.
+description: >-
+  Use to engineer and select features for an ML model — numerical transforms,
+  categorical encoding, time-based/cyclical features, importance-based
+  selection. Step 2 of the ml-modeling-* chain (data → features → train →
+  evaluate). Trigger on "engineer features for this," "encode these columns," or
+  continuing modeling work in an existing ml-<topic>-<n>/ project.
 ---
 
 # Engineer Features

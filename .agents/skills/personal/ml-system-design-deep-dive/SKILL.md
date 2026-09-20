@@ -1,6 +1,13 @@
 ---
 name: ml-system-design-deep-dive
-description: Use when writing or reviewing the Design Deep Dive section of an ML system design doc — data sources (online/offline, data engineering), feature list and feature engineering, candidate models and their tradeoffs, or training setup (loss function, algorithm, labeling, sampling). Also the required upstream step for the ml-modeling-* execution family — trigger on requests to pick a model, design features, specify training data/labels, discuss model tradeoffs, or start a quick ML POC/MVP.
+description: >-
+  Use when writing or reviewing the Design Deep Dive section of an ML system
+  design doc — data sources (online/offline, data engineering), feature list and
+  feature engineering, candidate models and their tradeoffs, or training setup
+  (loss function, algorithm, labeling, sampling). Also the required upstream
+  step for the ml-modeling-* execution family — trigger on requests to pick a
+  model, design features, specify training data/labels, discuss model tradeoffs,
+  or start a quick ML POC/MVP.
 ---
 
 # Design Deep Dive

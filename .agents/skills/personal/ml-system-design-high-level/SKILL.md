@@ -1,6 +1,11 @@
 ---
 name: ml-system-design-high-level
-description: Use when writing or reviewing the High-level Design section of an ML system design doc — ML problem framing, the online-inference/offline-training architecture diagrams, or crawl-walk-run delivery phasing (V0/V1/V2). Trigger on requests to frame a business problem as an ML problem, design an ML pipeline architecture, or phase an ML project into milestones.
+description: >-
+  Use when writing or reviewing the High-level Design section of an ML system
+  design doc — ML problem framing, the online-inference/offline-training
+  architecture diagrams, or crawl-walk-run delivery phasing (V0/V1/V2). Trigger
+  on requests to frame a business problem as an ML problem, design an ML
+  pipeline architecture, or phase an ML project into milestones.
 ---
 
 # High-level Design

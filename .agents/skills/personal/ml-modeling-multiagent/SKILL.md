@@ -1,6 +1,12 @@
 ---
 name: ml-modeling-multiagent
-description: Use to train and compare multiple ML model candidates concurrently instead of one at a time — dispatches one subagent per candidate, then merges results. Parallel alternative to ml-modeling-train for step 3 of the ml-modeling-* chain. Trigger on "try a few models in parallel," "compare multiple algorithms at once," or "multiagent"/"concurrent" training for an ml-<topic>-<n>/ project.
+description: >-
+  Use to train and compare multiple ML model candidates concurrently instead of
+  one at a time — dispatches one subagent per candidate, then merges results.
+  Parallel alternative to ml-modeling-train for step 3 of the ml-modeling-*
+  chain. Trigger on "try a few models in parallel," "compare multiple algorithms
+  at once," or "multiagent"/"concurrent" training for an ml-<topic>-<n>/
+  project.
 ---
 
 # Train (parallel, multiple candidates)

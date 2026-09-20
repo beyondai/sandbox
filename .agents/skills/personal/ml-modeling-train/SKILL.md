@@ -1,6 +1,12 @@
 ---
 name: ml-modeling-train
-description: Use to select and train one ML model candidate, sequentially — the algorithm-selection matrix, cross-validation, experiment logging. Step 3 of the ml-modeling-* chain (data → features → train → evaluate), the sequential alternative to ml-modeling-multiagent. Trigger on "train a model for this," "pick an algorithm," or continuing modeling work in an existing ml-<topic>-<n>/ project.
+description: >-
+  Use to select and train one ML model candidate, sequentially — the
+  algorithm-selection matrix, cross-validation, experiment logging. Step 3 of
+  the ml-modeling-* chain (data → features → train → evaluate), the sequential
+  alternative to ml-modeling-multiagent. Trigger on "train a model for this,"
+  "pick an algorithm," or continuing modeling work in an existing
+  ml-<topic>-<n>/ project.
 ---
 
 # Train (sequential)
@@ -32,7 +38,8 @@ Use cross-validation, not a single train/test split, to pick between candidates.
 ```
 python3 ../ml-modeling/scripts/experiment_tracker.py \
   --log-file <project-folder>/modeling/experiments.json \
-  log --name "<model>_v1" --params '{"lr":0.1,"depth":6}' --metrics '{"f1":0.87}'
+  log --name "<model>_v1" --params '{"lr":0.1,"depth":6}' \
+  --metrics '{"f1":0.87}'
 ```
 
 Every training run gets logged — this is what `ml-modeling-evaluate` and any

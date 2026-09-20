@@ -1,6 +1,12 @@
 ---
 name: ml-modeling-evaluate
-description: Use to evaluate a trained model rigorously — classification/regression metrics, baseline comparison, overfitting check. Also writes the project dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain (data → features → train → evaluate). Trigger on "evaluate this model," "compare to baseline," "is this overfitting," or continuing modeling work in an existing ml-<topic>-<n>/ project.
+description: >-
+  Use to evaluate a trained model rigorously — classification/regression
+  metrics, baseline comparison, overfitting check. Also writes the project
+  dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain
+  (data → features → train → evaluate). Trigger on "evaluate this model,"
+  "compare to baseline," "is this overfitting," or continuing modeling work in
+  an existing ml-<topic>-<n>/ project.
 ---
 
 # Evaluate
@@ -19,11 +25,14 @@ stops there — see `ml-modeling` router for the keyword rule.
 ## Classification
 
 ```python
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                             f1_score, roc_auc_score)
 
 def evaluate_classifier(y_true, y_pred, y_proba=None):
-    m = {"accuracy": accuracy_score(y_true, y_pred), "precision": precision_score(y_true, y_pred),
-         "recall": recall_score(y_true, y_pred), "f1": f1_score(y_true, y_pred)}
+    m = {"accuracy": accuracy_score(y_true, y_pred),
+         "precision": precision_score(y_true, y_pred),
+         "recall": recall_score(y_true, y_pred),
+         "f1": f1_score(y_true, y_pred)}
     if y_proba is not None:
         m["auc_roc"] = roc_auc_score(y_true, y_proba)
     return m
@@ -37,7 +46,8 @@ import numpy as np
 
 def evaluate_regressor(y_true, y_pred):
     return {"mae": mean_absolute_error(y_true, y_pred),
-            "rmse": np.sqrt(mean_squared_error(y_true, y_pred)), "r2": r2_score(y_true, y_pred)}
+            "rmse": np.sqrt(mean_squared_error(y_true, y_pred)),
+            "r2": r2_score(y_true, y_pred)}
 ```
 
 ## Required checks
