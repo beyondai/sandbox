@@ -5,7 +5,7 @@ description: Use to engineer and select features for an ML model — numerical t
 
 # Engineer Features
 
-Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and `modeling/01-data.md` (the risk flags from the profiling step). Writes `<project-folder>/modeling/02-features.md`.
+Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and `modeling/01-data.md` (the risk flags from the profiling step). Writes `<project-folder>/modeling/02-features.md`. First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
 
 Mode: Regular tries the transforms `design/deep-dive.md` named and checks importance before finalizing. Quick POC picks the most obviously useful transforms and moves on — see `ml-modeling` router for the keyword rule.
 

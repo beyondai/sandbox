@@ -5,7 +5,7 @@ description: Use to profile a dataset before feature engineering — row counts,
 
 # Profile Data
 
-Reads `<project-folder>/design/deep-dive.md`'s Data section (required — see `ml-modeling` router if it's missing). Writes `<project-folder>/modeling/01-data.md` and `modeling/01-data.json`, and (Regular/Quick-POC only — see below) creates `dashboard/eda.ipynb` and `dashboard/app.py`.
+Reads `<project-folder>/design/deep-dive.md`'s Data section (required — see `ml-modeling` router if it's missing). Writes `<project-folder>/modeling/01-data.md` and `modeling/01-data.json`, and (Regular/Quick-POC only — see below) creates `dashboard/eda.ipynb` and `dashboard/app.py`. First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md` (spec exists and its hash matches? proceed; otherwise ask).
 
 Mode: Regular asks about anything the data doesn't make obvious (e.g. why a null rate is high). Quick POC states a reasonable read and moves on — see `ml-modeling` router for the keyword rule.
 
@@ -38,7 +38,7 @@ Deliberately narrow — the dashboard's job is "understand the project and progr
 
 **Dashboard app** — copy `assets/dashboard_app.py` to `<project-folder>/dashboard/app.py` once (no later step ever edits this file, only the JSON it reads). It's a generic reader — nothing in it needs per-project editing, since it reads standardized paths (`../modeling/01-data.json`, `../modeling/04-evaluate.json`, `../modeling/train-candidates/*/metrics.json`) and renders one tab per file it finds. Design intent: compact and minimal — tabs instead of stacked sections, tightened CSS (small headers, small metric fonts, low padding), short chart heights (~220px). If the design ever needs another pass, edit `assets/dashboard_app.py` here (the single source of truth) and re-copy it into any project that should pick up the change — don't hand-edit a project's own `dashboard/app.py` and let it drift from the template.
 
-Launch it: `uv run streamlit run dashboard/app.py --server.headless true &` (background — don't block the conversation), then report the local URL (`http://localhost:8501`) to the user.
+Launch it on a per-project port, so two projects' dashboards never collide: pick the first port from 8501 upward where `lsof -nP -iTCP:<port> -sTCP:LISTEN` prints nothing, write it to `dashboard/.port`, then `uv run streamlit run dashboard/app.py --server.headless true --server.port $(cat dashboard/.port) &` (background — don't block the conversation), and report `http://localhost:<port>` to the user. `dashboard/.port` is the one place the port lives; `ml-modeling-evaluate` reads it for its health check.
 
 Done when every profile flag above is a real number from the actual data (not "looks fine"), `modeling/01-data.md` states which columns are risky and why, `01-data.json` matches it, `dashboard/eda.ipynb` has real executed outputs, and the Streamlit process is actually running and reachable at the reported URL — not just files written.
 

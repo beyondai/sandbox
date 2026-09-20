@@ -18,7 +18,7 @@ For the full chain, invoke each in order. For a single-step ask ("engineer featu
 
 Every step here reads `<project-folder>/design/deep-dive.md`, written by `ml-system-design-deep-dive` — this is true in both Regular and Quick-POC mode. If it doesn't exist yet, don't invent a substitute: run `ml-system-design-deep-dive` first (POC mode if speed matters — see below), then come back. This is the one hard dependency that makes `ml-modeling-*` reliable — it grounds every step in real decisions instead of assumptions made up mid-chain.
 
-**`spec/<topic>.md`**: the first time any `ml-modeling-*` step runs against a project that has `design/deep-dive.md` but no `spec/<topic>.md` yet, synthesize one — `prd/` + `adr/` + `design/deep-dive.md` distilled into an implementation-ready doc: Problem Statement, Solution, Implementation Decisions, Testing Decisions, Out of Scope. This is the fork point between designing and executing; full rationale in `../adr/0001-ml-modeling-family-and-continuity.md`.
+**`spec/<topic>.md`**: the first time any `ml-modeling-*` step runs against a project that has `design/deep-dive.md` but no `spec/<topic>.md` yet, synthesize one — `prd/` + `adr/` + `design/deep-dive.md` distilled into an implementation-ready doc: Problem Statement, Solution, Implementation Decisions, Testing Decisions, Out of Scope. Put `deep-dive-hash: <sha>` as the first line of the spec, where `<sha>` is the output of `git hash-object -w design/deep-dive.md` (the `-w` stores the blob so it stays diffable even if that version was never committed). This is the fork point between designing and executing; full rationale in `../adr/0001-ml-modeling-family-and-continuity.md`.
 
 ## Regular vs. Quick-POC mode
 
@@ -59,7 +59,19 @@ Once `modeling/04-evaluate.json` exists, `ml-modeling-autoresearch` (user-invoke
 
 ## Closing the loop
 
-If executing a step reveals something that should change an earlier decision (e.g. feature engineering surfaces a feature `design/deep-dive.md` didn't list), flag it and offer to update `design/deep-dive.md` — don't silently drift from the recorded decisions.
+If executing a step reveals something that should change an earlier decision (e.g. feature engineering surfaces a feature `design/deep-dive.md` didn't list), flag it and offer to update `design/deep-dive.md` — don't silently drift from the recorded decisions. After such an update, rewrite the spec's `deep-dive-hash:` line with the new `git hash-object -w design/deep-dive.md` so the check below doesn't re-ask about a change this chain made itself.
+
+### Deep-dive changed?
+
+The design session can keep editing `design/deep-dive.md` while modeling runs (the design path continues to delivery/post-delivery, or a forked session revises a decision). Every step skill runs this check first, before its own work, in both Regular and Quick-POC mode:
+
+1. `git hash-object design/deep-dive.md` vs. the spec's `deep-dive-hash:` line. Equal: proceed, say nothing.
+2. Different: show what changed — `git diff <recorded-hash> -- design/deep-dive.md`, summarized to which sections (Data / Features / Models / Training) moved and how — then ask two questions before doing the step:
+   - Re-synthesize `spec/<topic>.md` from the current deep-dive now, or keep the current spec?
+   - Apply the changed decisions in this step and later ones, or proceed on the previous decisions?
+3. Record the answer as one line in the step's output `.md` (e.g. `Deep-dive changed since spec (Features section); user chose: apply going forward, spec kept`) so a later session sees the choice. If the spec was re-synthesized, or the user chose to apply the change going forward, refresh `deep-dive-hash:` with `git hash-object -w` so the same change isn't asked about again. If the user chose to proceed on the previous decisions, leave the hash alone — the next step asks again, which is intended: each step is a fresh chance to pick the change up.
+
+`ml-modeling-autoresearch` is autonomous and does not ask; on a mismatch it notes the change in `round-summary.md` and keeps running against the current file. The next interactive step surfaces the question.
 
 ## Skill improvement log
 

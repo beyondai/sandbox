@@ -181,13 +181,18 @@ ml-<topic>-<n>/
   prd/<topic>.md            Definition, from ml-system-design-prd
   adr/000N-*.md             Architecture decisions, any stage
   design/deep-dive.md       Data/features/models/training decisions
-  spec/<topic>.md           Design→modeling fork synthesis
+  spec/<topic>.md           Design→modeling fork synthesis; first line is
+                             deep-dive-hash: (drift check, see below)
   dashboard/                eda.ipynb + app.py (Streamlit), EDA + Results
                              only, Regular/Quick-POC, never monkey-mode
+    .port                    This project's Streamlit port (per-project,
+                             so two dashboards never collide)
   modeling/                 01-data(.md/.json) → 02-features → 03-train →
                              04-evaluate(.md/.json), .json feeds dashboard
+    experiments.json         experiment_tracker log, always via --log-file
     autoresearch/            Optional, after 04-evaluate.json exists, 3
-                             self-contained modes, see above
+                             self-contained modes, see above; has its own
+                             experiments.json
   monkey-mode/              Independent fast-baseline track (report.md)
   SKILL-IMPROVEMENTS.md     Proposed fixes to the skills themselves, any
                              stage — logged, reviewed on request, see above
@@ -196,6 +201,52 @@ ml-<topic>-<n>/
 Regular vs. Quick-POC mode (keyword-selected: "poc"/"quick"/"mvp"/"fast" vs.
 nothing) applies across the design path and `ml-modeling-*` — monkey-mode
 has its own always-fast behavior and doesn't use this switch.
+
+## Running things concurrently
+
+The family is built so that runs which naturally overlap never write the
+same files. No git worktree is needed for any of these; each row's isolation
+is the folder split, not a checkout:
+
+| Pattern | Writes | Shared with the other side |
+|---|---|---|
+| Design path + monkey-mode, one project | `design/`, `prd/`, `adr/` vs. `monkey-mode/` | `SKILL-IMPROVEMENTS.md` (append-only) |
+| Design continues while a fork runs `ml-modeling-*` | `design/` vs. `modeling/`, `spec/`, `dashboard/` | `design/deep-dive.md` — read by every modeling step, so it can drift (see below) |
+| You edit by hand while autoresearch loops | Yours: `program.md`, `modeling/01-03*`, `design/`. The loop's: `autoresearch/experiment.py`, `best_metrics.json`, `rounds/`, `04-evaluate.*` | Nothing, if you stay on your side of that line |
+| Two projects at once (e.g. churn + ranking) | Two disjoint project folders | Only process/git state: the dashboard port and the git index |
+
+Three mechanics keep the shared bits from colliding:
+
+- **Per-project dashboard port.** `ml-modeling-data` picks the first free
+  port from 8501 up, writes it to `dashboard/.port`, and launches Streamlit
+  on it; `ml-modeling-evaluate` health-checks that port, never bare `:8501`.
+- **Explicit experiment log.** Every `experiment_tracker.py` call passes
+  `--log-file <project>/modeling/experiments.json` (autoresearch:
+  `modeling/autoresearch/experiments.json`). The script's default is relative
+  to the agent's CWD, which is wherever it happened to be.
+- **Deep-dive drift: detect, then ask.** `spec/<topic>.md` starts with
+  `deep-dive-hash:` (from `git hash-object -w design/deep-dive.md`). Each
+  `ml-modeling-*` step recomputes the hash first; on a mismatch it shows the
+  diff and asks two things before doing its work: re-synthesize the spec or
+  keep it, and apply the changed decisions going forward or proceed on the
+  old ones. The answer is recorded in that step's `.md`. Autoresearch never
+  asks — it notes the change in `round-summary.md` and the next interactive
+  step raises it.
+
+One git rule for any agent in a shared working tree: never run `git stash`,
+`checkout`, `restore`, `reset`, or `clean`. Those discard uncommitted files,
+and in a shared tree some of them belong to another session.
+
+**When a worktree does earn its keep**: two projects whose histories need
+independent commits while both are mid-flight (separate branches, separate
+index). Reach for Claude Code's `EnterWorktree`, or
+`Agent(isolation: "worktree")` for a background run, on demand — no standing
+setup. Know the costs before you do: `.venv` is gitignored, so `uv sync`
+again; `data/`, `*.csv`, `*.pkl`, `models/` are gitignored, so an existing
+project's data and trained models are absent in the new tree; Claude Code
+keys permissions and memory by directory path, so prompts start fresh; and
+anything uncommitted on `main` (a skill you're mid-way through editing) is
+invisible there. Skill edits stay on `main` regardless.
 
 ## Where to go deeper
 
