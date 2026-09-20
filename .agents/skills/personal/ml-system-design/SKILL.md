@@ -1,0 +1,34 @@
+---
+name: ml-system-design
+description: Use when writing, structuring, or reviewing a full ML system design document, RFC, or ML system design interview answer for a machine learning product or feature (ranking, recommendation, search, fraud/risk, forecasting, NLP/LLM systems, etc). Entry point for the whole doc; for one section only, trigger that section's own skill directly instead. Trigger on "ML system design," "design doc for a model," "ML RFC," or ML system design interview prep.
+---
+
+# ML System Design
+
+Five sections, each its own skill, invoked in order for a full doc:
+
+1. `ml-system-design-definition` — problem, requirements, metrics, team.
+2. `ml-system-design-high-level` — ML framing, architecture, phasing.
+3. `ml-system-design-deep-dive` — data, features, models, training.
+4. `ml-system-design-delivery` — execution, deployment, eval, monitoring, fallback.
+5. `ml-system-design-post-delivery` — analysis, explainability, iteration, democratize.
+
+For a full doc, invoke each in order. For a single-section ask, invoke that skill directly and skip this one next time. For interview prep, narrate through the five in order, using each skill's bullets as the follow-ups an interviewer would ask.
+
+Scale depth to system size: a small internal model doesn't need 10M-req/min-grade detail in every subsection. The two subsections most often skipped and most often flagged in review are out-of-scope (`ml-system-design-definition`) and fallback (`ml-system-design-delivery`) — never skip those two regardless of doc size.
+
+To scope a new project rather than draft straight into the doc, run `/ml-system-design-prd <topic>` by hand first: it grills the user round-by-round on the Definition checklist and writes the resolved answers into a project folder before any drafting starts.
+
+Each practice project is one folder at the repo root, `ml-<topic-slug>-<n>/` (e.g. `ml-ecommerce-search-1/`) — every artifact for that project (PRD, ADRs, design-doc sections from the five skills above) lives under it, not scattered into repo-wide `docs/`. Write ADRs for a project's architectural decisions into `<project-folder>/adr/`, following the numbering and when-to-write rules in the `domain-modeling` skill's ADR format — only the location is project-scoped, the format itself is unchanged.
+
+## Regular vs. Quick-POC mode
+
+Every section above supports both. Regular: full rigor, ask when unknown. Quick POC: a one-hour MVP, not lower quality — `ml-system-design-deep-dive` in particular answers all four of its items in one batched pass instead of asking round by round. Mode is chosen by keyword in the request ("poc"/"quick"/"mvp"/"prototype"/"fast"/"one hour" → Quick POC; "regular"/"full"/nothing → Regular), not a flag — this skill family has no structured argument syntax. Full detail in `adr/0001-ml-modeling-family-and-continuity.md`.
+
+## Forking into execution: the `ml-modeling` family
+
+`ml-system-design-*` stops at decisions on paper. `ml-modeling` (a separate skill family: data → features → train → evaluate) picks up from `ml-system-design-deep-dive`'s decisions and actually runs that work. The fork happens once `design/deep-dive.md` exists — the first `ml-modeling-*` call against a project synthesizes `spec/<topic>.md` (a PRD+ADR+deep-dive synthesis) and proceeds from there, optionally updating `design/deep-dive.md` if execution reveals something the design got wrong. See `ml-modeling` for the full chain, and `adr/0001-ml-modeling-family-and-continuity.md` for both full usage-path tables (design-only vs. fork-into-modeling).
+
+## A third, independent track: `ml-system-design-monkey-mode`
+
+Not a step in either path above — a fully autonomous fast-baseline track that shares only the project-folder root, nothing else (no `design/deep-dive.md` dependency, no `modeling/` writes). Run it by hand, `/ml-system-design-monkey-mode <topic>`, alongside either path when you want a real runnable baseline in the background while you keep working on the actual design.
