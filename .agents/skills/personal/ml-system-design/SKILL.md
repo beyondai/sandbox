@@ -32,3 +32,22 @@ Every section above supports both. Regular: full rigor, ask when unknown. Quick 
 ## A third, independent track: `ml-system-design-monkey-mode`
 
 Not a step in either path above — a fully autonomous fast-baseline track that shares only the project-folder root, nothing else (no `design/deep-dive.md` dependency, no `modeling/` writes). Run it by hand, `/ml-system-design-monkey-mode <topic>`, alongside either path when you want a real runnable baseline in the background while you keep working on the actual design.
+
+## Skill improvement log
+
+Any `ml-system-design-*` skill, while it runs, may turn up something about the *skill itself* worth fixing — not the design doc it's writing. Two triggers:
+
+1. **Agent-found**: a bug in this skill's own instructions, or a genuinely better way to do the section than what's written.
+2. **User-requested**: you ask to change how the skill behaves — as opposed to a one-off request specific to this project's design.
+
+Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry, appended to after) rather than editing the actual `SKILL.md` on the spot — keeps the skill files stable mid-run and gives you a batch to review later instead of drive-by edits:
+
+```markdown
+## <date> — <skill-name>
+- **Source**: agent-found bug | agent-found better design | user-requested
+- **Status**: proposed
+- **Finding**: <what's wrong or what could be better, concretely>
+- **Suggested change**: <the actual edit, concrete enough to apply as-is>
+```
+
+**Review**: any skill in the family, at the end of a run (after doing the task actually asked for, never blocking it), checks this file for entries still marked `proposed`. If any exist, say so and offer to review them now. Per entry: ask adopt or decline; an adopted entry gets applied as a real edit to the corresponding skill file under `.agents/skills/personal/<skill>/SKILL.md`, then the entry's `Status` flips to `adopted` or `declined`. Never delete an entry — `SKILL-IMPROVEMENTS.md` stays a durable per-project record of what was proposed and decided. Same convention on the `ml-modeling-*` side; full rationale in `adr/0004-skill-improvement-log.md`.

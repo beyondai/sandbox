@@ -16,3 +16,5 @@ Draft (Regular): answer each item below in the user's own numbers/words; ask if 
 - **Team — reuse**: existing components reusable instead of rebuilt; downstream consumers of this system's output.
 
 Done when every bullet above has a concrete answer in the doc, scaled to system size — a small internal model doesn't need 10M req/min-grade detail, but out-of-scope and the offline/online metric split are never optional.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.

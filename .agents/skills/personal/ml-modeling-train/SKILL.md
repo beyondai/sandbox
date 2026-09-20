@@ -31,3 +31,5 @@ python3 ../ml-modeling/scripts/experiment_tracker.py log --name "<model>_v1" \
 Every training run gets logged — this is what `ml-modeling-evaluate` and any later run compare against.
 
 Done when `03-train.md` names the chosen model, states why it beat the alternatives in the matrix above (not just "it's the default"), and includes the training code actually run — not a template.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

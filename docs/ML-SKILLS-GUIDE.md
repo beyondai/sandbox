@@ -82,6 +82,40 @@ back to self-inferred defaults:
 
 Full detail: `.agents/skills/personal/ml-system-design-monkey-mode/SKILL.md`.
 
+## Skill improvement log
+
+Every skill in both families — `ml-system-design-*` and `ml-modeling-*` —
+can log a proposed improvement to *itself*, not the project it's working on,
+to `<project-folder>/SKILL-IMPROVEMENTS.md`. Two triggers:
+
+| Source | What it means |
+|---|---|
+| Agent-found | A bug in the skill's own instructions, or a genuinely better way to do the step |
+| User-requested | You ask to change how the skill behaves, not just this project's data/design |
+
+Each entry is appended, never overwritten:
+
+```markdown
+## <date> — <skill-name>
+- **Source**: agent-found bug | agent-found better design | user-requested
+- **Status**: proposed
+- **Finding**: <what's wrong or what could be better, concretely>
+- **Suggested change**: <the actual edit, concrete enough to apply as-is>
+```
+
+Nothing is applied automatically — a `SKILL.md` is shared across every
+future project, so a silent edit from one project's run would change
+behavior for every other project without you ever deciding to. Instead: any
+skill, at the end of a run, checks for entries still marked `proposed` and
+offers to review them with you. Adopting one applies it as a real edit to
+the skill file under `.agents/skills/personal/<skill>/SKILL.md`, then flips
+that entry's `Status` to `adopted` or `declined` — entries are never
+deleted, so the file stays a durable per-project record of what was
+proposed and decided.
+
+Full rationale (why per-project over centralized, why log-and-review over
+auto-apply): `.agents/skills/personal/adr/0004-skill-improvement-log.md`.
+
 ## Command reference
 
 Every skill supports an explicit `/skill-name` command — that's a Claude Code
@@ -112,15 +146,17 @@ Every topic gets one folder at the repo root, `ml-<topic-slug>-<n>/`:
 
 ```
 ml-<topic>-<n>/
-  prd/<topic>.md       Definition, from ml-system-design-prd
-  adr/000N-*.md        Architecture decisions, any stage
-  design/deep-dive.md  Data/features/models/training decisions
-  spec/<topic>.md      Design→modeling fork synthesis
-  dashboard/           eda.ipynb + app.py (Streamlit) — EDA + Results only,
-                        Regular/Quick-POC, never monkey-mode
-  modeling/            01-data(.md/.json) → 02-features → 03-train →
-                        04-evaluate(.md/.json) — .json feeds the dashboard
-  monkey-mode/         Independent fast-baseline track (report.md)
+  prd/<topic>.md            Definition, from ml-system-design-prd
+  adr/000N-*.md             Architecture decisions, any stage
+  design/deep-dive.md       Data/features/models/training decisions
+  spec/<topic>.md           Design→modeling fork synthesis
+  dashboard/                eda.ipynb + app.py (Streamlit) — EDA + Results only,
+                             Regular/Quick-POC, never monkey-mode
+  modeling/                 01-data(.md/.json) → 02-features → 03-train →
+                             04-evaluate(.md/.json) — .json feeds the dashboard
+  monkey-mode/              Independent fast-baseline track (report.md)
+  SKILL-IMPROVEMENTS.md     Proposed fixes to the skills themselves, any
+                             stage — logged, reviewed on request, see above
 ```
 
 Regular vs. Quick-POC mode (keyword-selected: "poc"/"quick"/"mvp"/"fast" vs.
@@ -132,5 +168,6 @@ has its own always-fast behavior and doesn't use this switch.
 `.agents/skills/personal/adr/0001-ml-modeling-family-and-continuity.md` has
 the full rationale, both complete usage-path tables, and the
 mattpocock-integration decision (why this family doesn't call
-`to-spec`/`implement`/`implement-spec`). This guide is the fast orientation;
-that ADR is the reference.
+`to-spec`/`implement`/`implement-spec`). `adr/0004-skill-improvement-log.md`
+covers the skill improvement log above. This guide is the fast orientation;
+those ADRs are the reference.

@@ -17,3 +17,5 @@ Each topic gets its own project folder, `ml-<topic-slug>-<n>/` at the repo root 
 When the frontier empties, write the settled answers to `<project-folder>/prd/<topic-slug>.md`, one heading per checklist bullet, in the user's own words and numbers — never the placeholder-style assumptions a draft pass would use. Confirm the slug with the user if the topic name is ambiguous.
 
 Done when the PRD file exists and every checklist bullet has a concrete, user-confirmed answer under its heading.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.

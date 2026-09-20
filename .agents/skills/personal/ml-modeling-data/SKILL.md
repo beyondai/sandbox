@@ -41,3 +41,5 @@ Deliberately narrow — the dashboard's job is "understand the project and progr
 Launch it: `uv run streamlit run dashboard/app.py --server.headless true &` (background — don't block the conversation), then report the local URL (`http://localhost:8501`) to the user.
 
 Done when every profile flag above is a real number from the actual data (not "looks fine"), `modeling/01-data.md` states which columns are risky and why, `01-data.json` matches it, `dashboard/eda.ipynb` has real executed outputs, and the Streamlit process is actually running and reachable at the reported URL — not just files written.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

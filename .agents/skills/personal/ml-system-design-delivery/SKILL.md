@@ -18,3 +18,5 @@ Done when the rollout has a concrete ramp schedule, the fallback trigger and tar
 ## Offer an ADR
 
 If the rollout or fallback strategy is hard to reverse, would surprise a future reader, and was a real tradeoff, offer to record it in `<project-folder>/adr/000N-*.md` rather than letting it live only in this doc.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.

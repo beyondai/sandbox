@@ -62,3 +62,5 @@ Write the same results to `modeling/04-evaluate.json` (the dashboard reads this,
 Then check the dashboard is actually reachable at `http://localhost:8501` (e.g. `curl -sf http://localhost:8501 >/dev/null`). If it's not (the background process died — common after resuming in a new session), relaunch it the same way `ml-modeling-data` did: `uv run streamlit run dashboard/app.py --server.headless true &`. Don't touch `dashboard/app.py` itself — it already knows to read this file once it exists; nothing about its code needs to change.
 
 Done when metrics are reported against a real baseline (not standalone), the overfit check has an actual train/test gap number, `04-evaluate.md` states plainly whether this model is good enough — not just what the numbers are — `04-evaluate.json` matches it, and the dashboard is confirmed reachable with the Results section visible.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

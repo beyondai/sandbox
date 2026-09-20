@@ -46,3 +46,5 @@ Sin/cos pair matters for anything cyclical (hour, day-of-week, month) — raw in
 Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col> --top <n>` — composite score across variance, correlation, cardinality, null rate. Use this to justify dropping features, not just to generate a top-N list.
 
 Done when the feature set is a concrete list (not "relevant features"), each nontrivial transform is justified by something in `01-data.md` or `deep-dive.md` (not applied by default), and the file records what was tried and dropped, not just what survived.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

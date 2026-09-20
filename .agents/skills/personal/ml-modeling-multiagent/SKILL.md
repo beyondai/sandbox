@@ -22,3 +22,5 @@ Adapted from mattpocock's `implement-spec`, which dispatches one subagent per ti
 5. **Log**: `python3 ../ml-modeling/scripts/experiment_tracker.py log` once per candidate, so the comparison is queryable later via `compare --ids`.
 
 Done when every candidate actually trained (not just listed as a possibility), the comparison table has real metrics per candidate — not placeholders — and `03-train.md` states why the winner won, not just which one did.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

@@ -13,3 +13,5 @@ Draft (Regular): answer each item below in the user's own numbers/words; ask if 
 - **Democratize**: specific components (features, model architecture, platform pieces) other teams could reuse — name the team and the component, not "this could help others."
 
 Done when Democratize names an actual team + component rather than staying generic, and Iteration lists concrete next-version items rather than "TBD based on results."
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.

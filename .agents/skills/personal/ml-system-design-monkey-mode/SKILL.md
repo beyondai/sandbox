@@ -48,3 +48,5 @@ Write `<project-folder>/monkey-mode/report.md` with exactly these sections:
 Mark, per item in Requirements, whether it came from the user's answer or self-inference — the one place this doc must not blur "you told me" with "I assumed."
 
 Done when `report.md` exists with all six sections populated by a real run (real code, real numbers) — not placeholders.
+
+If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill improvement log.
