@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.9083,
+  "precision": 0.8421,
+  "recall": 0.6667,
+  "f1": 0.7442,
+  "hypothesis": "A small MLPClassifier(16,8) can capture nonlinear interactions among ticket_rate and usage_per_tenure that a linear model misses, improving F1 over Logistic Regression C=0.1."
+}

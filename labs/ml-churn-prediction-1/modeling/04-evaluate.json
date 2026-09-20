@@ -1,0 +1,21 @@
+{
+  "primary_metric": "f1",
+  "metrics": {
+    "accuracy": 0.9083,
+    "precision": 0.8421,
+    "recall": 0.6667,
+    "f1": 0.7442
+  },
+  "baseline_metrics": {
+    "accuracy": 0.8,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "overfit_gap": {
+    "train": 0.7692,
+    "test": 0.7442
+  },
+  "success_bar": "F1 > baseline (0.0, majority-class never predicts churn)",
+  "verdict": "Clears the bar: F1=0.7442 vs baseline F1=0.0, real learnable signal. Updated by ml-modeling-autoresearch round 6 (MLPClassifier, replacing Logistic Regression) - progression: 0.6296 -> 0.6415 -> 0.6667 -> 0.6792 -> 0.7442."
+}

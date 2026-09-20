@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8583,
+  "precision": 0.6207,
+  "recall": 0.75,
+  "f1": 0.6792,
+  "hypothesis": "usage_per_tenure = monthly_usage_hours / (tenure_months + 1) captures how actively engaged a customer is relative to their tenure, added alongside ticket_rate as a second rate-normalized feature."
+}

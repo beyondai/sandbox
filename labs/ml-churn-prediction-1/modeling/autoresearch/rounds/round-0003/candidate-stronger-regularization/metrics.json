@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8417,
+  "precision": 0.5862,
+  "recall": 0.7083,
+  "f1": 0.6415,
+  "hypothesis": "Tried C=0.01 and C=0.03 (even stronger regularization than round-0002's winning C=0.1). Both produced identical metrics (f1=0.6415); C=0.03 reported as the submitted candidate on an arbitrary tie-break. Ties the round-0002 best (C=0.1, f1=0.6415); does not beat it."
+}

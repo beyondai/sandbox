@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8417,
+  "precision": 0.5862,
+  "recall": 0.7083,
+  "f1": 0.6415,
+  "hypothesis": "A kernel SVM (RBF, class_weight=balanced) might capture non-linear feature interactions that beat the linear Logistic Regression current-best on the same feature set."
+}

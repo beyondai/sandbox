@@ -63,4 +63,8 @@ Then check the dashboard is actually reachable at `http://localhost:8501` (e.g. 
 
 Done when metrics are reported against a real baseline (not standalone), the overfit check has an actual train/test gap number, `04-evaluate.md` states plainly whether this model is good enough — not just what the numbers are — `04-evaluate.json` matches it, and the dashboard is confirmed reachable with the Results section visible.
 
+## What comes after
+
+Once `04-evaluate.json` exists, `ml-modeling-autoresearch` becomes available — an optional, user-invoked follow-up that keeps trying to beat this result. Self-contained, three modes: one round, until plateau, or for a duration — no external scheduling needed. See `../ml-modeling/SKILL.md` and `../ml-modeling-autoresearch/SKILL.md`.
+
 If this run turns up a bug or a better design in this skill, or you ask for a change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill improvement log.

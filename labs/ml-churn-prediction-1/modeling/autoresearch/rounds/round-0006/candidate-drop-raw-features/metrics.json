@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8167,
+  "precision": 0.5333,
+  "recall": 0.6667,
+  "f1": 0.5926,
+  "hypothesis": "Dropping raw tenure_months, monthly_usage_hours, and support_tickets_last_90d in favor of only their rate-normalized versions (ticket_rate, usage_per_tenure) reduces redundancy and overfitting risk on this small dataset."
+}

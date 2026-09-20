@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8417,
+  "precision": 0.5862,
+  "recall": 0.7083,
+  "f1": 0.6415,
+  "hypothesis": "Tuned LogisticRegression's C (regularization strength), keeping all other settings (features, preprocessing, split) identical to the baseline. Tried C=0.1 (stronger regularization) and C=10.0 (weaker regularization). C=0.1 won with f1=0.6415 vs C=10.0's f1=0.6296 (tied baseline). C=0.1 beats the baseline (f1=0.6296) by +0.0119."
+}

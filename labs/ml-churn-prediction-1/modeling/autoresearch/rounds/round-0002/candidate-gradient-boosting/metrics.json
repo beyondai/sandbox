@@ -1,0 +1,7 @@
+{
+  "hypothesis": "Gradient Boosting (a boosting ensemble, unlike round-1's bagging-based Random Forest) will outperform the current best Logistic Regression on the same features and split.",
+  "accuracy": 0.875,
+  "precision": 0.8,
+  "recall": 0.5,
+  "f1": 0.6154
+}

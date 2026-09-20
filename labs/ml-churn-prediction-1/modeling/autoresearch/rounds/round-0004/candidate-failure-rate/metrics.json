@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.85,
+  "precision": 0.6,
+  "recall": 0.75,
+  "f1": 0.6667,
+  "hypothesis": "Rate-normalizing payment_failures_last_90d by tenure (failure_rate), the same way ticket_rate normalized support_tickets_last_90d, does not further improve on the current-best candidate."
+}

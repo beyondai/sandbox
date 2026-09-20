@@ -82,6 +82,37 @@ back to self-inferred defaults:
 
 Full detail: `.agents/skills/personal/ml-system-design-monkey-mode/SKILL.md`.
 
+## Autoresearch
+
+Optional follow-up once `modeling/04-evaluate.json` exists — user-invoked
+only, not a step in the chain. Self-contained: no `/loop`, no cron, no
+interval, no expiry. Three modes, one mechanic — run a round, check whether
+to continue, run another round immediately if so, all within one invocation:
+
+| Mode | Command | Stops when |
+|---|---|---|
+| One round | `/ml-modeling-autoresearch <project>` | After that one round |
+| Until plateau | `/ml-modeling-autoresearch <project> until plateau` | Non-improvement streak hits `patience`, or round ceiling |
+| For a duration | `/ml-modeling-autoresearch <project> for 20 minutes` | Duration elapses, streak hits `patience`, or round ceiling — whichever first |
+| Any mode + candidate count | `/ml-modeling-autoresearch <project> until plateau, 4 candidates` | Same as the mode chosen |
+
+Default candidates per round is 2 (`program.md`'s `candidates_per_round`);
+state a count in the request (as above) to override it, for every round the
+invocation runs, without editing `program.md`.
+
+Stopping is plateau-based (a streak of rounds with no real improvement), not
+a guessed time or round count on its own — round duration scales with model
+complexity and data size, so a fixed number means something different per
+project. In a multi-round mode, hitting `patience` (default 5) or the round
+ceiling now actually ends the session — the skill owns its own recurrence,
+so there's nothing external left running to stop separately. It can only
+ever write inside `modeling/autoresearch/` plus `04-evaluate.md`/`.json` —
+never `prd/`, `adr/`, `design/`, or `spec/`.
+
+Full detail: `.agents/skills/personal/ml-modeling-autoresearch/SKILL.md`,
+`.agents/skills/personal/adr/0003-autoresearch.md`, and
+`.agents/skills/personal/adr/0005-autoresearch-self-contained-looping.md`.
+
 ## Skill improvement log
 
 Every skill in both families — `ml-system-design-*` and `ml-modeling-*` —
@@ -138,6 +169,7 @@ fire from plain conversation.
 | `ml-modeling-train` | Train one model, sequential → `modeling/03-train.md` | `/ml-modeling-train` | Yes |
 | `ml-modeling-multiagent` | Train N candidates, parallel → same slot | `/ml-modeling-multiagent` | Yes |
 | `ml-modeling-evaluate` | Evaluate → `modeling/04-evaluate.md` | `/ml-modeling-evaluate` | Yes |
+| `ml-modeling-autoresearch` | Optional: auto-improvement, 3 modes (see above) | `/ml-modeling-autoresearch <project> [mode]` | No — command required |
 | `ml-system-design-monkey-mode` | Fast autonomous baseline, background | `/ml-system-design-monkey-mode <topic>` | No — command required |
 
 ## Project folder
@@ -150,10 +182,12 @@ ml-<topic>-<n>/
   adr/000N-*.md             Architecture decisions, any stage
   design/deep-dive.md       Data/features/models/training decisions
   spec/<topic>.md           Design→modeling fork synthesis
-  dashboard/                eda.ipynb + app.py (Streamlit) — EDA + Results only,
-                             Regular/Quick-POC, never monkey-mode
+  dashboard/                eda.ipynb + app.py (Streamlit), EDA + Results
+                             only, Regular/Quick-POC, never monkey-mode
   modeling/                 01-data(.md/.json) → 02-features → 03-train →
-                             04-evaluate(.md/.json) — .json feeds the dashboard
+                             04-evaluate(.md/.json), .json feeds dashboard
+    autoresearch/            Optional, after 04-evaluate.json exists, 3
+                             self-contained modes, see above
   monkey-mode/              Independent fast-baseline track (report.md)
   SKILL-IMPROVEMENTS.md     Proposed fixes to the skills themselves, any
                              stage — logged, reviewed on request, see above

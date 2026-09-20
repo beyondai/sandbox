@@ -49,6 +49,10 @@ Step 3 has two producers for the same `modeling/03-train.md` slot — pick one p
 
 Never runs in monkey-mode — that family shares only the project-folder root and stays fully separate (see `ml-system-design-monkey-mode`).
 
+## Optional follow-up: `ml-modeling-autoresearch`
+
+Once `modeling/04-evaluate.json` exists, `ml-modeling-autoresearch` (user-invoked only) becomes available — not a step in the chain above, an opt-in extra. A round: a couple of parallel candidates each try one change, the winner is kept if it beats the current best, promoted results flow straight into `04-evaluate.json` (the dashboard picks it up with zero code changes). Three modes, self-contained — no external scheduling: `/ml-modeling-autoresearch <project>` (one round), `... until plateau` (keeps going until a non-improvement streak or the round ceiling), `... for 20 minutes` (also bounded by a duration, stopping early on plateau). Works in Regular and Quick-POC mode; never in monkey-mode. Full usage and design rationale in `ml-modeling-autoresearch/SKILL.md`, `../adr/0003-autoresearch.md`, and `../adr/0005-autoresearch-self-contained-looping.md`.
+
 ## Bundled tools
 
 `scripts/experiment_tracker.py`, `scripts/feature_selector.py`, `scripts/hypothesis_tester.py` — stdlib-only, run with plain `python3`, no project venv needed. Referenced from the relevant step skills; shared here since `experiment_tracker.py` spans both train and evaluate.
@@ -78,4 +82,4 @@ Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry, appe
 
 ## Where this leads
 
-After step 4, either iterate (rerun step 2 or 3), hand `modeling/04-evaluate.md` to mattpocock's `implement` skill by hand to productionize, or — if this graduated from a Path A quick POC into a real project — backfill `prd/` and a full `adr/` via `ml-system-design-prd` / `ml-system-design-high-level`. Full usage-path tables (both the modeling-focused path and the whole-design path that forks into this one) are in `../adr/0001-ml-modeling-family-and-continuity.md`.
+After step 4: iterate (rerun step 2 or 3), reach for `ml-modeling-autoresearch` to keep improving the model automatically while you do other analysis, hand `modeling/04-evaluate.md` to mattpocock's `implement` skill by hand to productionize, or — if this graduated from a Path A quick POC into a real project — backfill `prd/` and a full `adr/` via `ml-system-design-prd` / `ml-system-design-high-level`. Full usage-path tables (both the modeling-focused path and the whole-design path that forks into this one) are in `../adr/0001-ml-modeling-family-and-continuity.md`.
