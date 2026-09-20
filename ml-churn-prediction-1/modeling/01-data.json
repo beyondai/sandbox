@@ -1,0 +1,67 @@
+{
+  "shape": {
+    "rows": 600,
+    "columns": 6,
+    "memory_mb": 0.0329
+  },
+  "nulls": {
+    "tenure_months": 0.0,
+    "monthly_usage_hours": 0.0,
+    "plan_tier": 0.0,
+    "support_tickets_last_90d": 0.0,
+    "payment_failures_last_90d": 0.0,
+    "churned": 0.0
+  },
+  "target": {
+    "column": "churned",
+    "type": "classification",
+    "class_balance": {
+      "0": 0.8017,
+      "1": 0.1983
+    },
+    "distribution": {}
+  },
+  "numeric_distributions": {
+    "tenure_months": {
+      "min": 1.0,
+      "max": 60.0,
+      "mean": 30.5167,
+      "std": 17.3888,
+      "skew": 0.0027
+    },
+    "monthly_usage_hours": {
+      "min": 0.0,
+      "max": 51.79,
+      "mean": 19.7298,
+      "std": 9.9008,
+      "skew": 0.0357
+    },
+    "support_tickets_last_90d": {
+      "min": 0.0,
+      "max": 5.0,
+      "mean": 1.0133,
+      "std": 0.9805,
+      "skew": 0.9648
+    },
+    "payment_failures_last_90d": {
+      "min": 0.0,
+      "max": 2.0,
+      "mean": 0.265,
+      "std": 0.5019,
+      "skew": 1.7214
+    }
+  },
+  "categorical_distributions": {
+    "plan_tier": {
+      "cardinality": 3,
+      "top_values": {
+        "basic": 0.3917,
+        "standard": 0.39,
+        "premium": 0.2183
+      }
+    }
+  },
+  "quality_flags": [
+    "payment_failures_last_90d is highly skewed (skew=1.72)"
+  ]
+}

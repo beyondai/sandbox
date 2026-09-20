@@ -43,6 +43,12 @@ Step 3 has two producers for the same `modeling/03-train.md` slot — pick one p
 
 `ml-modeling-multiagent` trains every candidate model type `design/deep-dive.md` named (or the algorithm-selection matrix's short-list, if none was specified) concurrently, each in its own `modeling/train-candidates/<model-type>/`, then compares and writes the winner to `03-train.md`. Full rationale for why this is safe without git worktrees (unlike mattpocock's `implement-spec`, which this pattern is adapted from) is in the ADR.
 
+## Dashboard — deliberately narrow, Regular/Quick-POC only
+
+`ml-modeling-data` creates `dashboard/eda.ipynb` (real executed EDA) and bootstraps `dashboard/app.py` (Streamlit), launched as a background process. Only two sections: EDA (from `01-data.json`) and Final Results (from `04-evaluate.json`, written by `ml-modeling-evaluate`), plus an optional model-comparison section that reads `train-candidates/*/metrics.json` if `ml-modeling-multiagent` ran. `ml-modeling-features` and `ml-modeling-train`/`-multiagent` write nothing for the dashboard and are untouched by it — feature-engineering and training detail stay in their `.md` files, not duplicated onto a chart. `app.py` itself is written once and never edited by a later step; it just reads whatever JSON exists. Full rationale (why this scope and not a full per-step mirror) in `../adr/0002-modeling-dashboard.md`.
+
+Never runs in monkey-mode — that family shares only the project-folder root and stays fully separate (see `ml-system-design-monkey-mode`).
+
 ## Bundled tools
 
 `scripts/experiment_tracker.py`, `scripts/feature_selector.py`, `scripts/hypothesis_tester.py` — stdlib-only, run with plain `python3`, no project venv needed. Referenced from the relevant step skills; shared here since `experiment_tracker.py` spans both train and evaluate.

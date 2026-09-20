@@ -116,7 +116,10 @@ ml-<topic>-<n>/
   adr/000N-*.md        Architecture decisions, any stage
   design/deep-dive.md  Data/features/models/training decisions
   spec/<topic>.md      Design→modeling fork synthesis
-  modeling/            01-data → 02-features → 03-train → 04-evaluate
+  dashboard/           eda.ipynb + app.py (Streamlit) — EDA + Results only,
+                        Regular/Quick-POC, never monkey-mode
+  modeling/            01-data(.md/.json) → 02-features → 03-train →
+                        04-evaluate(.md/.json) — .json feeds the dashboard
   monkey-mode/         Independent fast-baseline track (report.md)
 ```
 

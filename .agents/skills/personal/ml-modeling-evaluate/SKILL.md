@@ -1,11 +1,11 @@
 ---
 name: ml-modeling-evaluate
-description: Use to evaluate a trained model rigorously — classification/regression metrics, baseline comparison, overfitting check. Step 4 (final) of the ml-modeling-* chain (data → features → train → evaluate). Trigger on "evaluate this model," "compare to baseline," "is this overfitting," or continuing modeling work in an existing ml-<topic>-<n>/ project.
+description: Use to evaluate a trained model rigorously — classification/regression metrics, baseline comparison, overfitting check. Also writes the project dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain (data → features → train → evaluate). Trigger on "evaluate this model," "compare to baseline," "is this overfitting," or continuing modeling work in an existing ml-<topic>-<n>/ project.
 ---
 
 # Evaluate
 
-Reads `<project-folder>/design/deep-dive.md`'s Training section (required) and `modeling/03-train.md` — written by either `ml-modeling-train` or `ml-modeling-multiagent`, doesn't matter which. Writes `<project-folder>/modeling/04-evaluate.md`. This is the last step in the chain — see `ml-modeling` router for what comes after.
+Reads `<project-folder>/design/deep-dive.md`'s Training section (required) and `modeling/03-train.md` — written by either `ml-modeling-train` or `ml-modeling-multiagent`, doesn't matter which. Writes `<project-folder>/modeling/04-evaluate.md` and `modeling/04-evaluate.json`. This is the last step in the chain — see `ml-modeling` router for what comes after.
 
 Mode: Regular reports the full metric set below and checks overfit explicitly. Quick POC reports the metrics that actually distinguish "does this work" and stops there — see `ml-modeling` router for the keyword rule.
 
@@ -44,4 +44,21 @@ def evaluate_regressor(y_true, y_pred):
 
 Out of the main chain — only relevant once a model is live and being compared against production traffic. See [references/ab-testing.md](references/ab-testing.md) for sample-size calculation and result analysis, and `../ml-modeling/scripts/hypothesis_tester.py` to actually run the test.
 
-Done when metrics are reported against a real baseline (not standalone), the overfit check has an actual train/test gap number, and `04-evaluate.md` states plainly whether this model is good enough — not just what the numbers are.
+## Dashboard (Regular/Quick-POC only — never in monkey-mode)
+
+Write the same results to `modeling/04-evaluate.json` (the dashboard reads this, not the `.md`) — this is the dashboard's Final Results section, the payoff view of the whole project:
+
+```json
+{
+  "primary_metric": "f1",
+  "metrics": {"accuracy": 0.0, "precision": 0.0, "recall": 0.0, "f1": 0.0},
+  "baseline_metrics": {},
+  "overfit_gap": {"train": 0.0, "test": 0.0},
+  "success_bar": "<string>",
+  "verdict": "<one sentence: clears or misses the bar, and why>"
+}
+```
+
+Then check the dashboard is actually reachable at `http://localhost:8501` (e.g. `curl -sf http://localhost:8501 >/dev/null`). If it's not (the background process died — common after resuming in a new session), relaunch it the same way `ml-modeling-data` did: `uv run streamlit run dashboard/app.py --server.headless true &`. Don't touch `dashboard/app.py` itself — it already knows to read this file once it exists; nothing about its code needs to change.
+
+Done when metrics are reported against a real baseline (not standalone), the overfit check has an actual train/test gap number, `04-evaluate.md` states plainly whether this model is good enough — not just what the numbers are — `04-evaluate.json` matches it, and the dashboard is confirmed reachable with the Results section visible.
