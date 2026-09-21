@@ -16,6 +16,8 @@ Applied to `.agents/skills/personal/ml-system-design/SKILL.md` (the "Starting a 
 
 ## 2026-09-20 — ml-system-design-monkey-mode
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-09-20)
 - **Finding**: Question 3 ("success bar") offers "a specific number" as an option, but when the user doesn't already have one in hand (no prior baseline for this problem/domain exists), the skill has no path for grounding that number other than the self-inferred guess-from-the-problem-shape fallback. The user wanted to do a quick real-world lookup (industry-typical player churn rates) first, then set the target from that, rather than either picking an arbitrary number or falling back to a pure guess.
 - **Suggested change**: When the user opts to set a specific success-bar number but signals they don't have one yet, offer a quick research step (a web search for a domain-typical benchmark, e.g. "typical game player churn rate" or "typical PR-AUC for churn models") as a third path alongside "self-inferred guess" and "user already knows the number" — cite the source and use it to ground the target instead of guessing blind.
+
+Applied to `.agents/skills/personal/ml-system-design-monkey-mode/SKILL.md` (question 3 now offers a "look one up" path with a population-mismatch caution).

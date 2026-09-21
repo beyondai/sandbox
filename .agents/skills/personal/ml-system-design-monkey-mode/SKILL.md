@@ -47,7 +47,13 @@ background, while you keep working on the real design.
    Self-inferred fallback: the standard metric for the inferred task — F1 for
    imbalanced-looking binary classification, RMSE for regression, nDCG for
    ranking.
-3. **Success bar**: what counts as "good enough" for a first baseline?
+3. **Success bar**: what counts as "good enough" for a first baseline? Offer
+   three ways to answer: a number the user already has; "look one up" — a
+   quick web search for a domain benchmark (typical model performance for
+   this kind of task, cited), translated into the chosen metric and stated as
+   a soft target; or leave it to the fallback. Watch for benchmarks that
+   measure a different population than the task (e.g. new-install churn vs.
+   retained-player lapse) and say so rather than adopting the number.
    Self-inferred fallback: an actual assumed target number based on the problem
    and data in hand (e.g. "F1 ~0.65-0.75 for a roughly balanced synthetic binary
    classification") — not just "beat random." Runnable is the floor: something
