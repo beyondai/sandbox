@@ -88,7 +88,7 @@ family's origin.
 ## A third, independent track: `ml-system-design-monkey-mode`
 
 Not a step in either path above — a fully autonomous fast-baseline track that
-shares only the project-folder root, nothing else (no `design/deep-dive.md`
+shares only the project-folder root, nothing else (no `design/` or `prd/`
 dependency, no `modeling/` writes). Run it by hand,
 `/ml-system-design-monkey-mode <topic>`, alongside either path when you want a
 real runnable baseline in the background while you keep working on the actual
