@@ -1,0 +1,14 @@
+{
+  "n_train": 60371,
+  "n_test": 15093,
+  "train_mean_target": 15.952668727705348,
+  "rmse_model_usd": 243.73258312224803,
+  "rmse_predict_zero_usd": 308.64821456441945,
+  "rmse_predict_mean_usd": 308.17635566771435,
+  "rmse_model_log1p": 1.55985383419729,
+  "rmse_predict_zero_log1p": 1.306228161848865,
+  "rmse_predict_mean_log1p": 2.5085419737579544,
+  "pct_test_users_nonzero_outcome": 0.3911747167561121,
+  "rmse_model_payers_usd": 379.5869601099096,
+  "rmse_model_nonpayers_usd": 70.69376109827482
+}

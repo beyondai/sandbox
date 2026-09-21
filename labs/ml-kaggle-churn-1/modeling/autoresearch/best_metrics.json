@@ -1,0 +1,11 @@
+{
+  "source": "ml-modeling-train + ml-modeling-evaluate (hist_gradient_boosting)",
+  "primary_metric": "auc_roc",
+  "metrics": {
+    "auc_roc": 0.9155,
+    "accuracy": 0.8169,
+    "precision": 0.5595,
+    "recall": 0.8798,
+    "f1": 0.684
+  }
+}

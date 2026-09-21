@@ -1,0 +1,125 @@
+{
+  "input": {
+    "data_path": "/Users/alex/dev/sandbox/data/playground-series-churn/train.csv",
+    "n_rows": 594194,
+    "n_cols": 21,
+    "total_nulls": 0,
+    "class_balance_pct": {
+      "No": 77.48,
+      "Yes": 22.52
+    },
+    "class_counts": {
+      "No": 460377,
+      "Yes": 133817
+    },
+    "numeric_cols": [
+      "SeniorCitizen",
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical_cols": [
+      "gender",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ]
+  },
+  "split": {
+    "train_rows": 475355,
+    "val_rows": 118839,
+    "test_size": 0.2
+  },
+  "results": {
+    "roc_auc": 0.9048902699255683,
+    "accuracy": 0.851000092562206,
+    "confusion_matrix": [
+      [
+        84633,
+        7443
+      ],
+      [
+        10264,
+        16499
+      ]
+    ],
+    "confusion_matrix_labels": [
+      "No (0)",
+      "Yes (1)"
+    ],
+    "top_feature_importances": [
+      [
+        "TotalCharges",
+        0.17344423004837087
+      ],
+      [
+        "tenure",
+        0.15211900229301545
+      ],
+      [
+        "MonthlyCharges",
+        0.1425225726427966
+      ],
+      [
+        "PaymentMethod_Electronic check",
+        0.08474257405119766
+      ],
+      [
+        "Contract_Month-to-month",
+        0.08037345142554214
+      ],
+      [
+        "InternetService_Fiber optic",
+        0.053656482458719935
+      ],
+      [
+        "OnlineSecurity_No",
+        0.04446269175904444
+      ],
+      [
+        "TechSupport_No",
+        0.028586713180910606
+      ],
+      [
+        "Contract_Two year",
+        0.021384328678332915
+      ],
+      [
+        "InternetService_DSL",
+        0.01625523444146658
+      ],
+      [
+        "OnlineBackup_No",
+        0.014030421770000436
+      ],
+      [
+        "PaperlessBilling_Yes",
+        0.012570728555094715
+      ],
+      [
+        "SeniorCitizen",
+        0.011557419072182355
+      ],
+      [
+        "DeviceProtection_No",
+        0.011139895206115514
+      ],
+      [
+        "Contract_One year",
+        0.009987319803335651
+      ]
+    ]
+  },
+  "elapsed_seconds": 41.99523711204529
+}

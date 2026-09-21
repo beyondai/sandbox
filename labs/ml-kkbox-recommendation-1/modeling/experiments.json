@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "name": "logistic_regression_v1",
+    "timestamp": "2026-09-21T00:19:30",
+    "parameters": {
+      "model": "LogisticRegression",
+      "max_iter": 1000,
+      "random_state": 42,
+      "solver": "lbfgs",
+      "penalty": "l2",
+      "C": 1.0,
+      "imputer_strategy": "median",
+      "scaler": "StandardScaler",
+      "cv": {
+        "strategy": "StratifiedKFold",
+        "n_splits": 5,
+        "shuffle": true,
+        "random_state": 42
+      },
+      "n_jobs": 2
+    },
+    "metrics": {
+      "auc": 0.735870107293952
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 2,
+    "name": "random_forest_v1",
+    "timestamp": "2026-09-21T00:19:39",
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 12,
+      "random_state": 42,
+      "n_jobs": 2,
+      "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+      "scoring": "roc_auc"
+    },
+    "metrics": {
+      "auc": 0.7550028716141115
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 3,
+    "name": "hist_gradient_boosting_v1",
+    "timestamp": "2026-09-21T00:20:02",
+    "parameters": {
+      "max_iter": 200,
+      "random_state": 42,
+      "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+      "scoring": "roc_auc",
+      "OMP_NUM_THREADS": "2"
+    },
+    "metrics": {
+      "auc": 0.9360217048524259
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 4,
+    "name": "logistic_regression_v2_fold_safe",
+    "timestamp": "2026-09-21T00:32:20",
+    "parameters": {
+      "max_iter": 1000,
+      "random_state": 42,
+      "cv": "StratifiedKFold(5,shuffle=True,random_state=42)",
+      "note": "fold-safe LOO recomputation"
+    },
+    "metrics": {
+      "auc": 0.7333
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 5,
+    "name": "random_forest_v2_fold_safe",
+    "timestamp": "2026-09-21T00:32:20",
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 12,
+      "random_state": 42,
+      "cv": "StratifiedKFold(5,shuffle=True,random_state=42)",
+      "note": "fold-safe LOO recomputation"
+    },
+    "metrics": {
+      "auc": 0.7351
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 6,
+    "name": "hist_gradient_boosting_v2_fold_safe",
+    "timestamp": "2026-09-21T00:32:20",
+    "parameters": {
+      "max_iter": 200,
+      "random_state": 42,
+      "cv": "StratifiedKFold(5,shuffle=True,random_state=42)",
+      "note": "fold-safe LOO recomputation"
+    },
+    "metrics": {
+      "auc": 0.6126
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 7,
+    "name": "random_forest_final_test_eval",
+    "timestamp": "2026-09-21T00:39:51",
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 12,
+      "random_state": 42,
+      "scored_on": "kkbox_test_features.csv (held-out, never used in training)"
+    },
+    "metrics": {
+      "auc": 0.7361436524739464,
+      "accuracy": 0.672975,
+      "precision": 0.6753083354026984,
+      "recall": 0.6751183343815167,
+      "f1": 0.6752133215258179,
+      "train_auc": 0.7691376534680223
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 8,
+    "name": "monkey_mode_baseline_rerun_on_real_test",
+    "timestamp": "2026-09-21T00:51:57",
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 12,
+      "random_state": 42,
+      "features": "12 raw columns (monkey-mode baseline.py exact feature set)",
+      "scored_on": "kkbox_test.csv (this project real held-out test, same rows as random_forest_final_test_eval)"
+    },
+    "metrics": {
+      "auc": 0.6746,
+      "accuracy": 0.6288,
+      "precision": 0.6397,
+      "recall": 0.6016,
+      "f1": 0.62,
+      "train_auc": 0.6848
+    },
+    "tags": [],
+    "notes": ""
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "model": "hist_gradient_boosting",
+  "cv_auc_mean_leaky": 0.9360217048524259,
+  "cv_auc_std_leaky": 0.0013942657485701857,
+  "cv_auc_mean_fold_safe": 0.6126,
+  "cv_auc_std_fold_safe": 0.0037,
+  "fold_safe_scores": [0.61, 0.6159, 0.6069, 0.6166, 0.6137],
+  "primary_metric": "cv_auc_mean_fold_safe",
+  "train_seconds": 125.39930701255798,
+  "params": {
+    "max_iter": 200,
+    "random_state": 42,
+    "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+    "scoring": "roc_auc",
+    "OMP_NUM_THREADS": "2"
+  },
+  "notes": "cv_auc_mean_leaky (0.9360) was implausibly high for this task (public leaderboard tops out ~0.72-0.74) and was diagnosed as CV leakage: the leave-one-out repeat-rate columns were built once across the full training table, not per CV fold, and HistGradientBoosting's iterative, fine-grained splitting could exploit that far more aggressively than Random Forest's bagged/regularized trees or a linear model could. Re-run with modeling/train_candidates_fold_safe_cv.py (per-fold recomputation of those three columns from each fold's train portion only) confirms this: cv_auc_mean_fold_safe collapsed to 0.6126, now the worst of the three candidates rather than the best. This is likely also an honest signal that this model's default hyperparameters (max_iter=200, default learning_rate, no early stopping) don't suit this problem well without tuning - not pursued further in this Quick POC pass; not selected as the winner. Native NaN handling was still verified working during the original run (no imputation needed for bd, song_length_log, or - before a since-fixed build_features.py bug, see 02-features.md's Change log - source_context_freq/artist_repeat_rate_loo/artist_count/artist_name_freq)."
+}

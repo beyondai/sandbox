@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "name": "random_forest_v1",
+    "timestamp": "2026-09-21T08:24:19",
+    "parameters": {
+      "n_estimators": 100,
+      "max_depth": 12,
+      "class_weight": "balanced",
+      "cv_folds": 3
+    },
+    "metrics": {
+      "roc_auc_mean": 0.9121,
+      "roc_auc_std": 0.0007
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 2,
+    "name": "hist_gradient_boosting_v1",
+    "timestamp": "2026-09-21T08:24:19",
+    "parameters": {
+      "max_iter": 100,
+      "class_weight": "balanced",
+      "cv_folds": 3
+    },
+    "metrics": {
+      "roc_auc_mean": 0.9148,
+      "roc_auc_std": 0.0007
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 3,
+    "name": "hist_gradient_boosting_v1_test_scored",
+    "timestamp": "2026-09-21T08:28:31",
+    "parameters": {
+      "max_iter": 100,
+      "class_weight": "balanced"
+    },
+    "metrics": {
+      "auc_roc_test": 0.9155,
+      "f1_test": 0.684,
+      "auc_roc_train": 0.9171
+    },
+    "tags": [],
+    "notes": ""
+  }
+]

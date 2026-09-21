@@ -1,0 +1,75 @@
+{
+  "dataset": {
+    "train": "datasets/churn_train.csv",
+    "test": "datasets/churn_test.csv",
+    "label": "label",
+    "id": "player_id",
+    "split": {
+      "type": "random",
+      "train_cutoff": null,
+      "test_cutoff": null,
+      "horizon_days": 60,
+      "seed": 42,
+      "test_share": 0.2
+    },
+    "exclusions": [
+      "onboarding grace period: players who signed up after day 106 (fewer than 14 days of tenure by the day-120 feature cutoff) are excluded",
+      "campaign.csv excluded from features (day-180 intervention, out of scope per design/high-level.md)",
+      "content_calendar.csv excluded from features (not per-player)"
+    ],
+    "built_by": "modeling/build_dataset.py"
+  },
+  "shape": {"rows": 7224, "columns": 19, "memory_mb": 1.2},
+  "nulls": {
+    "player_id": 0.0,
+    "signup_day": 0.0,
+    "region": 0.2951,
+    "platform": 0.0,
+    "acquisition_source": 0.0,
+    "tenure_at_scoring": 0.0,
+    "active_days": 0.0,
+    "total_games": 0.0,
+    "total_wins": 0.0,
+    "total_party_games": 0.0,
+    "total_minutes": 0.0,
+    "win_rate": 0.0,
+    "days_since_last_active": 0.0,
+    "activity_trend": 0.0,
+    "total_spend": 0.0,
+    "purchase_count": 0.0,
+    "distinct_item_types": 0.0,
+    "days_since_last_purchase": 0.0,
+    "label": 0.0
+  },
+  "target": {
+    "column": "label",
+    "type": "classification",
+    "class_balance": {"0_stayed": 2414, "1_left": 4810, "positive_rate": 0.6658}
+  },
+  "numeric_distributions": {
+    "tenure_at_scoring": {"min": 14.0, "max": 120.0, "mean": 94.875, "std": 33.82, "skew": -1.021},
+    "active_days": {"min": 0.0, "max": 119.0, "mean": 34.38, "std": 30.396, "skew": 0.779},
+    "total_games": {"min": 0.0, "max": 290.0, "mean": 74.28, "std": 66.089, "skew": 0.79},
+    "total_wins": {"min": 0.0, "max": 153.0, "mean": 37.088, "std": 33.456, "skew": 0.823},
+    "total_party_games": {"min": 0.0, "max": 183.0, "mean": 23.977, "std": 35.35, "skew": 1.828},
+    "total_minutes": {"min": 0.0, "max": 8188.6, "mean": 2082.337, "std": 1856.37, "skew": 0.795},
+    "win_rate": {"min": 0.0, "max": 1.0, "mean": 0.482, "std": 0.151, "skew": -0.723},
+    "days_since_last_active": {"min": 0.0, "max": 120.0, "mean": 37.072, "std": 41.84, "skew": 0.799},
+    "activity_trend": {"min": -138.0, "max": 127.0, "mean": 3.267, "std": 38.825, "skew": 0.114},
+    "total_spend": {"min": 0.0, "max": 439.92, "mean": 4.352, "std": 21.934, "skew": 8.182},
+    "purchase_count": {"min": 0.0, "max": 20.0, "mean": 0.285, "std": 1.291, "skew": 7.003},
+    "distinct_item_types": {"min": 0.0, "max": 3.0, "mean": 0.128, "std": 0.454, "skew": 3.843},
+    "days_since_last_purchase": {"min": 1.0, "max": 120.0, "mean": 89.896, "std": 37.273, "skew": -0.848}
+  },
+  "categorical_distributions": {
+    "region": {"cardinality": 4, "top_values": {"EUW": 2197, "nan": 2132, "BR": 1130, "KR": 1086, "LATAM": 679}},
+    "platform": {"cardinality": 2, "top_values": {"pc": 5824, "mobile": 1400}},
+    "acquisition_source": {"cardinality": 3, "top_values": {"organic": 3604, "paid_ads": 2152, "friend_referral": 1468}}
+  },
+  "quality_flags": [
+    "region is 29.5% null in the train table (raw players.csv: 3521/12000, 29.3%) - above the ~20% risk threshold. Not a data-pull bug (same rate in the raw source); treat as a real 'unknown region' segment in the features step rather than dropping the column or guessing a value.",
+    "total_spend, purchase_count, distinct_item_types are heavily right-skewed (skew 3.8-8.2): only 8.6% of players made any pre-cutoff purchase. Consider a binary has_purchased flag plus a log-transform of total_spend in the features step rather than using raw skewed values directly.",
+    "feature cutoff was deliberately moved from day 180 (same as the label) to day 120, a 60-day horizon before the label per design/high-level.md - the monkey-mode baseline for this same project found that using same-day features made the task near-tautological (recency features alone got ROC-AUC 0.99). This build avoids that by construction; see 01-data.md.",
+    "24.8% of the raw 12,000 players (2,971) were excluded as too new to score at the day-120 feature cutoff (signed up after day 106). This is expected given the exclusion rule, not a data quality issue, but it does mean the model only covers players with at least 14 days of tenure by the scoring date - noted here since it narrows 'scoring population' beyond what high-level.md states in the abstract."
+  ]
+}

@@ -1,0 +1,1 @@
+Dropping `TotalCharges_residual` did NOT improve AUC-ROC (0.9153 vs baseline 0.9155, a -0.02% relative change, well short of the 0.5% improvement threshold and effectively noise) - this confirms 02-features.md's "low-confidence addition" read: the column was neither harmful nor helpful, so it's safe to discard for a simpler feature set but there's no accuracy case for keeping it.

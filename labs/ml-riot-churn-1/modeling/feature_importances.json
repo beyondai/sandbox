@@ -1,0 +1,23 @@
+{
+  "days_since_last_active": 0.3270823585330324,
+  "total_party_games_log": 0.14505300085446518,
+  "activity_trend": 0.10457124770665928,
+  "total_minutes": 0.09278278273646433,
+  "active_days": 0.08324365362042603,
+  "total_games": 0.060961707717573005,
+  "total_wins": 0.05348130224413874,
+  "days_since_last_purchase": 0.043572859485320165,
+  "tenure_at_scoring": 0.038040207785786075,
+  "win_rate": 0.02483222974586912,
+  "total_spend_log": 0.0043150461342394185,
+  "acquisition_source_organic": 0.0032000916255936506,
+  "purchase_count_log": 0.0029469850292418243,
+  "platform_pc": 0.0025160785943170614,
+  "region_unknown": 0.002332981315599216,
+  "region_KR": 0.0021805984063762605,
+  "region_EUW": 0.002061080728333057,
+  "region_LATAM": 0.001982010735718445,
+  "acquisition_source_paid_ads": 0.0019474482985566844,
+  "distinct_item_types": 0.001658396140023356,
+  "has_purchased": 0.0012379325622667264
+}

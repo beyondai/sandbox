@@ -1,0 +1,91 @@
+"""Autoresearch current-best: the hist_gradient_boosting pipeline that
+won ml-modeling-train (03-train.md) and was scored in ml-modeling-evaluate
+(04-evaluate.md). Quick POC autoresearch mode: single train/test split
+(the same split churn_train_features.csv / churn_test.csv already use),
+not cross-validation.
+
+Every round's candidates branch from a copy of this file. Paths are
+relative to this file's own location (modeling/autoresearch/).
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+
+HERE = Path(__file__).resolve().parent
+PROJECT_MODELING = HERE.parent  # modeling/
+sys.path.insert(0, str(PROJECT_MODELING))
+from engineer_features import add_engineered_features  # noqa: E402
+
+TRAIN_FEATURES = PROJECT_MODELING / "datasets" / "churn_train_features.csv"
+TEST_SOURCE = PROJECT_MODELING / "datasets" / "churn_test.csv"
+
+NUMERIC_COLS = [
+    "SeniorCitizen",
+    "tenure",
+    "MonthlyCharges",
+    "TotalCharges",
+    "TotalCharges_residual",
+]
+
+
+def build_pipeline(categorical_cols):
+    preprocess = ColumnTransformer(
+        transformers=[
+            ("num", "passthrough", NUMERIC_COLS),
+            (
+                "cat",
+                OneHotEncoder(handle_unknown="ignore"),
+                categorical_cols,
+            ),
+        ]
+    )
+    model = HistGradientBoostingClassifier(
+        max_iter=100, class_weight="balanced", random_state=42
+    )
+    return Pipeline(steps=[("preprocess", preprocess), ("model", model)])
+
+
+def run():
+    train_df = pd.read_csv(TRAIN_FEATURES)
+    y_train = (train_df["Churn"] == "Yes").astype(int)
+    X_train = train_df.drop(columns=["Churn"])
+    categorical_cols = [c for c in X_train.columns if c not in NUMERIC_COLS]
+
+    test_df = pd.read_csv(TEST_SOURCE)
+    test_df = add_engineered_features(test_df).drop(columns=["id"])
+    y_test = (test_df["Churn"] == "Yes").astype(int)
+    X_test = test_df.drop(columns=["Churn"])
+
+    pipeline = build_pipeline(categorical_cols)
+    pipeline.fit(X_train, y_train)
+
+    test_proba = pipeline.predict_proba(X_test)[:, 1]
+    test_pred = (test_proba >= 0.5).astype(int)
+
+    metrics = {
+        "auc_roc": round(float(roc_auc_score(y_test, test_proba)), 4),
+        "accuracy": round(float(accuracy_score(y_test, test_pred)), 4),
+        "precision": round(float(precision_score(y_test, test_pred)), 4),
+        "recall": round(float(recall_score(y_test, test_pred)), 4),
+        "f1": round(float(f1_score(y_test, test_pred)), 4),
+    }
+    return metrics
+
+
+if __name__ == "__main__":
+    metrics = run()
+    print(json.dumps(metrics, indent=2))

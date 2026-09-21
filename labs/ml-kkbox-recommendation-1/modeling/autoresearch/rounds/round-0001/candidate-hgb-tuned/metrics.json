@@ -1,0 +1,10 @@
+{
+  "auc_roc": 0.6185601736583238,
+  "accuracy": 0.59235,
+  "precision": 0.6555687780602586,
+  "recall": 0.40116182847307275,
+  "f1": 0.4977411803359481,
+  "train_seconds": 38.34113788604736,
+  "hypothesis": "A tuned HistGradientBoostingClassifier (learning_rate=0.05, max_iter=500, early_stopping=True, n_iter_no_change=20, validation_fraction=0.1) will beat the Random Forest baseline, unlike the earlier untuned HGB run that underperformed.",
+  "verdict": "Did not beat baseline: auc_roc 0.618560 vs 0.736144 (-0.117583, about 16% relative). A secondary experiment with deeper trees (max_leaf_nodes=63, max_depth=10) performed even worse (auc_roc 0.578), suggesting HGB overfits or underfits this feature set (heavy on one-hot categoricals plus leave-one-out target-encoded features) regardless of tuning, not just an undertraining issue."
+}

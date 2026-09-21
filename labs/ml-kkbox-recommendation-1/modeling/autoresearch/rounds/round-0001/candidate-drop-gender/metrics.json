@@ -1,0 +1,10 @@
+{
+  "auc_roc": 0.7369243805392733,
+  "accuracy": 0.673425,
+  "precision": 0.6769387176880385,
+  "recall": 0.6722220383304095,
+  "f1": 0.674572133230363,
+  "train_seconds": 54.022457122802734,
+  "hypothesis": "Dropping the low-signal, 40%-null gender_* one-hot columns (gender_female, gender_male, gender_missing) will not hurt, and may slightly help, Random Forest auc_roc versus the full feature set.",
+  "verdict": "Beat baseline: auc_roc 0.736924 vs 0.736144 baseline (+0.000781)."
+}

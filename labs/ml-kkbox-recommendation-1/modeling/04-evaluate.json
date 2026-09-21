@@ -1,0 +1,20 @@
+{
+  "primary_metric": "auc_roc",
+  "metrics": {
+    "accuracy": 0.672975,
+    "precision": 0.6753083354026984,
+    "recall": 0.6751183343815167,
+    "f1": 0.6752133215258179,
+    "auc_roc": 0.7361436524739464
+  },
+  "baseline_metrics": {
+    "accuracy": 0.5035166666666666,
+    "auc_roc": 0.6746
+  },
+  "overfit_gap": {
+    "train": 0.7691376534680223,
+    "test": 0.7361436524739464
+  },
+  "success_bar": "AUC >= 0.65 (the bar monkey-mode/report.md established with the user; PRD names AUC as the metric but no separate numeric bar)",
+  "verdict": "Clears the bar: test AUC 0.7361 > 0.65, and beats a true same-test-set re-run of monkey-mode's exact approach (0.6746) by +0.0615 AUC - confirming the feature engineering and model-selection work in this project produced a real improvement, not a CV or split artifact. baseline_metrics.accuracy is the majority-class baseline (= test set's own positive rate); baseline_metrics.auc_roc is monkey-mode's 12-raw-column RandomForestClassifier, retrained and scored on this project's exact kkbox_test.csv (modeling/rerun_monkey_mode_on_test.py) - not monkey-mode/report.md's originally-reported 0.6727, which came from its own independently-sampled split (that number was very close: 0.6727 vs. 0.6746 on the real test set, confirming the original comparison was a reasonable signal even before this rigorous re-run)."
+}

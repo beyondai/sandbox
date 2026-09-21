@@ -1,0 +1,78 @@
+{
+  "dataset": {
+    "train": "modeling/datasets/kkbox_train.csv",
+    "test": "modeling/datasets/kkbox_test.csv",
+    "label": "target",
+    "id": "row_id",
+    "split": {
+      "type": "random",
+      "train_cutoff": null,
+      "test_cutoff": null,
+      "horizon_days": 30,
+      "seed": 42,
+      "test_share": 0.2
+    },
+    "exclusions": [
+      "No future-listen leakage is possible from the columns used: target is pre-computed by KKBOX from underlying listening logs that are not exposed at row level in train.csv, and every joined column (member attributes, song metadata) describes static state, not post-label-window events."
+    ],
+    "built_by": "modeling/build_dataset.py"
+  },
+  "shape": {
+    "rows": 480000,
+    "columns": 21,
+    "memory_mb": 178.71
+  },
+  "nulls": {
+    "row_id": 0.0,
+    "msno": 0.0,
+    "song_id": 0.0,
+    "source_system_tab": 0.0033,
+    "source_screen_name": 0.0556,
+    "source_type": 0.003,
+    "target": 0.0,
+    "city": 0.0,
+    "bd": 0.3997,
+    "gender": 0.4015,
+    "registered_via": 0.0,
+    "registration_init_time": 0.0,
+    "expiration_date": 0.0,
+    "song_length": 0.0,
+    "genre_ids": 0.0163,
+    "artist_name": 0.0,
+    "composer": 0.2273,
+    "lyricist": 0.4305,
+    "language": 0.0,
+    "name": 0.0002,
+    "isrc": 0.0784
+  },
+  "target": {
+    "column": "target",
+    "type": "classification",
+    "class_balance": {"1": 0.5035, "0": 0.4965}
+  },
+  "numeric_distributions": {
+    "bd": {"min": 2.0, "max": 95.0, "mean": 28.72, "median": 27.0, "std": 8.63, "skew": 1.3},
+    "song_length": {"min": 1.393, "max": 7575.835, "mean": 245.03, "median": 241.68, "std": 66.48, "skew": 17.32},
+    "registration_init_time": {"min": 20040326.0, "max": 20170131.0, "mean": 20128112.22, "median": 20131022.0, "std": 30107.05, "skew": -0.92},
+    "expiration_date": {"min": 20041016.0, "max": 20201017.0, "mean": 20171575.38, "median": 20170926.0, "std": 3837.48, "skew": -3.45}
+  },
+  "categorical_distributions": {
+    "source_system_tab": {"cardinality": 8, "top_values": {"my library": 239942, "discover": 141451, "search": 40719, "radio": 30863, "listen with": 13940}},
+    "source_screen_name": {"cardinality": 19, "top_values": {"Local playlist more": 210243, "Online playlist more": 84406, "Radio": 30701, "Album more": 27386, "Search": 19560}},
+    "source_type": {"cardinality": 12, "top_values": {"local-library": 147296, "online-playlist": 127994, "local-playlist": 70280, "radio": 31279, "album": 31095}},
+    "city": {"cardinality": 21, "top_values": {"1": 170519, "13": 74807, "5": 53800, "4": 35337, "15": 31382}},
+    "gender": {"cardinality": 2, "top_values": {"male": 149857, "female": 137418}},
+    "registered_via": {"cardinality": 5, "top_values": {"9": 183270, "7": 166087, "3": 81188, "4": 48483, "13": 972}},
+    "language": {"cardinality": 10, "top_values": {"3.0": 263150, "52.0": 121421, "31.0": 42794, "-1.0": 19845, "17.0": 16075}},
+    "genre_ids": {"cardinality": 370, "top_values": {"465": 241854, "458": 82007, "921": 22828, "1609": 20518, "444": 15838}},
+    "artist_name": {"cardinality": 15239, "top_values": {"Various Artists": 20029, "周杰倫 (Jay Chou)": 12197, "五月天 (Mayday)": 11986, "林俊傑 (JJ Lin)": 7528, "田馥甄 (Hebe)": 6779}}
+  },
+  "quality_flags": [
+    "191858 rows (40.0%) had an implausible member age ('bd' <= 0 or > 100) and were masked to null in build_dataset.py (a known data-quality issue in the raw KKBOX data, not a bug in this build) - bd's null rate below reflects this masking, not missing source data.",
+    "Column 'bd' has a 40.0% null rate (post-masking) - modeling risk, needs explicit missing handling.",
+    "Column 'gender' has a 40.2% null rate - modeling risk, needs explicit missing-category handling.",
+    "Column 'composer' has a 22.7% null rate - modeling risk if used as a raw categorical.",
+    "Column 'lyricist' has a 43.0% null rate - modeling risk if used as a raw categorical.",
+    "No source-table drift from design/high-level.md's Architecture: all five named tables (train, test, members, songs, song_extra_info) were present in the zip and used as described."
+  ]
+}

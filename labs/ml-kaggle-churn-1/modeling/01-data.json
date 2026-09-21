@@ -1,0 +1,213 @@
+{
+  "dataset": {
+    "train": "datasets/churn_train.csv",
+    "test": "datasets/churn_test.csv",
+    "label": "Churn",
+    "id": "id",
+    "split": {
+      "type": "random",
+      "train_cutoff": null,
+      "test_cutoff": null,
+      "horizon_days": null,
+      "seed": 42,
+      "test_share": 0.2
+    },
+    "exclusions": [],
+    "built_by": "registered"
+  },
+  "shape": {
+    "rows": 475355,
+    "columns": 21,
+    "memory_mb": 123.829
+  },
+  "nulls": {
+    "id": 0.0,
+    "gender": 0.0,
+    "SeniorCitizen": 0.0,
+    "Partner": 0.0,
+    "Dependents": 0.0,
+    "tenure": 0.0,
+    "PhoneService": 0.0,
+    "MultipleLines": 0.0,
+    "InternetService": 0.0,
+    "OnlineSecurity": 0.0,
+    "OnlineBackup": 0.0,
+    "DeviceProtection": 0.0,
+    "TechSupport": 0.0,
+    "StreamingTV": 0.0,
+    "StreamingMovies": 0.0,
+    "Contract": 0.0,
+    "PaperlessBilling": 0.0,
+    "PaymentMethod": 0.0,
+    "MonthlyCharges": 0.0,
+    "TotalCharges": 0.0,
+    "Churn": 0.0
+  },
+  "target": {
+    "column": "Churn",
+    "type": "classification",
+    "class_balance": {
+      "No": 0.7748,
+      "Yes": 0.2252
+    },
+    "distribution": {}
+  },
+  "numeric_distributions": {
+    "SeniorCitizen": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.114,
+      "median": 0.0,
+      "std": 0.3178,
+      "skew": 2.4297
+    },
+    "tenure": {
+      "min": 1.0,
+      "max": 72.0,
+      "mean": 36.5748,
+      "median": 35.0,
+      "std": 25.0521,
+      "skew": 0.063
+    },
+    "MonthlyCharges": {
+      "min": 18.25,
+      "max": 118.75,
+      "mean": 65.892,
+      "median": 74.15,
+      "std": 31.0789,
+      "skew": -0.2897
+    },
+    "TotalCharges": {
+      "min": 18.8,
+      "max": 8684.8,
+      "mean": 2495.6278,
+      "median": 1434.65,
+      "std": 2355.0145,
+      "skew": 0.9093
+    }
+  },
+  "categorical_distributions": {
+    "gender": {
+      "cardinality": 2,
+      "top_values": {
+        "Female": 238927,
+        "Male": 236428
+      }
+    },
+    "Partner": {
+      "cardinality": 2,
+      "top_values": {
+        "Yes": 247799,
+        "No": 227556
+      }
+    },
+    "Dependents": {
+      "cardinality": 2,
+      "top_values": {
+        "No": 331445,
+        "Yes": 143910
+      }
+    },
+    "PhoneService": {
+      "cardinality": 2,
+      "top_values": {
+        "Yes": 446290,
+        "No": 29065
+      }
+    },
+    "MultipleLines": {
+      "cardinality": 3,
+      "top_values": {
+        "No": 226832,
+        "Yes": 219458,
+        "No phone service": 29065
+      }
+    },
+    "InternetService": {
+      "cardinality": 3,
+      "top_values": {
+        "Fiber optic": 218053,
+        "DSL": 144820,
+        "No": 112482
+      }
+    },
+    "OnlineSecurity": {
+      "cardinality": 3,
+      "top_values": {
+        "No": 231550,
+        "Yes": 131323,
+        "No internet service": 112482
+      }
+    },
+    "OnlineBackup": {
+      "cardinality": 3,
+      "top_values": {
+        "No": 200138,
+        "Yes": 162735,
+        "No internet service": 112482
+      }
+    },
+    "DeviceProtection": {
+      "cardinality": 3,
+      "top_values": {
+        "No": 197863,
+        "Yes": 165010,
+        "No internet service": 112482
+      }
+    },
+    "TechSupport": {
+      "cardinality": 3,
+      "top_values": {
+        "No": 230738,
+        "Yes": 132135,
+        "No internet service": 112482
+      }
+    },
+    "StreamingTV": {
+      "cardinality": 3,
+      "top_values": {
+        "Yes": 192476,
+        "No": 170397,
+        "No internet service": 112482
+      }
+    },
+    "StreamingMovies": {
+      "cardinality": 3,
+      "top_values": {
+        "Yes": 193397,
+        "No": 169476,
+        "No internet service": 112482
+      }
+    },
+    "Contract": {
+      "cardinality": 3,
+      "top_values": {
+        "Month-to-month": 239065,
+        "Two year": 149440,
+        "One year": 86850
+      }
+    },
+    "PaperlessBilling": {
+      "cardinality": 2,
+      "top_values": {
+        "Yes": 292581,
+        "No": 182774
+      }
+    },
+    "PaymentMethod": {
+      "cardinality": 4,
+      "top_values": {
+        "Electronic check": 172165,
+        "Credit card (automatic)": 106969,
+        "Mailed check": 99011,
+        "Bank transfer (automatic)": 97210
+      }
+    }
+  },
+  "quality_flags": [
+    "0 exact duplicate rows in train split",
+    "no column exceeds 20% null rate (all 0%)",
+    "TotalCharges vs. tenure*MonthlyCharges correlation: 0.9921 (near-1.0 confirms redundancy flagged in design/high-level.md, worth addressing in feature engineering)",
+    "id: unverified for leakage - carried over as a data-quality-neutral flag (not an impossible/unusual value), verification deferred to ml-modeling-features per design/high-level.md Phasing V1"
+  ]
+}

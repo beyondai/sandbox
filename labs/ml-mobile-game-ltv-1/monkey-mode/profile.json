@@ -1,0 +1,37 @@
+{
+  "total_event_rows": 21006238,
+  "n_chunks": 22,
+  "elapsed_seconds": 42.4,
+  "n_users": 75464,
+  "null_counts_raw_columns": {
+    "user_id": 0,
+    "platform": 0,
+    "country_tier": 0,
+    "channel_tier": 0,
+    "install_day": 0,
+    "install_week": 0,
+    "day_since_install": 0,
+    "event_hour": 0,
+    "event_type": 0,
+    "event_name": 0,
+    "product_id": 20950193,
+    "network": 2415572,
+    "ad_placement": 2415572,
+    "revenue_usd": 2359512,
+    "ltv_d8_d180": 0
+  },
+  "target_stats": {
+    "mean": 16.1818906015774,
+    "median": 0.0,
+    "std": 287.63177936604546,
+    "min": 0.0,
+    "max": 24456.15625,
+    "p90": 8.674590110778809,
+    "p99": 197.41396057128642,
+    "p999": 2556.964523925751
+  },
+  "pct_zero_target": 0.6051759779497509,
+  "pct_nonzero_target": 0.39482402205024913,
+  "pct_payer_d0_7": 0.0760362556980812,
+  "top10_target_sum_share": 0.9607330605933689
+}

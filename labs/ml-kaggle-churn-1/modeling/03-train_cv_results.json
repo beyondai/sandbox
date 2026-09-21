@@ -1,0 +1,22 @@
+{
+  "random_forest": {
+    "cv_roc_auc_mean": 0.9120979646761015,
+    "cv_roc_auc_std": 0.0007236600255371724,
+    "cv_roc_auc_folds": [
+      0.9127725926296242,
+      0.9110941797006575,
+      0.9124271216980229
+    ],
+    "elapsed_seconds": 31.2
+  },
+  "hist_gradient_boosting": {
+    "cv_roc_auc_mean": 0.9147568298502574,
+    "cv_roc_auc_std": 0.0006546233421325087,
+    "cv_roc_auc_folds": [
+      0.9155026689195574,
+      0.9139089464831671,
+      0.9148588741480476
+    ],
+    "elapsed_seconds": 18.4
+  }
+}

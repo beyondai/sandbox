@@ -1,0 +1,45 @@
+players: (12000, 5), activity: (748811, 6), purchases: (6889, 5), truth: (12000, 9)
+
+Raw state_at_cutoff counts:
+state_at_cutoff
+active     4832
+churned    4634
+lapsed     2534
+Name: count, dtype: int64
+
+Binary label counts (0=stayed, 1=left):
+left
+1    7168
+0    4832
+Name: count, dtype: int64
+
+Modeling table: 12000 players, 22 numeric + 3 categorical features
+Any nulls left in X? 0
+
+=== Held-out test set (20%, n=2400) ===
+F1: 0.9683
+ROC-AUC: 0.9899
+
+Classification report:
+              precision    recall  f1-score   support
+
+      stayed       0.94      0.97      0.95       966
+        left       0.98      0.96      0.97      1434
+
+    accuracy                           0.96      2400
+   macro avg       0.96      0.96      0.96      2400
+weighted avg       0.96      0.96      0.96      2400
+
+
+Top 10 feature importances:
+last_active_day             0.343344
+days_since_last_activity    0.301277
+second_half_minutes         0.076946
+second_half_games           0.063220
+activity_trend_games        0.047966
+activity_trend_minutes      0.047501
+total_party_games           0.021495
+signup_day                  0.016011
+active_days                 0.013591
+total_minutes               0.013181
+dtype: float64

@@ -1,0 +1,35 @@
+{
+  "logistic_regression": {
+    "cv_auc_mean_fold_safe": 0.7333,
+    "cv_auc_std_fold_safe": 0.0015,
+    "fold_scores": [
+      0.7312,
+      0.7324,
+      0.7356,
+      0.7337,
+      0.7335
+    ]
+  },
+  "random_forest": {
+    "cv_auc_mean_fold_safe": 0.7351,
+    "cv_auc_std_fold_safe": 0.002,
+    "fold_scores": [
+      0.7315,
+      0.7352,
+      0.7374,
+      0.7355,
+      0.7362
+    ]
+  },
+  "hist_gradient_boosting": {
+    "cv_auc_mean_fold_safe": 0.6126,
+    "cv_auc_std_fold_safe": 0.0037,
+    "fold_scores": [
+      0.61,
+      0.6159,
+      0.6069,
+      0.6166,
+      0.6137
+    ]
+  }
+}

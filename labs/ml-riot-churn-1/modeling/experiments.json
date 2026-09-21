@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "name": "logistic_regression_v0",
+    "timestamp": "2026-09-20T21:06:50",
+    "parameters": {
+      "class_weight": "balanced",
+      "max_iter": 2000,
+      "scaled": true
+    },
+    "metrics": {
+      "cv_f1_mean": 0.8207,
+      "cv_roc_auc_mean": 0.8827
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 2,
+    "name": "random_forest_v0",
+    "timestamp": "2026-09-20T21:06:50",
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 8,
+      "class_weight": "balanced"
+    },
+    "metrics": {
+      "cv_f1_mean": 0.828,
+      "cv_roc_auc_mean": 0.8836
+    },
+    "tags": [],
+    "notes": ""
+  },
+  {
+    "id": 3,
+    "name": "random_forest_v0_test_eval",
+    "timestamp": "2026-09-20T21:10:10",
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 8,
+      "class_weight": "balanced",
+      "split": "held-out test"
+    },
+    "metrics": {
+      "f1": 0.827,
+      "roc_auc": 0.8748,
+      "precision_at_20pct": 0.9972,
+      "baseline_f1": 0.7995,
+      "baseline_roc_auc": 0.5
+    },
+    "tags": [],
+    "notes": ""
+  }
+]

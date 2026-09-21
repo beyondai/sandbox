@@ -1,0 +1,28 @@
+{
+  "model": "logistic_regression",
+  "cv_auc_mean_leaky": 0.735870107293952,
+  "cv_auc_std_leaky": 0.0014014870890540197,
+  "cv_auc_mean_fold_safe": 0.7333,
+  "cv_auc_std_fold_safe": 0.0015,
+  "fold_safe_scores": [0.7312, 0.7324, 0.7356, 0.7337, 0.7335],
+  "primary_metric": "cv_auc_mean_fold_safe",
+  "train_seconds": 36.97462320327759,
+  "params": {
+    "model": "LogisticRegression",
+    "max_iter": 1000,
+    "random_state": 42,
+    "solver": "lbfgs",
+    "penalty": "l2",
+    "C": 1.0,
+    "imputer_strategy": "median",
+    "scaler": "StandardScaler",
+    "cv": {
+      "strategy": "StratifiedKFold",
+      "n_splits": 5,
+      "shuffle": true,
+      "random_state": 42
+    },
+    "n_jobs": 2
+  },
+  "notes": "cv_auc_mean_leaky was flagged, then confirmed and corrected: the leave-one-out repeat-rate columns were built once across the full training table (not per CV fold), so CV folds weren't fully independent for those three columns. Re-run with modeling/train_candidates_fold_safe_cv.py, which recomputes them per fold from that fold's train portion only. For logistic regression the correction was small (0.7359 -> 0.7333) - a linear model can't exploit fine-grained leakage in a continuous feature much. cv_auc_mean_fold_safe is the trustworthy number; see modeling/03-train.md for the full comparison and diagnosis. Original NaN note (still accurate): bd (191858), source_context_freq (26927 - since fixed at the source, see 02-features.md's Change log), artist_repeat_rate_loo (17), artist_count (17), song_length_log (17), artist_name_freq (17, since fixed at the source for artist_name)."
+}

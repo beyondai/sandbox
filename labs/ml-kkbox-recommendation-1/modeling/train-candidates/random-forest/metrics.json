@@ -1,0 +1,19 @@
+{
+  "model": "random_forest",
+  "cv_auc_mean_leaky": 0.7550028716141115,
+  "cv_auc_std_leaky": 0.0023357636616288258,
+  "cv_auc_mean_fold_safe": 0.7351,
+  "cv_auc_std_fold_safe": 0.002,
+  "fold_safe_scores": [0.7315, 0.7352, 0.7374, 0.7355, 0.7362],
+  "primary_metric": "cv_auc_mean_fold_safe",
+  "train_seconds": 237.55487203598022,
+  "params": {
+    "n_estimators": 200,
+    "max_depth": 12,
+    "random_state": 42,
+    "n_jobs": 2,
+    "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+    "scoring": "roc_auc"
+  },
+  "notes": "Params (n_estimators=200, max_depth=12) held identical to the monkey-mode fast baseline for direct comparability; that baseline scored AUC 0.6727 on 12 raw columns with no feature engineering. cv_auc_mean_fold_safe (0.7351) still clears that baseline by ~0.062, confirming the feature engineering genuinely helps even after removing the CV leakage described below. cv_auc_mean_leaky (0.7550) was inflated: the leave-one-out repeat-rate columns were built once across the full training table, not per CV fold, so CV folds weren't fully independent for those three columns - re-run with modeling/train_candidates_fold_safe_cv.py, which recomputes them per fold from that fold's train portion only. The correction here was modest (0.7550 -> 0.7351); it was dramatic for HistGradientBoosting (0.9360 -> 0.6126), which could exploit the same leakage far more aggressively - see modeling/03-train.md. cv_auc_mean_fold_safe is the trustworthy number. Original NaN note (still accurate for context): bd (191858, ~40%, expected), plus a real bug found and since fixed at the source in build_features.py (see 02-features.md's Change log) that caused source_context_freq (26927 rows) and artist_repeat_rate_loo/artist_count/artist_name_freq (17 rows each) to have unexpected NaN; song_length_log's 17 NaN rows are a genuine songs.csv join gap, not a bug, still needs imputation. n_jobs capped at 2 (rather than -1) because 3 candidates trained concurrently on an 8-core machine originally; the fold-safe re-run used n_jobs=4 since it ran alone."
+}

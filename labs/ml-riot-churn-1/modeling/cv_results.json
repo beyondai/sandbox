@@ -1,0 +1,17 @@
+{
+  "results": {
+    "logistic_regression": {
+      "f1_mean": 0.8207435940217485,
+      "f1_std": 0.0073073393715663865,
+      "roc_auc_mean": 0.8827375404499704,
+      "roc_auc_std": 0.006587625908924527
+    },
+    "random_forest": {
+      "f1_mean": 0.8279816547403863,
+      "f1_std": 0.00821378901579509,
+      "roc_auc_mean": 0.8836043414159958,
+      "roc_auc_std": 0.00506813574413964
+    }
+  },
+  "winner": "random_forest"
+}
