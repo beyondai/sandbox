@@ -43,15 +43,22 @@ checklist and writes the resolved answers into a project folder before any
 drafting starts.
 
 Each practice project is one folder under `labs/`, `labs/ml-<topic-slug>-<n>/`
-(e.g. `labs/ml-ecommerce-search-1/`) — every artifact for that project (PRD, ADRs,
-design-doc sections from the five skills above) lives under it, not scattered
-into repo-wide `docs/`. Write ADRs for a project's architectural decisions into
-`<project-folder>/adr/`, following the numbering and when-to-write rules in the
-`domain-modeling` skill's ADR format — only the location is project-scoped, the
-format itself is unchanged. ADRs stay one-per-decision even as a project
-accumulates several - never a single running project-decisions log, and never
-the home for a whole design section (each section has its own file under
-`design/`).
+(e.g. `labs/ml-ecommerce-search-1/`) — every artifact for that project (PRD,
+ADRs, design-doc sections from the five skills above) lives under it, not
+scattered into repo-wide `docs/`. Write ADRs for a project's architectural
+decisions into `<project-folder>/adr/`, following the numbering and
+when-to-write rules in the `domain-modeling` skill's ADR format — only the
+location is project-scoped, the format itself is unchanged. ADRs stay
+one-per-decision even as a project accumulates several - never a single running
+project-decisions log, and never the home for a whole design section (each
+section has its own file under `design/`).
+
+## Which project folder
+
+Use, in order: the folder named in the request; else the `labs/ml-*` folder
+whose files this conversation has already been reading or writing; else, if
+exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
+step skills never create a folder - that is `/ml-system-design-prd`'s job.
 
 ## Regular vs. Quick-POC mode
 

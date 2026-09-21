@@ -1,9 +1,11 @@
 ## 2026-09-20 — grilling (via ml-system-design-prd wrapper)
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-09-20)
 - **Finding**: The user prefers to answer grilling-round questions through a labeled notes file (e.g. `notes/riot-practice-churn-2.md`, with their own section headers like `#to-prd`) referenced via `@path`, rather than typing every answer in chat — the file doubles as a durable log of inputs and changes. Inputs are deliberately mixed: long-form answers go in the notes file, short answers come through chat; the point is one long-lived doc per session for the long-form parts, not a file per round. The grilling skill has no convention for reading a referenced note file's user-defined sections as the answer to the current round, nor a read-cursor so a later reference to the same file is treated as an incremental append rather than reprocessing the whole file.
 - **Suggested change**: When a round answer is a reference to a notes file, read it, match content to open questions via the user's own section labels (no fixed schema), and track how much has already been consumed so a later reference only surfaces new content. Since `grilling` lives in the vendored mattpocock pack, put this in the personal wrapper (`ml-system-design-prd/SKILL.md`) rather than editing the pack.
 - (Restored 2026-09-20: this entry was accidentally overwritten by a later full-file write earlier the same day.)
+
+Applied to `.agents/skills/personal/ml-system-design-prd/SKILL.md` as a new "Answers can arrive in a notes file" section.
 
 ## 2026-09-20 — ml-system-design-high-level
 - **Source**: agent-found bug
@@ -51,8 +53,12 @@ Applied as a `dataset` block in `01-data.json` (one model per project folder, no
 - **Finding**: `01-data.json` and `assets/dashboard_app.py` are one-table/one-target by design, and the adopted `dataset` contract keeps that (one model per project folder). If two models ever need to live in one folder again, the dashboard has no way to show both profiles.
 - **Suggested change**: Only if multi-model folders come back: optional `tasks: {<name>: {...profile...}}` in `01-data.json` and a task selector in `assets/dashboard_app.py`, legacy single-object shape still valid. Deferred on purpose.
 
+Deferred by user decision (2026-09-20): stays `proposed`; revisit only if the one-model-per-folder rule changes.
+
 ## 2026-09-20 — ml-system-design-* sections and ml-modeling-* steps: project-folder resolution
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted (2026-09-20)
 - **Finding**: The section skills (`ml-system-design-definition` .. `-post-delivery`) and step skills (`ml-modeling-data` .. `-evaluate`) never say how they decide which `labs/ml-*` folder they are working in; they rely on conversation context. In a fresh session with several practice folders, that is a guess. `ml-system-design-prd` and `ml-system-design-monkey-mode` do have a rule (check for existing `ml-<topic-slug>-*`, ask if several).
 - **Suggested change**: One shared rule in the two routers, referenced by every section/step skill: use the folder named in the request; else the folder whose files the conversation has been reading or writing; else, if exactly one `labs/ml-*` exists, that one; otherwise ask. Never create a folder from a step skill - that is `ml-system-design-prd`'s job.
+
+Applied as a shared "Which project folder" section in `ml-system-design/SKILL.md` and `ml-modeling/SKILL.md`, with a one-line pointer in every section and step skill.

@@ -18,6 +18,8 @@ Regular vs. Quick-POC (how fast). Mode is chosen by keyword in the request —
 "regular"/"full"/nothing → Regular (default). Full rationale in
 `../adr/0001-ml-modeling-family-and-continuity.md`.
 
+Project folder: see `../ml-system-design/SKILL.md`, "Which project folder".
+
 **Draft, Regular**: answer each item below in the user's own numbers/words; ask
 if unknown, never invent.
 
@@ -66,8 +68,9 @@ traceable to a real data pipeline.
 Write the settled answers to `<project-folder>/design/deep-dive.md`, one heading
 per item above — this is what `ml-system-design-delivery` builds on when the
 project took the paper route. Create `design/` if it doesn't exist. This skill
-and `ml-modeling-*` are alternatives after `design/high-level.md`: `ml-modeling-*`
-answers the same four items by doing the work and does not read this file.
+and `ml-modeling-*` are alternatives after `design/high-level.md`:
+`ml-modeling-*` answers the same four items by doing the work and does not read
+this file.
 
 ## Offer an ADR
 

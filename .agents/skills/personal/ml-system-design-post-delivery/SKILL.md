@@ -11,6 +11,8 @@ description: >-
 
 # Post Delivery
 
+Project folder: see `../ml-system-design/SKILL.md`, "Which project folder".
+
 Draft (Regular): answer each item below in the user's own numbers/words; ask if
 unknown, never invent. Quick POC: state each item's most likely answer in one
 pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs.

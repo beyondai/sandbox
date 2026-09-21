@@ -16,13 +16,13 @@ description: >-
 
 Reads `<project-folder>/design/high-level.md` (ML framing: target, label +
 horizon, population, exclusions; Architecture: the named source tables) and
-`prd/<topic>.md` (scope) — both required, see `ml-modeling` router if either
-is missing. Writes
-`<project-folder>/modeling/01-data.md` and `modeling/01-data.json`, and
-(Regular/Quick-POC only — see below) creates `dashboard/eda.ipynb` and
-`dashboard/app.py`. First, run the "Design docs changed?" check from
-`../ml-modeling/SKILL.md` (spec exists and its hash matches? proceed; otherwise
-ask).
+`prd/<topic>.md` (scope) — both required, see `ml-modeling` router if either is
+missing. Writes `<project-folder>/modeling/01-data.md` and
+`modeling/01-data.json`, and (Regular/Quick-POC only — see below) creates
+`dashboard/eda.ipynb` and `dashboard/app.py`. Project folder: see
+`../ml-modeling/SKILL.md`, "Which project folder". First, run the "Design docs
+changed?" check from `../ml-modeling/SKILL.md` (spec exists and its hash
+matches? proceed; otherwise ask).
 
 Mode: Regular asks about anything the data doesn't make obvious (e.g. why a null
 rate is high). Quick POC states a reasonable read and moves on — see

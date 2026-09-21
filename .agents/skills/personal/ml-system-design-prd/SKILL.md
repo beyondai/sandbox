@@ -21,6 +21,17 @@ always does. Don't skip Requirements — scope's out-of-scope list or the
 offline/online metric split just because the topic feels obvious — grilling
 exists precisely to stop those from being silently assumed.
 
+## Answers can arrive in a notes file
+
+The user may answer a round by pointing at a notes file (`@notes/<topic>.md`)
+instead of typing in chat, and will mix the two: long answers in the file,
+short ones inline. The file is one long-lived document per session with the
+user's own section labels (e.g. `#to-prd`), not a fixed schema. When a round's
+answer is such a reference: read the file, match its content to the open
+questions by the user's labels, and treat only content added since the last
+time this session read the file as new input - never re-process the whole
+file. Say which questions the new content answered and which are still open.
+
 Regular vs. Quick POC (keyword-selected, see
 `../adr/0001-ml-modeling-family-and-continuity.md`) changes the grill's pace,
 not its coverage: Quick POC still touches every bullet, but batches them into
@@ -29,8 +40,8 @@ for precision — grilling's exhaustiveness is the one thing POC mode doesn't ge
 to skip here, since a PRD missing a branch entirely defeats the point of using
 this skill at all.
 
-Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/`
-(e.g. `labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
+Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/` (e.g.
+`labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
 ADRs, later design-doc sections) lives under it, so a repo with multiple
 practice projects stays sorted by project rather than by doc type. Before
 writing, check for existing `ml-<topic-slug>-*` folders: if none exist, use

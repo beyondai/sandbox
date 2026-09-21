@@ -11,13 +11,14 @@ description: >-
 
 # Evaluate
 
-Reads `<project-folder>/prd/<topic>.md`'s Metrics — offline section (the
-primary metric, secondary metrics, guardrails — this is where "good enough"
-is defined) and `modeling/03-train.md` — written by either `ml-modeling-train` or
+Reads `<project-folder>/prd/<topic>.md`'s Metrics — offline section (the primary
+metric, secondary metrics, guardrails — this is where "good enough" is defined)
+and `modeling/03-train.md` — written by either `ml-modeling-train` or
 `ml-modeling-multiagent`, doesn't matter which. Writes
 `<project-folder>/modeling/04-evaluate.md` and `modeling/04-evaluate.json`. This
 is the last step in the chain — see `ml-modeling` router for what comes after.
-First, run the "Design docs changed?" check from `../ml-modeling/SKILL.md`.
+Project folder: see `../ml-modeling/SKILL.md`, "Which project folder". First,
+run the "Design docs changed?" check from `../ml-modeling/SKILL.md`.
 
 Score on `01-data.json` -> `dataset.test`. The train-side number for the
 overfit gap comes from the table the model was fit on (see `03-train.md`).

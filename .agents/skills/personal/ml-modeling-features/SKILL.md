@@ -10,12 +10,13 @@ description: >-
 
 # Engineer Features
 
-Reads `<project-folder>/design/high-level.md`'s ML framing (population, unit
-of prediction — what one row is) and `modeling/01-data.md` (the profile and
-its risk flags). The feature list is this step's decision, recorded in
+Reads `<project-folder>/design/high-level.md`'s ML framing (population, unit of
+prediction — what one row is) and `modeling/01-data.md` (the profile and its
+risk flags). The feature list is this step's decision, recorded in
 `02-features.md`; there is no upstream list to copy. Writes
-`<project-folder>/modeling/02-features.md`. First, run the "Design docs changed?"
-check from `../ml-modeling/SKILL.md`.
+`<project-folder>/modeling/02-features.md`. Project folder: see
+`../ml-modeling/SKILL.md`, "Which project folder". First, run the "Design docs
+changed?" check from `../ml-modeling/SKILL.md`.
 
 Input table: `01-data.json` -> `dataset.train`. Never open `dataset.test`
 here. If you write a transformed table, save it under `modeling/datasets/`
@@ -64,8 +65,10 @@ adjacent.
 ## Selection
 
 Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col>
---top <n>` — composite score across variance, correlation, cardinality, null
-rate. Use this to justify dropping features, not just to generate a top-N list.
+--top <n>` with `<csv>` = `01-data.json` -> `dataset.train` (or your "Output
+table") and `<col>` = `dataset.label` — composite score across variance,
+correlation, cardinality, null rate. Use this to justify dropping features, not
+just to generate a top-N list.
 
 Done when the feature set is a concrete list (not "relevant features"), each
 nontrivial transform is justified by something in `01-data.md` or the framing

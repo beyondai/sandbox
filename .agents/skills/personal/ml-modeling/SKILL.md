@@ -31,6 +31,13 @@ For the full chain, invoke each in order. For a single-step ask ("engineer
 features for this dataset"), invoke that skill directly — it reads whatever the
 previous step already wrote and continues from there.
 
+## Which project folder
+
+Use, in order: the folder named in the request; else the `labs/ml-*` folder
+whose files this conversation has already been reading or writing; else, if
+exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
+step skills never create a folder - that is `/ml-system-design-prd`'s job.
+
 ## Required upstream: PRD + fork-grade high-level design
 
 Every step here reads `<project-folder>/prd/<topic>.md` and
@@ -70,10 +77,30 @@ project that has both upstream files but no `spec/<topic>.md` yet, synthesize
 one — `prd/` + `adr/` + `design/high-level.md` distilled into an
 implementation-ready doc: Problem Statement, Solution, Implementation Decisions,
 Testing Decisions, Out of Scope. Its first two lines are `prd-hash: <sha>` and
-`high-level-hash: <sha>`, each from `git hash-object -w <file>` (the `-w`
-stores the blob so it stays diffable even if that version was never
-committed). Full rationale in
-`../adr/0001-ml-modeling-family-and-continuity.md` and `../adr/0006-fork-after-high-level.md`.
+`high-level-hash: <sha>`, each from `git hash-object -w <file>` (the `-w` stores
+the blob so it stays diffable even if that version was never committed). Full
+rationale in `../adr/0001-ml-modeling-family-and-continuity.md` and
+`../adr/0006-fork-after-high-level.md`.
+
+Spec template - each section is a distillation, not a copy:
+
+```
+prd-hash: <sha>
+high-level-hash: <sha>
+
+# Spec: <topic>
+## Problem Statement      <- PRD Problem, one paragraph
+## Solution               <- high-level ML framing (target, label, horizon,
+                             population, unit, exclusions) + which model this
+                             folder builds + the offline/batch architecture
+## Implementation Decisions
+                          <- high-level Phasing (model class per phase),
+                             Architecture's source tables, every adr/ decision
+                             in one line each
+## Testing Decisions      <- PRD Metrics - offline (primary, secondary,
+                             guardrails); split rule once mm-data has set it
+## Out of Scope           <- PRD Requirements - scope, out-of-scope list
+```
 
 ## Regular vs. Quick-POC mode
 
@@ -103,10 +130,10 @@ run, same keyword mechanism:
 
 `ml-modeling-multiagent` trains every candidate model type high-level's Phasing
 names (plus the algorithm-selection matrix's short-list, if Phasing names only
-one) concurrently, each in its own `modeling/train-candidates/<model-type>/`, then
-compares and writes the winner to `03-train.md`. Full rationale for why this is
-safe without git worktrees (unlike mattpocock's `implement-spec`, which this
-pattern is adapted from) is in the ADR.
+one) concurrently, each in its own `modeling/train-candidates/<model-type>/`,
+then compares and writes the winner to `03-train.md`. Full rationale for why
+this is safe without git worktrees (unlike mattpocock's `implement-spec`, which
+this pattern is adapted from) is in the ADR.
 
 ## Dashboard — deliberately narrow, Regular/Quick-POC only
 
