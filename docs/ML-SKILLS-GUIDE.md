@@ -107,23 +107,27 @@ labs/ml-<topic>-<n>/
 
 ## Command reference
 
-| Skill | Purpose | Command | Plain-language trigger? |
-|---|---|---|---|
-| `ml-system-design` | Router - whole design doc | `/ml-system-design <topic>` | Yes |
-| `ml-system-design-prd` | Grill Definition, write `prd/` | `/ml-system-design-prd <topic>` | No |
-| `ml-system-design-definition` | Definition section, no grilling | `/ml-system-design-definition` | Yes |
-| `ml-system-design-high-level` | Framing, architecture, phasing; the fork point | `/ml-system-design-high-level` | Yes |
-| `ml-system-design-deep-dive` | Paper deep dive (alternative to modeling) | `/ml-system-design-deep-dive` | Yes |
-| `ml-system-design-delivery` | Rollout, eval, monitoring, fallback | `/ml-system-design-delivery` | Yes |
-| `ml-system-design-post-delivery` | Analysis, explainability, iteration | `/ml-system-design-post-delivery` | Yes |
-| `ml-modeling` | Router - data -> features -> train -> evaluate | `/ml-modeling <topic>` | Yes |
-| `ml-modeling-data` | Build/register table, profile | `/ml-modeling-data` | Yes |
-| `ml-modeling-features` | Engineer features | `/ml-modeling-features` | Yes |
-| `ml-modeling-train` | Train one model | `/ml-modeling-train` | Yes |
-| `ml-modeling-multiagent` | Train N candidates in parallel | `/ml-modeling-multiagent` | Yes |
-| `ml-modeling-evaluate` | Evaluate vs. baseline | `/ml-modeling-evaluate` | Yes |
-| `ml-modeling-autoresearch` | Optional auto-improvement loop | `/ml-modeling-autoresearch <project> [mode]` | No |
-| `ml-system-design-monkey-mode` | Fast autonomous baseline | `/ml-system-design-monkey-mode <topic>` | No |
+`sd-*` is short for `ml-system-design-*`, `mm-*` for `ml-modeling-*`. Every
+skill runs as `/<full name>` (e.g. `/ml-modeling-data`); those marked `cmd`
+run only by command, the rest also trigger from plain language.
+
+| Skill                 | What it does                                  |
+|-----------------------|-----------------------------------------------|
+| `sd`                  | Router for the whole design doc               |
+| `sd-prd` cmd          | Grill the Definition, write `prd/`            |
+| `sd-definition`       | Definition section, no grilling               |
+| `sd-high-level`       | Framing, architecture, phasing; the fork      |
+| `sd-deep-dive`        | Paper deep dive (alternative to `mm-*`)       |
+| `sd-delivery`         | Rollout, eval, monitoring, fallback           |
+| `sd-post-delivery`    | Analysis, explainability, iteration           |
+| `sd-monkey-mode` cmd  | Fast autonomous baseline, background          |
+| `mm`                  | Router: data -> features -> train -> evaluate |
+| `mm-data`             | Build or register the table, profile it       |
+| `mm-features`         | Engineer features                             |
+| `mm-train`            | Train one model                               |
+| `mm-multiagent`       | Train N candidates in parallel                |
+| `mm-evaluate`         | Evaluate against a baseline                   |
+| `mm-autoresearch` cmd | Optional auto-improvement loop                |
 
 ## Key design decisions
 
