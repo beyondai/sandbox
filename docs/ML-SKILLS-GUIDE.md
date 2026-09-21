@@ -31,10 +31,13 @@ topic/prompt
   │     → monkey-mode/report.md  (done — nothing else touches this)
   │
   ▼
+(new project? ask first: monkey-mode in parallel? PRD first?)
+  │
+  ▼
 /ml-system-design-prd  (whole design path)
   │
   ▼
--high-level  (offers an ADR on real tradeoffs)
+-high-level  → design/high-level.md  (offers an ADR on real tradeoffs)
   │
   ▼
 -deep-dive  → design/deep-dive.md
@@ -159,7 +162,7 @@ fire from plain conversation.
 | `ml-system-design` | Router — whole design doc | `/ml-system-design <topic>` | Yes |
 | `ml-system-design-prd` | Grill Definition, write `prd/` | `/ml-system-design-prd <topic>` | No — command required |
 | `ml-system-design-definition` | Definition section directly (draft/review, no grilling) | `/ml-system-design-definition` | Yes |
-| `ml-system-design-high-level` | ML framing, architecture, phasing | `/ml-system-design-high-level` | Yes |
+| `ml-system-design-high-level` | ML framing, architecture, phasing → `design/high-level.md` | `/ml-system-design-high-level` | Yes |
 | `ml-system-design-deep-dive` | Data/features/models/training → `design/deep-dive.md` | `/ml-system-design-deep-dive` | Yes |
 | `ml-system-design-delivery` | Rollout, eval, monitoring, fallback | `/ml-system-design-delivery` | Yes |
 | `ml-system-design-post-delivery` | Analysis, explainability, iteration | `/ml-system-design-post-delivery` | Yes |
@@ -179,7 +182,8 @@ Every topic gets one folder at the repo root, `ml-<topic-slug>-<n>/`:
 ```
 ml-<topic>-<n>/
   prd/<topic>.md            Definition, from ml-system-design-prd
-  adr/000N-*.md             Architecture decisions, any stage
+  adr/000N-*.md             Architecture decisions, any stage, one per file
+  design/high-level.md      ML framing, architecture diagrams, phasing
   design/deep-dive.md       Data/features/models/training decisions
   spec/<topic>.md           Design→modeling fork synthesis; first line is
                              deep-dive-hash: (drift check, see below)

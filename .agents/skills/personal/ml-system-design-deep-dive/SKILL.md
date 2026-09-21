@@ -30,6 +30,22 @@ but surface-level answer to all four items, fast — this file is what unblocks
 **Review** (either mode): check each item is actually answered, not just headed;
 flag gaps, don't rewrite what's solid.
 
+## Before drafting (Regular mode)
+
+Two checks, in one message, before writing any of the four sections:
+
+1. Restate the problem definition in 1-3 sentences and name the prediction
+   target(s). If the project has no `prd/`, say so and offer
+   `/ml-system-design-prd` first rather than drafting on an unconfirmed
+   framing.
+2. Confirm the data actually exists: list the source files with row counts
+   (a listing, not a profile - profiling is `ml-modeling-data`'s job).
+
+Wait for the user's acknowledgement, then draft. Quick POC keeps both checks
+but folds them into its single batched round.
+
+## The four items
+
 - **Data**: sources feeding real-time inference vs. batch training; new data
   engineering work needed (e.g. an ETL pipeline joining two logs).
 - **Features**: concrete feature list (user, item, contextual); nontrivial

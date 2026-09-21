@@ -32,10 +32,15 @@ skipped and most often flagged in review are out-of-scope
 (`ml-system-design-definition`) and fallback (`ml-system-design-delivery`) —
 never skip those two regardless of doc size.
 
-To scope a new project rather than draft straight into the doc, run
-`/ml-system-design-prd <topic>` by hand first: it grills the user round-by-round
-on the Definition checklist and writes the resolved answers into a project
-folder before any drafting starts.
+Starting a new project: before invoking any section skill, ask two things in
+one message - (a) run `/ml-system-design-monkey-mode <topic>` in parallel as a
+background baseline? (b) scope with `/ml-system-design-prd <topic>` first? Both
+are hand-run commands, so the user has to type them; your job is to make sure
+they're offered rather than discovered later. Default recommendation: yes to
+both. Only skip the questions when the user names a specific section to work
+on. `/ml-system-design-prd` grills the user round-by-round on the Definition
+checklist and writes the resolved answers into a project folder before any
+drafting starts.
 
 Each practice project is one folder at the repo root, `ml-<topic-slug>-<n>/`
 (e.g. `ml-ecommerce-search-1/`) — every artifact for that project (PRD, ADRs,
@@ -43,7 +48,10 @@ design-doc sections from the five skills above) lives under it, not scattered
 into repo-wide `docs/`. Write ADRs for a project's architectural decisions into
 `<project-folder>/adr/`, following the numbering and when-to-write rules in the
 `domain-modeling` skill's ADR format — only the location is project-scoped, the
-format itself is unchanged.
+format itself is unchanged. ADRs stay one-per-decision even as a project
+accumulates several - never a single running project-decisions log, and never
+the home for a whole design section (each section has its own file under
+`design/`).
 
 ## Regular vs. Quick-POC mode
 

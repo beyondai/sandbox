@@ -30,6 +30,14 @@ Done when the ML framing is one precise sentence (not a restated business goal),
 both diagrams exist separately, and every phase names features + timeline +
 headcount rather than just a version number.
 
+## Write the file
+
+Write the settled answers to `<project-folder>/design/high-level.md`, one
+heading per item above (ML framing, Architecture, Phasing). Create `design/`
+if it doesn't exist. Diagrams are ASCII in fenced code blocks, matching the
+rest of this repo's design docs. The ADR below is for one hard-to-reverse
+decision, not a home for this whole section.
+
 ## Offer an ADR
 
 If the architecture choice is hard to reverse, would surprise a future reader,
