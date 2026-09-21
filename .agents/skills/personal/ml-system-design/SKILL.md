@@ -45,6 +45,14 @@ on. `/ml-system-design-prd` grills the user round-by-round on the Definition
 checklist and writes the resolved answers into a project folder before any
 drafting starts.
 
+Monkey-mode runs concurrently with PRD/design work on the same project
+folder by design (see the track below) — when dispatching it, describe the
+project folder as shared, in-progress state, not an empty one to set up from
+scratch, even on a brand-new project. A background agent told a shared path
+"does not exist yet" has previously reset the whole folder instead of only
+creating its own `monkey-mode/` subdirectory, destroying a PRD the foreground
+session had just written.
+
 Each practice project is one folder under `labs/`, `labs/ml-<topic-slug>-<n>/`
 (e.g. `labs/ml-ecommerce-search-1/`) — every artifact for that project (PRD,
 ADRs, design-doc sections from the five skills above) lives under it, not

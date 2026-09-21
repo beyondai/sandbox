@@ -41,13 +41,18 @@ to skip here, since a PRD missing a branch entirely defeats the point of using
 this skill at all.
 
 Quick POC round shape: produce `ml-system-design-definition`'s one-pass POC
-draft (every checklist item with its most likely answer) and present it as a
-single grilling round, each item a numbered question with the draft answer as
-the recommendation. The user's confirmations and overrides become the PRD; the
-draft itself is never written to `design/definition.md` by this skill. The
-split between the two skills: this one is the interview (hand-run, creates the
-folder, writes `prd/`); `-definition` owns the checklist and the drafted
-section, and this skill reuses its checklist rather than keeping a copy.
+draft (every checklist item with its most likely answer) and present it as
+grilling rounds, each item a numbered question with the draft answer as the
+recommendation. Cap each round at 6 questions: if the checklist has more than
+6 open items, split the draft into consecutive rounds of at most 6 each
+instead of one large round. End every round with an explicit invitation for
+free-form input — e.g. "anything else to add or change before I move on?" —
+so the user isn't limited to reacting item by item. The user's confirmations,
+overrides, and free-form additions become the PRD; the draft itself is never
+written to `design/definition.md` by this skill. The split between the two
+skills: this one is the interview (hand-run, creates the folder, writes
+`prd/`); `-definition` owns the checklist and the drafted section, and this
+skill reuses its checklist rather than keeping a copy.
 
 Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/` (e.g.
 `labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,

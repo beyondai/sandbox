@@ -98,13 +98,31 @@ else:
                              use_container_width=True, height=150)
 
             if d.get("categorical_distributions"):
-                cols = st.columns(len(d["categorical_distributions"]))
-                for col, (name, info) in zip(cols, d["categorical_distributions"].items()):
-                    vals = info["top_values"]
-                    cat_df = pd.DataFrame({"category": list(vals.keys()), "share": list(vals.values())})
-                    with col:
-                        st.plotly_chart(compact(px.pie(cat_df, names="category", values="share", title=name)),
-                                         use_container_width=True, config={"displayModeBar": False})
+                st.subheader("Categorical distributions")
+                items = list(d["categorical_distributions"].items())
+                PIES_PER_ROW = 4
+                for row_start in range(0, len(items), PIES_PER_ROW):
+                    row_items = items[row_start:row_start + PIES_PER_ROW]
+                    cols = st.columns(len(row_items))
+                    for col, (name, info) in zip(cols, row_items):
+                        vals = info["top_values"]
+                        cat_df = pd.DataFrame({"category": list(vals.keys()), "share": list(vals.values())})
+                        fig = px.pie(cat_df, names="category", values="share", title=name, hole=0.35)
+                        # Percent labels go inside the slices; category names move to a
+                        # horizontal legend below the pie instead of plotly's default
+                        # right-side legend, which overlaps the slices once a narrow
+                        # column (many categories -> many columns per row) shrinks the pie.
+                        fig.update_traces(textposition="inside", textinfo="percent")
+                        fig.update_layout(
+                            height=CHART_HEIGHT + 70,
+                            margin=dict(l=10, r=10, t=30, b=10),
+                            title_font_size=13,
+                            legend=dict(orientation="h", yanchor="top", y=-0.05,
+                                        xanchor="center", x=0.5, font=dict(size=9)),
+                        )
+                        with col:
+                            st.plotly_chart(fig, use_container_width=True,
+                                             config={"displayModeBar": False})
 
             if d.get("quality_flags"):
                 st.caption("**Quality flags:** " + " · ".join(d["quality_flags"]))
@@ -117,14 +135,49 @@ else:
                 if metrics_file.exists():
                     rows.append(json.loads(metrics_file.read_text()))
             if rows:
-                cmp_df = pd.DataFrame(rows)
-                metric_col = "f1" if "f1" in cmp_df.columns else cmp_df.columns[-1]
+                full_df = pd.DataFrame(rows)
+
+                # Keep only compact scalars for this view - a metrics.json
+                # may also carry free-form provenance (params, notes) or
+                # list-valued fields (e.g. per-fold scores) that blow up
+                # the table's width and break the chart if picked up as
+                # the plotted column (a long string was silently chosen
+                # as the y-axis once before this filter existed).
+                def _is_compact_scalar(v):
+                    if isinstance(v, bool):
+                        return True
+                    if isinstance(v, (int, float)):
+                        return True
+                    if isinstance(v, str):
+                        return len(v) <= 40
+                    return False
+
+                scalar_cols = [c for c in full_df.columns
+                               if full_df[c].map(_is_compact_scalar).all()]
+                cmp_df = full_df[scalar_cols]
+                numeric_cols = [c for c in cmp_df.columns
+                                if pd.api.types.is_numeric_dtype(cmp_df[c])]
+
+                # Prefer each candidate's own declared primary_metric (set by
+                # ml-modeling-train/-multiagent when more than one metric
+                # variant exists, e.g. a corrected vs. original CV score),
+                # then "f1", then the last numeric column found.
+                metric_col = None
+                if "primary_metric" in cmp_df.columns and cmp_df["primary_metric"].nunique() == 1:
+                    declared = cmp_df["primary_metric"].iloc[0]
+                    metric_col = declared if declared in numeric_cols else None
+                if metric_col is None:
+                    metric_col = "f1" if "f1" in numeric_cols else (
+                        numeric_cols[-1] if numeric_cols else None
+                    )
+
                 left, right = st.columns([1, 1])
                 with left:
                     st.dataframe(cmp_df.round(4), use_container_width=True, height=150)
                 with right:
-                    st.plotly_chart(compact(px.bar(cmp_df, x="model", y=metric_col)),
-                                     use_container_width=True, config={"displayModeBar": False})
+                    if metric_col:
+                        st.plotly_chart(compact(px.bar(cmp_df, x="model", y=metric_col)),
+                                         use_container_width=True, config={"displayModeBar": False})
 
     if "Final Results" in tab_map:
         with tab_map["Final Results"]:

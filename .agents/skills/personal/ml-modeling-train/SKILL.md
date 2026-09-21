@@ -45,6 +45,38 @@ only if weights underperform) from `01-data`'s class balance, and say why in
 Use cross-validation, not a single train/test split, to pick between candidates.
 Folds are drawn inside the train table, never across the `dataset` split.
 
+Before trusting a CV ranking, check whether any feature in the table was
+built from the target column without per-fold nesting (a leave-one-out or
+target-encoded aggregate computed once, globally - see
+`ml-modeling-features/SKILL.md`, "Aggregation features"). If so, either
+recompute it per fold or treat the ranking as provisional pending the real
+held-out evaluation in `ml-modeling-evaluate`, and say so explicitly in
+`03-train.md` - don't pick a winner off unverified CV numbers. The
+distortion this causes is not uniform across model classes: a
+gradient-boosted/iterative model can exploit it far more than a bagged or
+linear one, which is exactly the failure mode this check exists to catch.
+
+## Quick POC time budget
+
+Target roughly 3 minutes of wall-clock for the candidate, not left
+unbounded. Neither the mode line above nor the algorithm-selection matrix
+names a fold count or model size, so without an explicit default this
+step silently reaches for Regular-mode-grade rigor (5-fold CV, 200
+trees/iterations) even on a fast POC pass - real numbers from one project:
+Random Forest (`n_estimators=200`, `max_depth=12`) took 237.6s for 5-fold
+CV on a 480k-row table, HistGradientBoosting (`max_iter=200`) took 125.4s.
+Default Quick POC to (1) 3-fold CV instead of 5-fold - cuts wall-clock by
+~40% with only a small loss of estimate stability for a POC-grade
+decision, and (2) roughly half the Regular-mode default trees/iterations
+(e.g. `n_estimators=100` instead of 200 for Random Forest, `max_iter=100`
+instead of 200 for HistGradientBoosting/LightGBM/XGBoost) unless the user
+names a specific size. Applied to the numbers above, this would bring
+Random Forest to roughly 70s and HistGradientBoosting to roughly 40s -
+both comfortably under budget. Regular mode keeps the fuller defaults
+(5-fold, 200 trees/iterations) since it isn't optimizing for speed. State
+the reduced fold count and size explicitly in `03-train.md`'s params (not
+silently) so a later Regular-mode re-run knows what was traded away.
+
 ## Log it
 
 ```
@@ -62,8 +94,11 @@ whatever directory the agent happens to be in, which scatters logs across
 projects.
 
 Done when `03-train.md` names the chosen model, states why it beat the
-alternatives in the matrix above (not just "it's the default"), and includes the
-training code actually run — not a template.
+alternatives in the matrix above (not just "it's the default"), includes the
+training code actually run — not a template — and, if this step's choice of
+model/loss/class-weighting resolves a placeholder or contradicts an
+assumption in `spec/<topic>.md`, that spec line is updated to match (see
+`../ml-modeling/SKILL.md`, "Spec self-staleness").
 
 If this run turns up a bug or a better design in this skill, or you ask for a
 change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill

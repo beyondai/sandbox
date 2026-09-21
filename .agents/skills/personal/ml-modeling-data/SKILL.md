@@ -2,14 +2,16 @@
 name: ml-modeling-data
 description: >-
   Use to profile a dataset before feature engineering — row counts, null rates,
-  class balance, feature distributions, data-quality flags. Also creates the
-  project's EDA notebook and bootstraps its Streamlit dashboard. Step 1 of the
-  ml-modeling-* chain (data → features → train → evaluate). Trigger on "profile
-  this data," "check data quality," "set up a dashboard for this," or continuing
-  modeling work in an existing ml-<topic>-<n>/ project. Builds the labeled
-  table first when the source is raw logs rather than a flat labeled table, and
-  records the table paths, label, and split in `01-data.json`'s `dataset`
-  block - the contract every later step reads.
+  class balance, feature distributions, data-quality flags — and clean genuine
+  errors it finds (impossible values, sentinel-coded missingness, exact
+  duplicates). Also creates the project's EDA notebook and bootstraps its
+  Streamlit dashboard. Step 1 of the ml-modeling-* chain (data → features →
+  train → evaluate). Trigger on "profile this data," "check data quality,"
+  "clean this data," "set up a dashboard for this," or continuing modeling
+  work in an existing ml-<topic>-<n>/ project. Builds the labeled table first
+  when the source is raw logs rather than a flat labeled table, and records
+  the table paths, label, and split in `01-data.json`'s `dataset` block - the
+  contract every later step reads.
 ---
 
 # Profile Data
@@ -50,6 +52,14 @@ at.
   drifted rule; this check has caught a real 100%-churn look-ahead bug. Keep
   the script small and re-runnable; it is part of the project's record.
 
+  `uv run python3 ...` invoked from inside the project folder auto-discovers
+  the sandbox root's shared `pyproject.toml`/`.venv` (already stocked with
+  pandas, numpy, scikit-learn, and the notebook/dashboard packages below) - no
+  ambient-`python3` check and no project-local venv needed. If a genuinely new
+  package is required, run `uv add <pkg>` from the sandbox root (not this
+  project folder) so it's added to the shared environment for every future
+  project too.
+
 **The split is this step's decision.** No design doc states cutoffs; you do.
 For time-windowed labels use two cutoffs: a test cutoff late enough that its
 label window still closes inside the data, and a train cutoff at least one
@@ -61,6 +71,14 @@ Then fill the `dataset` block (schema below) in `01-data.json` and add a
 "Dataset" section to `01-data.md` with the same facts in prose. Profile the
 train table only - never look at test rows while profiling.
 
+**If the built/registered table is a sample of a larger source table**,
+state the sample's size **as an explicit, bolded percentage of the
+source** in that Dataset section - not just raw row counts left for the
+reader to compute (e.g. "**takes a 600,000-row sample (~8.1% of the full
+7,377,419-row `train.csv`)**"). This matters for judging results later
+(e.g. against a benchmark that used the full dataset) and has gone
+unnoticed before when only the raw counts were given.
+
 ## Profile
 
 - **Shape**: row count, column count, memory footprint.
@@ -69,8 +87,8 @@ train table only - never look at test rows while profiling.
 - **Target/label**: class balance (classification) or distribution shape
   (regression) — this is what decides whether class-imbalance handling matters
   later.
-- **Feature distributions**: numeric columns — min/max/mean/std, skew;
-  categorical columns — cardinality, top values.
+- **Feature distributions**: numeric columns — min/max/mean/median/std,
+  skew; categorical columns — cardinality, top values.
 - **Quality flags**: duplicated rows, obvious outliers, sources or columns that
   don't match what `design/high-level.md`'s Architecture named (a real source
   drifted from the design, or the design was wrong — either way, surface it
@@ -96,11 +114,41 @@ the `.md`):
   "target": {"column": "<name>", "type": "classification|regression",
              "class_balance": {}, "distribution": {}},
   "numeric_distributions": {"<col>": {"min": 0, "max": 0, "mean": 0,
-                                      "std": 0, "skew": 0}},
+                                      "median": 0, "std": 0, "skew": 0}},
   "categorical_distributions": {"<col>": {"cardinality": 0, "top_values": {}}},
   "quality_flags": ["<string>"]
 }
 ```
+
+## Clean
+
+Not every `quality_flags` entry gets the same treatment. Split them with one
+test: **would a domain expert call this impossible, or just unusual?**
+
+- **Impossible → fix it here.** A negative or 200-year-old age, a sentinel
+  value standing in for missing (e.g. `0` meaning "unknown" in a field where
+  `0` is otherwise a valid value), an exact duplicate row. Mask invalid
+  values to null (never drop the row for a single bad column - that discards
+  every other feature the row carries) or drop exact duplicates, in the same
+  build step that produced the table (`build_dataset.py`, or the
+  registration step for a flat table). Then **re-run the profile** so
+  `01-data.md`/`01-data.json` reflect the cleaned numbers, not the pre-clean
+  ones - a stale profile next to a cleaned table is worse than no cleaning
+  at all.
+- **Unusual → leave it flagged, not touched.** A long-but-real song, a
+  large-but-real purchase, a legitimately old account. These are signal, not
+  error; cleaning them would delete real variance the model should learn
+  from. They stay exactly as `quality_flags` already handles them today -
+  surfaced, not silently fixed.
+
+When a fix changes the data meaningfully, record it in `01-data.md`: what
+changed, why, and a before/after stat (e.g. skew, null rate) as evidence the
+fix mattered - "191858 rows masked" is a count; "skew dropped from 22.26 to
+1.3 once the corrupted rows were excluded" is evidence.
+
+Quick POC applies the impossible-vs-unusual calls without asking and moves
+on. Regular asks when a flag's classification is genuinely ambiguous (e.g. a
+value that's extreme but not obviously impossible) rather than guessing.
 
 ## Dashboard (Regular/Quick-POC only)
 
@@ -135,16 +183,22 @@ Launch it on a per-project port, so two projects' dashboards never collide: pick
 the first port from 8501 upward where `lsof -nP -iTCP:<port> -sTCP:LISTEN`
 prints nothing, write it to `dashboard/.port`, then `uv run streamlit run
 dashboard/app.py --server.headless true --server.port $(cat dashboard/.port) &`
-(background — don't block the conversation), and report
-`http://localhost:<port>` to the user. `dashboard/.port` is the one place the
-port lives; `ml-modeling-evaluate` reads it for its health check.
+(background — don't block the conversation), capture its PID with `echo $! >
+dashboard/.pid`, and report `http://localhost:<port>` to the user.
+`dashboard/.port` is the one place the port lives; `ml-modeling-evaluate` reads
+it for its health check. `dashboard/.pid` lets a session-exit hook find and
+stop this exact process without guessing from the port alone.
 
 Done when every profile flag above is a real number from the actual data (not
 "looks fine"), `01-data.json` has a `dataset` block whose paths resolve,
-`modeling/01-data.md` states which columns are risky and why,
-`01-data.json` matches it, `dashboard/eda.ipynb` has real executed outputs, and
-the Streamlit process is actually running and reachable at the reported URL —
-not just files written.
+every quality flag is either cleaned-and-reprofiled or explicitly left as a
+documented risk (never silently ignored either way), `modeling/01-data.md`
+states which columns are risky and why, `01-data.json` matches it,
+`dashboard/eda.ipynb` has real executed outputs, the Streamlit process is
+actually running and reachable at the reported URL — not just files written —
+and, if this step resolved a split/cutoff decision `spec/<topic>.md` had
+deferred or assumed, that spec line is updated to match (see
+`../ml-modeling/SKILL.md`, "Spec self-staleness").
 
 If this run turns up a bug or a better design in this skill, or you ask for a
 change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill

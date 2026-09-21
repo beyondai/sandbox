@@ -18,7 +18,8 @@ Four sequential steps, each its own skill, chained by files under
 standalone in a fresh session:
 
 1. `ml-modeling-data` — build or register the labeled table, record it in
-   `01-data.json`'s `dataset` block, profile → `modeling/01-data.md`
+   `01-data.json`'s `dataset` block, profile, and clean →
+   `modeling/01-data.md`
 2. `ml-modeling-features` — engineer features → `modeling/02-features.md`
 3. `ml-modeling-train` (sequential) **or** `ml-modeling-multiagent` (parallel,
    see below) — train → `modeling/03-train.md`
@@ -27,9 +28,15 @@ standalone in a fresh session:
 `dataset` is the data contract: later steps read table paths, label, and
 split roles from it, never from prose. One model per project folder.
 
-For the full chain, invoke each in order. For a single-step ask ("engineer
-features for this dataset"), invoke that skill directly — it reads whatever the
-previous step already wrote and continues from there.
+`/ml-modeling <topic>` is the entry point for the step-by-step path by
+default: invoke step 1, report its result, and stop for user confirmation
+before invoking step 2 — same checkpointed pattern as
+`ml-system-design-prd` and `ml-system-design-high-level` — and so on through
+step 4. Only run the whole chain in one uninterrupted pass when the request
+says so explicitly (e.g. "full chain," "run all four steps," "don't stop
+between steps"). For a single-step ask ("engineer features for this
+dataset"), invoke that skill directly — it reads whatever the previous step
+already wrote and continues from there.
 
 ## Which project folder
 
@@ -73,7 +80,7 @@ the record `ml-system-design-delivery` cites. Rationale in
 
 | Step | Reads | Decides and records itself |
 |---|---|---|
-| `ml-modeling-data` | framing (target, label, horizon, population, exclusions); Architecture's source tables; PRD scope | the train/test split and cutoffs -> `dataset` block in `01-data.json`, reasoning in `01-data.md` |
+| `ml-modeling-data` | framing (target, label, horizon, population, exclusions); Architecture's source tables; PRD scope | the train/test split and cutoffs, and which quality flags to clean vs. leave flagged -> `dataset` block in `01-data.json`, reasoning in `01-data.md` |
 | `ml-modeling-features` | framing (population, unit); `01-data.md` | the feature list -> `02-features.md` |
 | `ml-modeling-train` / `-multiagent` | Phasing (model class per phase); algorithm-selection matrix; `01-data` class balance | candidates, loss, class weighting -> `03-train.md` |
 | `ml-modeling-evaluate` | PRD Metrics — offline (primary, secondary, guardrails); `dataset.split` | -> `04-evaluate.md` / `.json` |
@@ -225,6 +232,28 @@ Hand edits to a step's own output (`modeling/0N-*.md`, `01-data.json`) need
 no hash check: the next step reads the file as it stands. When the user says
 one changed, re-run from the step after it; see `../ml-system-design/SKILL.md`,
 "Hand edits between steps".
+
+### Spec self-staleness
+
+A second, separate reconciliation path from the hash check above — that one
+catches `prd/`/`high-level.md` drift; this one catches `spec/<topic>.md`
+going stale relative to a *step's own* resolved decision. `spec/` is
+synthesized once, before most steps run, so its Implementation Decisions and
+Testing Decisions sections can contain a placeholder deferring a decision to
+a specific step ("split rule: to be set by `ml-modeling-data`") or a stated
+assumption a step's real decision later contradicts. Nothing else in this
+chain notices when that happens — it sat wrong until caught by hand in one
+project.
+
+After a step writes its own decision to its `0N-*.md`, scan
+`spec/<topic>.md`'s Implementation Decisions and Testing Decisions sections
+for (a) a placeholder explicitly deferring that decision to this step, or
+(b) a stated assumption the fresh decision now contradicts. If either
+matches, update that spec line in place with the actual decision plus a
+one-line pointer to the step's own file for full reasoning — no hash refresh
+needed, since this isn't upstream-doc drift, just spec catching up to its
+own deferred or assumed content. Do this as an explicit item in the step's
+own "Done when" checklist so it isn't skipped.
 
 ## Skill improvement log
 
