@@ -1,5 +1,10 @@
 # ml-modeling-* family, and how it chains to ml-system-design-*
 
+> **2026-09-20:** the fork point moved from `design/deep-dive.md` to
+> `design/high-level.md`, and deep-dive and `ml-modeling-*` became
+> alternatives rather than a sequence — see `0006-fork-after-high-level.md`.
+> The Usage-path tables and the first Consequence below are kept as history.
+
 The `ml-system-design-*` family covers deciding and documenting an ML system's design (PRD → high-level → deep-dive → delivery → post-delivery) but stops at decisions on paper — it never executes anything. `ml-modeling-*` is a new, separate family that picks up from `ml-system-design-deep-dive`'s decisions and actually runs the data→features→train→evaluate work, checkpointed at each step. Kept as a separate family rather than nested under deep-dive so "decide & document" stays distinct from "actually execute," but the two need a real, file-based handoff — not just conversation memory — since either family can be invoked standalone in a fresh session.
 
 Source material for `ml-modeling-*`: `ds-modeling-SKILL.md` (`borghei/Claude-Skills`, `data-analytics/data-scientist/`), rewritten for this repo's conventions (minimal frontmatter, no references to agents/tooling that don't exist here) and split into one skill per step. Three of its referenced CLI tools (`experiment_tracker.py`, `feature_selector.py`, `hypothesis_tester.py`) were ported near-verbatim from the same source repo — they're stdlib-only, no adaptation needed beyond confirming they run.

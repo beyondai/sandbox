@@ -4,10 +4,10 @@ description: >-
   Use when writing or reviewing the Design Deep Dive section of an ML system
   design doc — data sources (online/offline, data engineering), feature list and
   feature engineering, candidate models and their tradeoffs, or training setup
-  (loss function, algorithm, labeling, sampling). Also the required upstream
-  step for the ml-modeling-* execution family — trigger on requests to pick a
-  model, design features, specify training data/labels, discuss model tradeoffs,
-  or start a quick ML POC/MVP.
+  (loss function, algorithm, labeling, sampling). The paper alternative to the
+  ml-modeling-* execution family, which answers the same questions hands-on —
+  trigger on requests to pick a model, design features, specify training
+  data/labels, or discuss model tradeoffs on paper.
 ---
 
 # Design Deep Dive
@@ -24,8 +24,8 @@ if unknown, never invent.
 **Draft, Quick POC — a one-hour MVP**: ask the essential questions from the four
 items below in one batched round, not sequential grilling; state a reasonable
 default for anything not essential and flag it as an assumption. Target: a real
-but surface-level answer to all four items, fast — this file is what unblocks
-`ml-modeling-*`, so it needs to exist quickly, not be exhaustive.
+but surface-level answer to all four items, fast — enough for delivery to
+build on, not exhaustive.
 
 **Review** (either mode): check each item is actually answered, not just headed;
 flag gaps, don't rewrite what's solid.
@@ -64,8 +64,10 @@ traceable to a real data pipeline.
 ## Write the file
 
 Write the settled answers to `<project-folder>/design/deep-dive.md`, one heading
-per item above — this is what `ml-modeling-*` reads to continue into execution,
-in both modes. Create `design/` if it doesn't exist.
+per item above — this is what `ml-system-design-delivery` builds on when the
+project took the paper route. Create `design/` if it doesn't exist. This skill
+and `ml-modeling-*` are alternatives after `design/high-level.md`: `ml-modeling-*`
+answers the same four items by doing the work and does not read this file.
 
 ## Offer an ADR
 

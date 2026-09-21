@@ -10,9 +10,11 @@ description: >-
 
 # Engineer Features
 
-Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and
-`modeling/01-data.md` (the risk flags from the profiling step). Writes
-`<project-folder>/modeling/02-features.md`. First, run the "Deep-dive changed?"
+Reads `<project-folder>/design/high-level.md`'s ML framing (population, unit
+of prediction — what one row is) and `modeling/01-data.md` (the profile and
+its risk flags). The feature list is this step's decision, recorded in
+`02-features.md`; there is no upstream list to copy. Writes
+`<project-folder>/modeling/02-features.md`. First, run the "Design docs changed?"
 check from `../ml-modeling/SKILL.md`.
 
 Input table: `01-data.json` -> `dataset.train`. Never open `dataset.test`
@@ -20,7 +22,7 @@ here. If you write a transformed table, save it under `modeling/datasets/`
 and record its path in `02-features.md` under "Output table" so train picks
 it up.
 
-Mode: Regular tries the transforms `design/deep-dive.md` named and checks
+Mode: Regular proposes transforms from the profile and the framing, then checks
 importance before finalizing. Quick POC picks the most obviously useful
 transforms and moves on — see `ml-modeling` router for the keyword rule.
 
@@ -66,7 +68,7 @@ Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col>
 rate. Use this to justify dropping features, not just to generate a top-N list.
 
 Done when the feature set is a concrete list (not "relevant features"), each
-nontrivial transform is justified by something in `01-data.md` or `deep-dive.md`
+nontrivial transform is justified by something in `01-data.md` or the framing
 (not applied by default), and the file records what was tried and dropped, not
 just what survived.
 

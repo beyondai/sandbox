@@ -14,11 +14,13 @@ description: >-
 
 # Profile Data
 
-Reads `<project-folder>/design/deep-dive.md`'s Data section (required — see
-`ml-modeling` router if it's missing). Writes
+Reads `<project-folder>/design/high-level.md` (ML framing: target, label +
+horizon, population, exclusions; Architecture: the named source tables) and
+`prd/<topic>.md` (scope) — both required, see `ml-modeling` router if either
+is missing. Writes
 `<project-folder>/modeling/01-data.md` and `modeling/01-data.json`, and
 (Regular/Quick-POC only — see below) creates `dashboard/eda.ipynb` and
-`dashboard/app.py`. First, run the "Deep-dive changed?" check from
+`dashboard/app.py`. First, run the "Design docs changed?" check from
 `../ml-modeling/SKILL.md` (spec exists and its hash matches? proceed; otherwise
 ask).
 
@@ -28,24 +30,32 @@ rate is high). Quick POC states a reasonable read and moves on — see
 
 ## Build or register the labeled table
 
-Read deep-dive's Data and Training sections. One model per project folder;
-one `dataset` block.
+Read high-level's ML framing (target, label definition and horizon, scoring
+population, unit of prediction, exclusions) and its Architecture diagram (the
+named source tables). One model per project folder; one `dataset` block. If
+the framing names several models, build the one "This folder builds" points
+at.
 
 - **Flat labeled table exists** (CSV with the label column): register it -
   fill the `dataset` block with its path(s), label, id, and the split you
   will use. If there is no test split yet, make one here (random with a
-  fixed seed unless deep-dive says time-based) and record it.
+  fixed seed unless the labels are time-windowed) and record it.
 - **Source is raw logs** (events, activity rows, transactions; no label
   column): write `modeling/build_dataset.py` and run it with
-  `uv run python3`. It takes every rule from deep-dive's Training section -
-  label definition, horizon, cutoff(s), population rule, exclusions - and
-  writes `modeling/datasets/<task>_train.csv` and `<task>_test.csv`.
-  Features use only rows strictly before the cutoff; labels use only rows
-  at or after it. Assert the positive rate is not degenerate (nowhere near
-  0% or 100%) and equals deep-dive's stated number when it states one - a
-  mismatch means a leak or a drifted rule; this check has caught a real
-  100%-churn look-ahead bug. Keep the script small and re-runnable; it is
-  part of the project's record.
+  `uv run python3`. It takes label definition, horizon, population rule, and
+  exclusions from the framing, and writes `modeling/datasets/<task>_train.csv`
+  and `<task>_test.csv`. Features use only rows strictly before the cutoff;
+  labels use only rows at or after it. Assert the positive rate is not
+  degenerate (nowhere near 0% or 100%) - a degenerate rate means a leak or a
+  drifted rule; this check has caught a real 100%-churn look-ahead bug. Keep
+  the script small and re-runnable; it is part of the project's record.
+
+**The split is this step's decision.** No design doc states cutoffs; you do.
+For time-windowed labels use two cutoffs: a test cutoff late enough that its
+label window still closes inside the data, and a train cutoff at least one
+horizon earlier so no training label overlaps the test window. Avoid cutoffs
+that sit inside a known seasonal event if the framing names any. Record the
+cutoffs in the `dataset` block and the reasoning in `01-data.md`.
 
 Then fill the `dataset` block (schema below) in `01-data.json` and add a
 "Dataset" section to `01-data.md` with the same facts in prose. Profile the
@@ -61,10 +71,11 @@ train table only - never look at test rows while profiling.
   later.
 - **Feature distributions**: numeric columns — min/max/mean/std, skew;
   categorical columns — cardinality, top values.
-- **Quality flags**: duplicated rows, obvious outliers, columns that don't match
-  `design/deep-dive.md`'s stated Data section (a real source drifted from the
-  design, or the design was wrong — either way, surface it, don't silently
-  reconcile).
+- **Quality flags**: duplicated rows, obvious outliers, sources or columns that
+  don't match what `design/high-level.md`'s Architecture named (a real source
+  drifted from the design, or the design was wrong — either way, surface it
+  and offer to update high-level per the router's "Closing the loop"; don't
+  silently reconcile).
 
 Write the same facts to `modeling/01-data.json` (the dashboard reads this, not
 the `.md`):

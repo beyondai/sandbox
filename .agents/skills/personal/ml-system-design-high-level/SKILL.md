@@ -19,16 +19,26 @@ actually answered, not just headed; flag gaps, don't rewrite what's solid.
 
 - **ML framing**: restate the business problem as a precise ML problem (e.g.
   "show better content" → "predict per-item click probability,
-  learning-to-rank").
+  learning-to-rank"). This is the fork point into `ml-modeling-*`, so the one
+  sentence must be backed by, per model: prediction target; label definition
+  and horizon; scoring population and cadence (who gets a score, when); unit
+  of prediction (what one row is); known exclusions or contamination (e.g.
+  players in a past campaign). If the framing yields more than one model, add
+  one line "This folder builds: <model>" — one model per project folder; the
+  others get their own. The primary metric stays in the PRD; reference it.
 - **Architecture**: two diagrams, not one — online inference (real-time
-  request/response path) and offline training (data processing → model
-  training). Conflating them is the most common review flag here.
+  request/response path) and offline training (named source tables/logs →
+  processing → model training). Conflating them is the most common review
+  flag here. Name the concrete sources; "user data" is not a source.
 - **Phasing**: crawl-walk-run sequence (V0/V1/V2). Per phase: features shipped,
-  rough timeline, headcount.
+  model class (baseline / first real model / stretch), rough timeline,
+  headcount.
 
-Done when the ML framing is one precise sentence (not a restated business goal),
-both diagrams exist separately, and every phase names features + timeline +
-headcount rather than just a version number.
+Done when the ML framing is one precise sentence backed by target, label +
+horizon, population, unit, and exclusions per model, both diagrams exist
+separately with the offline one naming its sources, and every phase names
+features + model class + timeline + headcount rather than just a version
+number.
 
 ## Write the file
 
@@ -37,6 +47,11 @@ heading per item above (ML framing, Architecture, Phasing). Create `design/`
 if it doesn't exist. Diagrams are ASCII in fenced code blocks, matching the
 rest of this repo's design docs. The ADR below is for one hard-to-reverse
 decision, not a home for this whole section.
+
+This file is the fork point: after it, the project goes either to
+`ml-system-design-deep-dive` (the paper deep dive) or to `ml-modeling-*` (the
+hands-on one), and both lead to `ml-system-design-delivery`. See the
+`ml-modeling` router for what it reads from here.
 
 ## Offer an ADR
 

@@ -22,9 +22,10 @@ actually answered, not just headed; flag gaps, don't rewrite what's solid.
 - **Deployment**: rollout plan (e.g. ramp %, schedule), testing plan
   (unit/integration/load), CI/CD strategy.
 - **Eval**: A/B test design and significance method; offline eval methodology
-  (e.g. held-out window). If this project forked into `ml-modeling-*`, reference
-  the real `modeling/04-evaluate.md` results here instead of a hypothetical
-  plan.
+  (e.g. held-out window). If this project took the hands-on route
+  (`ml-modeling-*` instead of `ml-system-design-deep-dive`), reference the real
+  `modeling/04-evaluate.md` results here instead of a hypothetical plan; if it
+  took the paper route, build on `design/deep-dive.md`'s Training section.
 - **Monitoring**: system-health metrics (latency, error rate) and model-health
   metrics (prediction distribution, feature drift) on a live dashboard.
 - **Fallback**: what happens when the new model/service fails or degrades —

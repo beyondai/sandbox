@@ -15,7 +15,7 @@ disable-model-invocation: true
 A third, independent track alongside `ml-system-design-*` (the whole design doc)
 and `ml-modeling-*` (the deliberate data→features→train→evaluate chain) — shares
 only the project-folder root with both, nothing else. Doesn't read
-`design/deep-dive.md`, doesn't write into `modeling/`, doesn't require either
+`design/` or `prd/`, doesn't write into `modeling/`, doesn't require either
 path to have run first. The point: one line in, a runnable baseline out, in the
 background, while you keep working on the real design.
 
@@ -85,8 +85,8 @@ Write `<project-folder>/monkey-mode/report.md` with exactly these sections:
 - **Learnings** — what the baseline reveals (is the target learnable, any data
   issue found, anything surprising)
 - **Suggested Next Steps** — what this implies for the regular flow, either path
-  (e.g. "this suggests the model choice in `design/deep-dive.md` is a reasonable
-  bet") — without monkey-mode itself ever reading from or writing into
+  (e.g. "this suggests the V1 model class in `design/high-level.md`'s Phasing
+  is a reasonable bet") — without monkey-mode itself ever reading from or writing into
   `design/`, `modeling/`, `prd/`, `adr/`, or `spec/`
 
 Mark, per item in Requirements, whether it came from the user's answer or

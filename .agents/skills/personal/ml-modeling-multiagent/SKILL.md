@@ -11,10 +11,11 @@ description: >-
 
 # Train (parallel, multiple candidates)
 
-Reads `<project-folder>/design/deep-dive.md`'s Models section (required) and
-`modeling/02-features.md`. Writes `<project-folder>/modeling/03-train.md` — same
+Reads `<project-folder>/design/high-level.md`'s Phasing (model class per
+phase), `modeling/01-data.md` (class balance), and `modeling/02-features.md`.
+Writes `<project-folder>/modeling/03-train.md` — same
 slot `ml-modeling-train` would write, so `ml-modeling-evaluate` doesn't need to
-know which one ran. First, run the "Deep-dive changed?" check from
+know which one ran. First, run the "Design docs changed?" check from
 `../ml-modeling/SKILL.md`.
 
 Train on `02-features.md`'s "Output table" if present, else `01-data.json`
@@ -38,9 +39,9 @@ run directly against the current working tree.
 
 ## Process
 
-1. **List candidates**: every model type `design/deep-dive.md`'s Models section
-   already named, or (if it named none) the algorithm-selection matrix's
-   short-list from `ml-modeling-train` for this data size/scenario.
+1. **List candidates**: every model class high-level's Phasing named across
+   its phases, plus the algorithm-selection matrix's short-list from
+   `ml-modeling-train` for this data size/scenario if Phasing named only one.
 2. **Dispatch concurrently**: one subagent per candidate, in the same turn
    (parallel tool calls, not sequential ones — the whole point is wall-clock
    speed). Each subagent: reads `modeling/02-features.md`, trains its one
@@ -48,9 +49,9 @@ run directly against the current working tree.
    writes its result to `modeling/train-candidates/<model-type>/` (code +
    metrics), and reports its metrics back.
 3. **Compare**: once all candidates report back, build a comparison table (model
-   type, key metric, training cost/time). Pick a winner by the metric
-   `design/deep-dive.md` named as primary — or, if the call is close, present
-   the comparison and let the user pick rather than guessing.
+   type, key metric, training cost/time). Pick a winner by the primary metric
+   `prd/<topic>.md`'s Metrics — offline section names — or, if the call is
+   close, present the comparison and let the user pick rather than guessing.
 4. **Write `03-train.md`**: the comparison table, the winner, and the winner's
    actual training code (not all candidates' code — that stays in
    `train-candidates/` for anyone who wants to dig in).

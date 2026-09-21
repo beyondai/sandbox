@@ -155,16 +155,16 @@ start time now.
 
 **One round** (repeated as many times as the mode requires):
 
-1. Read `program.md`, `experiment.py`, `best_metrics.json`, and
-   `design/deep-dive.md` fresh — every round, not just the first (same grounding
-   every other step in this family reads; `program.md` is the human's steering
-   wheel and may have been edited between rounds). If `git hash-object
-   design/deep-dive.md` differs from the spec's `deep-dive-hash:` line, this
-   skill does not stop to ask (it's autonomous): note `deep-dive.md changed
-   since spec (<sections>)` in this round's `round-summary.md`, keep going
-   against the current file, and leave the hash alone so the next interactive
-   `ml-modeling-*` step asks the user (see `../ml-modeling/SKILL.md`, "Deep-dive
-   changed?").
+1. Read `program.md`, `experiment.py`, `best_metrics.json`, `prd/<topic>.md`,
+   and `design/high-level.md` fresh — every round, not just the first (same
+   grounding every other step in this family reads; `program.md` is the
+   human's steering wheel and may have been edited between rounds). If `git
+   hash-object` of either design doc differs from the spec's `prd-hash:` or
+   `high-level-hash:` line, this skill does not stop to ask (it's autonomous):
+   note `<file> changed since spec (<sections>)` in this round's
+   `round-summary.md`, keep going against the current file, and leave the hash
+   alone so the next interactive `ml-modeling-*` step asks the user (see
+   `../ml-modeling/SKILL.md`, "Design docs changed?").
 2. Dispatch `candidates_per_round` parallel subagents — same "no worktree
    needed, separate output dirs" reasoning already established for
    `ml-modeling-multiagent`, since candidates don't touch each other's code,

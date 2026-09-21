@@ -11,9 +11,12 @@ description: >-
 
 # Train (sequential)
 
-Reads `<project-folder>/design/deep-dive.md`'s Models section (required) and
-`modeling/02-features.md`. Writes `<project-folder>/modeling/03-train.md`.
-First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
+Reads `<project-folder>/design/high-level.md`'s Phasing (the model class per
+phase: baseline, first real model, stretch), `modeling/01-data.md` (class
+balance), and `modeling/02-features.md`. The candidate, loss, and class
+weighting are this step's decisions, recorded in `03-train.md`. Writes
+`<project-folder>/modeling/03-train.md`.
+First, run the "Design docs changed?" check from `../ml-modeling/SKILL.md`.
 
 Train on `02-features.md`'s "Output table" if present, else `01-data.json`
 -> `dataset.train`. Cross-validate inside that table only; `dataset.test` is
@@ -23,7 +26,10 @@ One candidate, chosen and trained in this single pass — see `ml-modeling` rout
 if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent,
 compared). Mode: Regular starts simple and upgrades only if the simple model
 underperforms; Quick POC goes straight to the workhorse row below unless
-`deep-dive.md` says otherwise — see `ml-modeling` router for the keyword rule.
+high-level's Phasing says otherwise — see `ml-modeling` router for the keyword
+rule. Class imbalance: decide the handling here (class weights first, resampling
+only if weights underperform) from `01-data`'s class balance, and say why in
+`03-train.md`.
 
 ## Algorithm selection
 

@@ -67,14 +67,23 @@ structured argument syntax. Full detail in
 ## Forking into execution: the `ml-modeling` family
 
 `ml-system-design-*` stops at decisions on paper. `ml-modeling` (a separate
-skill family: data → features → train → evaluate) picks up from
-`ml-system-design-deep-dive`'s decisions and actually runs that work. The fork
-happens once `design/deep-dive.md` exists — the first `ml-modeling-*` call
-against a project synthesizes `spec/<topic>.md` (a PRD+ADR+deep-dive synthesis)
-and proceeds from there, optionally updating `design/deep-dive.md` if execution
-reveals something the design got wrong. See `ml-modeling` for the full chain,
-and `adr/0001-ml-modeling-family-and-continuity.md` for both full usage-path
-tables (design-only vs. fork-into-modeling).
+skill family: data → features → train → evaluate) is the hands-on version of
+the deep dive. The fork sits right after `design/high-level.md`:
+
+```
+prd -> high-level -> [ -deep-dive (paper) | ml-modeling-* (hands-on) ] -> -delivery -> -post-delivery
+```
+
+Pick one. Both answer the same questions (data, features, models, training);
+the paper one writes `design/deep-dive.md`, the hands-on one writes
+`modeling/01`-`04` and does not read `design/deep-dive.md`. `-delivery` cites
+whichever exists (real `04-evaluate.md` numbers when modeling ran). The first
+`ml-modeling-*` call synthesizes `spec/<topic>.md` from PRD + ADRs +
+high-level and pins their hashes; execution that contradicts the framing is
+flagged back to `design/high-level.md`, not silently absorbed. See
+`ml-modeling` for the chain, `adr/0006-fork-after-high-level.md` for why the
+fork moved here, and `adr/0001-ml-modeling-family-and-continuity.md` for the
+family's origin.
 
 ## A third, independent track: `ml-system-design-monkey-mode`
 

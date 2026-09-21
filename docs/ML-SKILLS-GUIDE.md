@@ -37,22 +37,21 @@ topic/prompt
 /ml-system-design-prd  (whole design path)
   │
   ▼
--high-level  → design/high-level.md  (offers an ADR on real tradeoffs)
+-high-level  → design/high-level.md  (fork-grade ML framing; offers an ADR)
   │
-  ▼
--deep-dive  → design/deep-dive.md
+  ▼  FORK — pick one
+  ├─▶ -deep-dive  → design/deep-dive.md          (paper deep dive)
   │
-  ▼  FORK into execution
-ml-modeling-data → -features
+  └─▶ ml-modeling-data → -features                (hands-on deep dive)
+        │
+        ├─▶ ml-modeling-train        (sequential, 1 model)
+        ├─▶ ml-modeling-multiagent   (parallel, N candidates)
+        │     both write modeling/03-train.md  — CONVERGE here
+        ▼
+      ml-modeling-evaluate → modeling/04-evaluate.md
   │
-  ├─▶ ml-modeling-train        (sequential, 1 model)
-  ├─▶ ml-modeling-multiagent   (parallel, N candidates)
-  │     both write modeling/03-train.md  — CONVERGE here
-  ▼
-ml-modeling-evaluate → modeling/04-evaluate.md
-  │
-  ▼  CONVERGE back into the design doc
--delivery  (cites real eval results if modeling ran)
+  ▼  CONVERGE — both routes land here
+-delivery  (cites real eval results if modeling ran, else deep-dive)
   │
   ▼
 -post-delivery
@@ -60,14 +59,17 @@ ml-modeling-evaluate → modeling/04-evaluate.md
 
 Three things worth naming explicitly:
 
-- **The design path forks into execution** at `design/deep-dive.md` —
-  `ml-modeling-*` reads it, always, in both Regular and Quick-POC mode.
+- **The fork is after high-level, and it's either/or.** `-deep-dive` and
+  `ml-modeling-*` answer the same questions (data, features, models,
+  training) — one on paper, one by doing the work. `ml-modeling-*` reads
+  `prd/` + `design/high-level.md`, never `design/deep-dive.md`. See
+  `.agents/skills/personal/adr/0006-fork-after-high-level.md`.
 - **Training forks again, then converges** — sequential (`ml-modeling-train`)
   or parallel (`ml-modeling-multiagent`) both write the same
   `modeling/03-train.md` slot, so `ml-modeling-evaluate` doesn't care which
   one ran.
 - **Monkey-mode is not part of this graph at all** — it shares only the
-  project-folder root, nothing else. No dependency on `design/deep-dive.md`,
+  project-folder root, nothing else. No dependency on `design/` or `prd/`,
   no write into `modeling/`.
 
 ## Monkey-mode
@@ -162,8 +164,8 @@ fire from plain conversation.
 | `ml-system-design` | Router — whole design doc | `/ml-system-design <topic>` | Yes |
 | `ml-system-design-prd` | Grill Definition, write `prd/` | `/ml-system-design-prd <topic>` | No — command required |
 | `ml-system-design-definition` | Definition section directly (draft/review, no grilling) | `/ml-system-design-definition` | Yes |
-| `ml-system-design-high-level` | ML framing, architecture, phasing → `design/high-level.md` | `/ml-system-design-high-level` | Yes |
-| `ml-system-design-deep-dive` | Data/features/models/training → `design/deep-dive.md` | `/ml-system-design-deep-dive` | Yes |
+| `ml-system-design-high-level` | ML framing, architecture, phasing → `design/high-level.md`; fork point into `ml-modeling-*` | `/ml-system-design-high-level` | Yes |
+| `ml-system-design-deep-dive` | Data/features/models/training on paper → `design/deep-dive.md`; the alternative to `ml-modeling-*` | `/ml-system-design-deep-dive` | Yes |
 | `ml-system-design-delivery` | Rollout, eval, monitoring, fallback | `/ml-system-design-delivery` | Yes |
 | `ml-system-design-post-delivery` | Analysis, explainability, iteration | `/ml-system-design-post-delivery` | Yes |
 | `ml-modeling` | Router — data→features→train→evaluate | `/ml-modeling <topic>` | Yes |
@@ -185,8 +187,8 @@ ml-<topic>-<n>/
   adr/000N-*.md             Architecture decisions, any stage, one per file
   design/high-level.md      ML framing, architecture diagrams, phasing
   design/deep-dive.md       Data/features/models/training decisions
-  spec/<topic>.md           Design→modeling fork synthesis; first line is
-                             deep-dive-hash: (drift check, see below)
+  spec/<topic>.md           Design→modeling fork synthesis; first lines are
+                             prd-hash: and high-level-hash: (drift check, below)
   dashboard/                eda.ipynb + app.py (Streamlit), EDA + Results
                              only, Regular/Quick-POC, never monkey-mode
     .port                    This project's Streamlit port (per-project,
@@ -221,7 +223,7 @@ is the folder split, not a checkout:
 | Pattern | Writes | Shared with the other side |
 |---|---|---|
 | Design path + monkey-mode, one project | `design/`, `prd/`, `adr/` vs. `monkey-mode/` | `SKILL-IMPROVEMENTS.md` (append-only) |
-| Design continues while a fork runs `ml-modeling-*` | `design/` vs. `modeling/`, `spec/`, `dashboard/` | `design/deep-dive.md` — read by every modeling step, so it can drift (see below) |
+| Design continues while `ml-modeling-*` runs | `design/`, `prd/` vs. `modeling/`, `spec/`, `dashboard/` | `prd/<topic>.md` and `design/high-level.md` — read by every modeling step, so they can drift (see below) |
 | You edit by hand while autoresearch loops | Yours: `program.md`, `modeling/01-03*`, `design/`. The loop's: `autoresearch/experiment.py`, `best_metrics.json`, `rounds/`, `04-evaluate.*` | Nothing, if you stay on your side of that line |
 | Two projects at once (e.g. churn + ranking) | Two disjoint project folders | Only process/git state: the dashboard port and the git index |
 
@@ -234,9 +236,9 @@ Three mechanics keep the shared bits from colliding:
   `--log-file <project>/modeling/experiments.json` (autoresearch:
   `modeling/autoresearch/experiments.json`). The script's default is relative
   to the agent's CWD, which is wherever it happened to be.
-- **Deep-dive drift: detect, then ask.** `spec/<topic>.md` starts with
-  `deep-dive-hash:` (from `git hash-object -w design/deep-dive.md`). Each
-  `ml-modeling-*` step recomputes the hash first; on a mismatch it shows the
+- **Design drift: detect, then ask.** `spec/<topic>.md` starts with
+  `prd-hash:` and `high-level-hash:` (from `git hash-object -w <file>`). Each
+  `ml-modeling-*` step recomputes both first; on a mismatch it shows the
   diff and asks two things before doing its work: re-synthesize the spec or
   keep it, and apply the changed decisions going forward or proceed on the
   old ones. The answer is recorded in that step's `.md`. Autoresearch never
