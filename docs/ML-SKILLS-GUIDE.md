@@ -129,6 +129,32 @@ run only by command, the rest also trigger from plain language.
 | `mm-evaluate`         | Evaluate against a baseline                   |
 | `mm-autoresearch` cmd | Optional auto-improvement loop                |
 
+### Parameters
+
+Free text after the command, no flags. Three kinds of words are recognized:
+
+- **topic or project** - `churn prediction` starts a new folder;
+  `labs/ml-riot-churn-2` continues an existing one.
+- **speed** - `poc`, `quick`, `mvp`, `fast`, `one hour` -> Quick POC;
+  anything else -> Regular.
+- **training** - `parallel` or `multiagent` -> `mm-multiagent`; otherwise
+  `mm-train`. Only matters when going through `/mm`.
+
+| Command                              | Takes                             |
+|--------------------------------------|-----------------------------------|
+| `/sd <topic>`                        | topic, speed                      |
+| `/sd-prd <topic>`                    | topic (required), speed           |
+| `/sd-definition` .. `-post-delivery` | project*, speed, `review`         |
+| `/sd-monkey-mode <topic>`            | topic (required)                  |
+| `/mm <topic>`                        | topic or project, speed, training |
+| `/mm-data` .. `/mm-evaluate`         | project*, speed                   |
+| `/mm-autoresearch <project> ...`     | project (required), stop, count   |
+
+\* only when the project is not clear from the conversation. `review` runs
+the section in review mode instead of drafting. Autoresearch stop rule:
+`until plateau`, `for N minutes`, or nothing (one round); count: `N
+candidates`.
+
 ## Key design decisions
 
 Each has an ADR in `.agents/skills/personal/adr/`.
