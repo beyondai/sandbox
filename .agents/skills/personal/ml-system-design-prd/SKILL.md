@@ -29,8 +29,8 @@ for precision — grilling's exhaustiveness is the one thing POC mode doesn't ge
 to skip here, since a PRD missing a branch entirely defeats the point of using
 this skill at all.
 
-Each topic gets its own project folder, `ml-<topic-slug>-<n>/` at the repo root
-(e.g. `ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
+Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/`
+(e.g. `labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
 ADRs, later design-doc sections) lives under it, so a repo with multiple
 practice projects stays sorted by project rather than by doc type. Before
 writing, check for existing `ml-<topic-slug>-*` folders: if none exist, use

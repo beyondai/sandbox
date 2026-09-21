@@ -42,8 +42,8 @@ on. `/ml-system-design-prd` grills the user round-by-round on the Definition
 checklist and writes the resolved answers into a project folder before any
 drafting starts.
 
-Each practice project is one folder at the repo root, `ml-<topic-slug>-<n>/`
-(e.g. `ml-ecommerce-search-1/`) — every artifact for that project (PRD, ADRs,
+Each practice project is one folder under `labs/`, `labs/ml-<topic-slug>-<n>/`
+(e.g. `labs/ml-ecommerce-search-1/`) — every artifact for that project (PRD, ADRs,
 design-doc sections from the five skills above) lives under it, not scattered
 into repo-wide `docs/`. Write ADRs for a project's architectural decisions into
 `<project-folder>/adr/`, following the numbering and when-to-write rules in the
