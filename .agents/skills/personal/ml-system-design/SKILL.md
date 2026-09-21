@@ -21,8 +21,11 @@ Five sections, each its own skill, invoked in order for a full doc:
 5. `ml-system-design-post-delivery` — analysis, explainability, iteration,
    democratize.
 
-For a full doc, invoke each in order. For a single-section ask, invoke that
-skill directly and skip this one next time. For interview prep, narrate through
+For a full doc, invoke each in order. If `<project-folder>/prd/<topic>.md`
+exists, it is the Definition section: start the full doc at
+`ml-system-design-high-level`, and reserve `ml-system-design-definition` for a
+project without a PRD or for reviewing an existing Definition section. For a
+single-section ask, invoke that skill directly and skip this one next time. For interview prep, narrate through
 the five in order, using each skill's bullets as the follow-ups an interviewer
 would ask.
 
@@ -60,6 +63,27 @@ whose files this conversation has already been reading or writing; else, if
 exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
 step skills never create a folder - that is `/ml-system-design-prd`'s job.
 
+## Output docs
+
+Every file written under the project folder (`prd/`, `design/`, `adr/`,
+`spec/`, `modeling/`, `monkey-mode/`) wraps prose at 80 columns: hard line
+breaks inside paragraphs and list items, continuation lines indented under
+their bullet. Fenced code blocks are the exception. A table whose row would
+run past 80 columns becomes a list of headed paragraphs instead - the reader
+is a human in a terminal, not a renderer.
+
+## Hand edits between steps
+
+Every file under the project folder is the user's to edit by hand between
+steps. When the user says a file changed, or a re-read shows it did: re-read
+it, then re-run each downstream step whose file cites the changed content,
+updating those files in place. Downstream order: `prd/` feeds
+`design/high-level.md`, which feeds `design/deep-dive.md` or `spec/` +
+`modeling/`, which feed `delivery` and `post-delivery`. Each touched file
+gets one line under a `## Change log` heading at its end saying what moved
+and why. On the hands-on route the hash check in `../ml-modeling/SKILL.md`,
+"Design docs changed?", catches the same edits without being told.
+
 ## Regular vs. Quick-POC mode
 
 Every section above supports both. Regular: full rigor, ask when unknown. Quick
@@ -78,7 +102,7 @@ skill family: data → features → train → evaluate) is the hands-on version 
 the deep dive. The fork sits right after `design/high-level.md`:
 
 ```
-prd -> high-level -> [ -deep-dive (paper) | ml-modeling-* (hands-on) ] -> -delivery -> -post-delivery
+prd (= definition) -> high-level -> [ -deep-dive (paper) | ml-modeling-* (hands-on) ] -> -delivery -> -post-delivery
 ```
 
 Pick one. Both answer the same questions (data, features, models, training);

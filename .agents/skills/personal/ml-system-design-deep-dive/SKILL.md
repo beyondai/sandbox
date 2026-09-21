@@ -18,7 +18,8 @@ Regular vs. Quick-POC (how fast). Mode is chosen by keyword in the request —
 "regular"/"full"/nothing → Regular (default). Full rationale in
 `../adr/0001-ml-modeling-family-and-continuity.md`.
 
-Project folder: see `../ml-system-design/SKILL.md`, "Which project folder".
+Project folder and output format: see `../ml-system-design/SKILL.md`,
+"Which project folder" and "Output docs".
 
 **Draft, Regular**: answer each item below in the user's own numbers/words; ask
 if unknown, never invent.

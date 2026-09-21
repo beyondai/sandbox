@@ -17,7 +17,8 @@ and `modeling/03-train.md` — written by either `ml-modeling-train` or
 `ml-modeling-multiagent`, doesn't matter which. Writes
 `<project-folder>/modeling/04-evaluate.md` and `modeling/04-evaluate.json`. This
 is the last step in the chain — see `ml-modeling` router for what comes after.
-Project folder: see `../ml-modeling/SKILL.md`, "Which project folder". First,
+Project folder and output format: see `../ml-modeling/SKILL.md`,
+"Which project folder" and "Output docs". First,
 run the "Design docs changed?" check from `../ml-modeling/SKILL.md`.
 
 Score on `01-data.json` -> `dataset.test`. The train-side number for the

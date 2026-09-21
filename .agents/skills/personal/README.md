@@ -1,6 +1,7 @@
 # ml-system-design-* / ml-modeling-* - operational reference
 
-Read `docs/ML-SKILLS-GUIDE.md` first for orientation. This file holds the
+Entry point for a new project: `/ml-system-design <topic> [poc]`. Read
+`docs/ML-SKILLS-GUIDE.md` first for orientation. This file holds the
 detail that guide deliberately leaves out: how the pieces behave when several
 things run at once, the mechanics behind the drift check and the improvement
 log, autoresearch's modes, and when a git worktree is and is not worth it.

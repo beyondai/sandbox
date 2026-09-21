@@ -15,8 +15,8 @@ Reads `<project-folder>/design/high-level.md`'s Phasing (the model class per
 phase: baseline, first real model, stretch), `modeling/01-data.md` (class
 balance), and `modeling/02-features.md`. The candidate, loss, and class
 weighting are this step's decisions, recorded in `03-train.md`. Writes
-`<project-folder>/modeling/03-train.md`. Project folder: see
-`../ml-modeling/SKILL.md`, "Which project folder". First, run the "Design docs
+`<project-folder>/modeling/03-train.md`. Project folder and output format: see `../ml-modeling/SKILL.md`,
+"Which project folder" and "Output docs". First, run the "Design docs
 changed?" check from `../ml-modeling/SKILL.md`.
 
 Train on `02-features.md`'s "Output table" if present, else `01-data.json`

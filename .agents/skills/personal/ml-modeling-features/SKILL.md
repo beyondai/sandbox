@@ -14,8 +14,8 @@ Reads `<project-folder>/design/high-level.md`'s ML framing (population, unit of
 prediction — what one row is) and `modeling/01-data.md` (the profile and its
 risk flags). The feature list is this step's decision, recorded in
 `02-features.md`; there is no upstream list to copy. Writes
-`<project-folder>/modeling/02-features.md`. Project folder: see
-`../ml-modeling/SKILL.md`, "Which project folder". First, run the "Design docs
+`<project-folder>/modeling/02-features.md`. Project folder and output format: see `../ml-modeling/SKILL.md`,
+"Which project folder" and "Output docs". First, run the "Design docs
 changed?" check from `../ml-modeling/SKILL.md`.
 
 Input table: `01-data.json` -> `dataset.train`. Never open `dataset.test`

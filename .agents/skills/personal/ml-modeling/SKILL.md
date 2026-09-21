@@ -38,6 +38,12 @@ whose files this conversation has already been reading or writing; else, if
 exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
 step skills never create a folder - that is `/ml-system-design-prd`'s job.
 
+## Output docs
+
+Every `.md` this family writes follows `../ml-system-design/SKILL.md`,
+"Output docs": prose wrapped at 80 columns, code blocks exempt, wide tables
+turned into headed paragraphs.
+
 ## Required upstream: PRD + fork-grade high-level design
 
 Every step here reads `<project-folder>/prd/<topic>.md` and
@@ -214,6 +220,11 @@ first, before its own work, in both Regular and Quick-POC mode:
 `ml-modeling-autoresearch` is autonomous and does not ask; on a mismatch it
 notes the change in `round-summary.md` and keeps running against the current
 file. The next interactive step surfaces the question.
+
+Hand edits to a step's own output (`modeling/0N-*.md`, `01-data.json`) need
+no hash check: the next step reads the file as it stands. When the user says
+one changed, re-run from the step after it; see `../ml-system-design/SKILL.md`,
+"Hand edits between steps".
 
 ## Skill improvement log
 

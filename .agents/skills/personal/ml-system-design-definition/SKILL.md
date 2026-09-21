@@ -12,14 +12,18 @@ description: >-
 
 # Definition
 
-Project folder: see `../ml-system-design/SKILL.md`, "Which project folder".
+Project folder and output format: see `../ml-system-design/SKILL.md`,
+"Which project folder" and "Output docs".
 
 Draft (Regular): answer each item below in the user's own numbers/words; ask if
 unknown, never invent. Quick POC: state each item's most likely answer in one
 pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs.
 "regular"/nothing), see `../adr/0001-ml-modeling-family-and-continuity.md`.
 Review: check each item is actually answered, not just headed; flag gaps, don't
-rewrite what's solid.
+rewrite what's solid. When invoked from `ml-system-design-prd`, the one-pass
+POC draft is shown as a grilling round and the PRD is the output - nothing is
+written to `design/` (see that skill). A project that already has
+`prd/<topic>.md` skips this section's draft entirely.
 
 - **Problem**: core problem, why now, user pain point, link to team/company
   goals.

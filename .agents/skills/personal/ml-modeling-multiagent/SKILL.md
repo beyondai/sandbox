@@ -14,8 +14,8 @@ description: >-
 Reads `<project-folder>/design/high-level.md`'s Phasing (model class per phase),
 `modeling/01-data.md` (class balance), and `modeling/02-features.md`. Writes
 `<project-folder>/modeling/03-train.md` — same slot `ml-modeling-train` would
-write, so `ml-modeling-evaluate` doesn't need to know which one ran. Project
-folder: see `../ml-modeling/SKILL.md`, "Which project folder". First, run the
+write, so `ml-modeling-evaluate` doesn't need to know which one ran. Project folder and output format: see `../ml-modeling/SKILL.md`,
+"Which project folder" and "Output docs". First, run the
 "Design docs changed?" check from `../ml-modeling/SKILL.md`.
 
 Train on `02-features.md`'s "Output table" if present, else `01-data.json`

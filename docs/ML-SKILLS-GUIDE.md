@@ -26,6 +26,9 @@ invoke the next step**, which reads what the previous one wrote.
 ## The shape
 
 ```
+/ml-system-design <topic> [poc]   (entry point: picks the mode, offers the
+  |                                two commands below, then runs the sections)
+  v
 topic
   |
   |--> /ml-system-design-monkey-mode   (optional, runs in the background,
@@ -47,9 +50,23 @@ topic
 
 Three things to know:
 
-- **Start with PRD, then high-level.** A new project starts by asking two
-  questions: run monkey-mode in parallel? scope with the PRD first? Both are
-  hand-run commands.
+- **Start with `/ml-system-design <topic>`.** It picks Regular vs. Quick POC
+  from your wording, then asks two questions: run
+  `/ml-system-design-monkey-mode` in parallel? scope with
+  `/ml-system-design-prd` first? Both are hand-run commands; answer them, then
+  come back to `/ml-system-design` and it continues at high-level - the PRD
+  is the Definition section, so `-definition` is not run again. (`-prd` is the
+  interview: hand-run, creates the folder, writes `prd/`. `-definition` is the
+  checklist and the drafted section for a project without a PRD.)
+- **Every file is yours to edit between steps.** Open any `prd/`, `design/`,
+  `adr/`, `spec/` or `modeling/` file, change it, and tell Claude which one;
+  it re-reads it and re-runs the downstream steps that cite it, noting the
+  change in that file's `## Change log`. On the hands-on route the hash
+  check in the spec catches edits to `prd/` and `design/high-level.md` even
+  if you forget to say.
+- **Docs wrap at 80 columns.** Every file the skills write is meant to be
+  read in a terminal: prose hard-wrapped, code blocks exempt, wide tables
+  turned into headed paragraphs.
 - **After high-level, choose paper or hands-on.** `-deep-dive` and
   `ml-modeling-*` answer the same four questions (data, features, models,
   training). One writes a design section; the other does the work and records

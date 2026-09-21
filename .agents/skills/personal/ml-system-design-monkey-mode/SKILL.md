@@ -78,7 +78,8 @@ paths.
 
 ## Deliverable
 
-Write `<project-folder>/monkey-mode/report.md` with exactly these sections:
+Write `<project-folder>/monkey-mode/report.md` (format:
+`../ml-system-design/SKILL.md`, "Output docs") with exactly these sections:
 
 - **Requirements** — the simple/assumed version, from the 3 answers or their
   inferred fallbacks

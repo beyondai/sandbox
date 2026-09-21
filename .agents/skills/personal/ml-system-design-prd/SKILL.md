@@ -40,6 +40,15 @@ for precision — grilling's exhaustiveness is the one thing POC mode doesn't ge
 to skip here, since a PRD missing a branch entirely defeats the point of using
 this skill at all.
 
+Quick POC round shape: produce `ml-system-design-definition`'s one-pass POC
+draft (every checklist item with its most likely answer) and present it as a
+single grilling round, each item a numbered question with the draft answer as
+the recommendation. The user's confirmations and overrides become the PRD; the
+draft itself is never written to `design/definition.md` by this skill. The
+split between the two skills: this one is the interview (hand-run, creates the
+folder, writes `prd/`); `-definition` owns the checklist and the drafted
+section, and this skill reuses its checklist rather than keeping a copy.
+
 Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/` (e.g.
 `labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
 ADRs, later design-doc sections) lives under it, so a repo with multiple
@@ -51,7 +60,7 @@ starts a new numbered attempt at the same topic.
 When the frontier empties, write the settled answers to
 `<project-folder>/prd/<topic-slug>.md`, one heading per checklist bullet, in the
 user's own words and numbers — never the placeholder-style assumptions a draft
-pass would use. Confirm the slug with the user if the topic name is ambiguous.
+pass would use. Output format: `../ml-system-design/SKILL.md`, "Output docs". Confirm the slug with the user if the topic name is ambiguous.
 
 Done when the PRD file exists and every checklist bullet has a concrete,
 user-confirmed answer under its heading.

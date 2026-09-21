@@ -19,8 +19,8 @@ horizon, population, exclusions; Architecture: the named source tables) and
 `prd/<topic>.md` (scope) — both required, see `ml-modeling` router if either is
 missing. Writes `<project-folder>/modeling/01-data.md` and
 `modeling/01-data.json`, and (Regular/Quick-POC only — see below) creates
-`dashboard/eda.ipynb` and `dashboard/app.py`. Project folder: see
-`../ml-modeling/SKILL.md`, "Which project folder". First, run the "Design docs
+`dashboard/eda.ipynb` and `dashboard/app.py`. Project folder and output format: see `../ml-modeling/SKILL.md`,
+"Which project folder" and "Output docs". First, run the "Design docs
 changed?" check from `../ml-modeling/SKILL.md` (spec exists and its hash
 matches? proceed; otherwise ask).
 
