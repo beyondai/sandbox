@@ -6,7 +6,10 @@ description: >-
   project's EDA notebook and bootstraps its Streamlit dashboard. Step 1 of the
   ml-modeling-* chain (data → features → train → evaluate). Trigger on "profile
   this data," "check data quality," "set up a dashboard for this," or continuing
-  modeling work in an existing ml-<topic>-<n>/ project.
+  modeling work in an existing ml-<topic>-<n>/ project. Builds the labeled
+  table first when the source is raw logs rather than a flat labeled table, and
+  records the table paths, label, and split in `01-data.json`'s `dataset`
+  block - the contract every later step reads.
 ---
 
 # Profile Data
@@ -22,6 +25,31 @@ ask).
 Mode: Regular asks about anything the data doesn't make obvious (e.g. why a null
 rate is high). Quick POC states a reasonable read and moves on — see
 `ml-modeling` router for the keyword rule.
+
+## Build or register the labeled table
+
+Read deep-dive's Data and Training sections. One model per project folder;
+one `dataset` block.
+
+- **Flat labeled table exists** (CSV with the label column): register it -
+  fill the `dataset` block with its path(s), label, id, and the split you
+  will use. If there is no test split yet, make one here (random with a
+  fixed seed unless deep-dive says time-based) and record it.
+- **Source is raw logs** (events, activity rows, transactions; no label
+  column): write `modeling/build_dataset.py` and run it with
+  `uv run python3`. It takes every rule from deep-dive's Training section -
+  label definition, horizon, cutoff(s), population rule, exclusions - and
+  writes `modeling/datasets/<task>_train.csv` and `<task>_test.csv`.
+  Features use only rows strictly before the cutoff; labels use only rows
+  at or after it. Assert the positive rate is not degenerate (nowhere near
+  0% or 100%) and equals deep-dive's stated number when it states one - a
+  mismatch means a leak or a drifted rule; this check has caught a real
+  100%-churn look-ahead bug. Keep the script small and re-runnable; it is
+  part of the project's record.
+
+Then fill the `dataset` block (schema below) in `01-data.json` and add a
+"Dataset" section to `01-data.md` with the same facts in prose. Profile the
+train table only - never look at test rows while profiling.
 
 ## Profile
 
@@ -43,6 +71,15 @@ the `.md`):
 
 ```json
 {
+  "dataset": {
+    "train": "datasets/<task>_train.csv",
+    "test": "datasets/<task>_test.csv",
+    "label": "<col>", "id": "<col>",
+    "split": {"type": "cutoff|random", "train_cutoff": 0, "test_cutoff": 0,
+              "horizon_days": 0, "seed": 0, "test_share": 0.0},
+    "exclusions": ["<rule>"],
+    "built_by": "modeling/build_dataset.py|registered"
+  },
   "shape": {"rows": 0, "columns": 0, "memory_mb": 0.0},
   "nulls": {"<col>": 0.0},
   "target": {"column": "<name>", "type": "classification|regression",
@@ -92,7 +129,8 @@ dashboard/app.py --server.headless true --server.port $(cat dashboard/.port) &`
 port lives; `ml-modeling-evaluate` reads it for its health check.
 
 Done when every profile flag above is a real number from the actual data (not
-"looks fine"), `modeling/01-data.md` states which columns are risky and why,
+"looks fine"), `01-data.json` has a `dataset` block whose paths resolve,
+`modeling/01-data.md` states which columns are risky and why,
 `01-data.json` matches it, `dashboard/eda.ipynb` has real executed outputs, and
 the Streamlit process is actually running and reachable at the reported URL —
 not just files written.

@@ -17,6 +17,11 @@ slot `ml-modeling-train` would write, so `ml-modeling-evaluate` doesn't need to
 know which one ran. First, run the "Deep-dive changed?" check from
 `../ml-modeling/SKILL.md`.
 
+Train on `02-features.md`'s "Output table" if present, else `01-data.json`
+-> `dataset.train`; pass that table path to every candidate subagent's
+prompt. Each candidate cross-validates inside that table only;
+`dataset.test` is never read here - it belongs to `ml-modeling-evaluate`.
+
 This is the sequential-vs-parallel choice from the `ml-modeling` router — pick
 this over `ml-modeling-train` when there are genuinely multiple reasonable
 candidates worth trying rather than one clear choice, or when speed matters more

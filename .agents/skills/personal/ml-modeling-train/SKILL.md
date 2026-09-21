@@ -15,6 +15,10 @@ Reads `<project-folder>/design/deep-dive.md`'s Models section (required) and
 `modeling/02-features.md`. Writes `<project-folder>/modeling/03-train.md`.
 First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
 
+Train on `02-features.md`'s "Output table" if present, else `01-data.json`
+-> `dataset.train`. Cross-validate inside that table only; `dataset.test` is
+never read here - it belongs to `ml-modeling-evaluate`.
+
 One candidate, chosen and trained in this single pass — see `ml-modeling` router
 if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent,
 compared). Mode: Regular starts simple and upgrades only if the simple model
@@ -32,6 +36,7 @@ underperforms; Quick POC goes straight to the workhorse row below unless
 | Unsupervised grouping | K-Means/DBSCAN | Validate `k` via silhouette score |
 
 Use cross-validation, not a single train/test split, to pick between candidates.
+Folds are drawn inside the train table, never across the `dataset` split.
 
 ## Log it
 

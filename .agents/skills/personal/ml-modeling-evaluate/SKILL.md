@@ -18,6 +18,11 @@ Reads `<project-folder>/design/deep-dive.md`'s Training section (required) and
 is the last step in the chain — see `ml-modeling` router for what comes after.
 First, run the "Deep-dive changed?" check from `../ml-modeling/SKILL.md`.
 
+Score on `01-data.json` -> `dataset.test`. The train-side number for the
+overfit gap comes from the table the model was fit on (see `03-train.md`).
+If `dataset.split.type` is `cutoff`, say so in `04-evaluate.md`: this is a
+backtest at a later cutoff, not a random hold-out.
+
 Mode: Regular reports the full metric set below and checks overfit explicitly.
 Quick POC reports the metrics that actually distinguish "does this work" and
 stops there — see `ml-modeling` router for the keyword rule.

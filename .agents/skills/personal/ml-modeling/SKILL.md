@@ -16,11 +16,15 @@ Four sequential steps, each its own skill, chained by files under
 `ml-<topic>-<n>/modeling/` — not conversation memory, so any step can be invoked
 standalone in a fresh session:
 
-1. `ml-modeling-data` — profile data → `modeling/01-data.md`
+1. `ml-modeling-data` — build or register the labeled table, record it in
+   `01-data.json`'s `dataset` block, profile → `modeling/01-data.md`
 2. `ml-modeling-features` — engineer features → `modeling/02-features.md`
 3. `ml-modeling-train` (sequential) **or** `ml-modeling-multiagent` (parallel,
    see below) — train → `modeling/03-train.md`
 4. `ml-modeling-evaluate` — evaluate → `modeling/04-evaluate.md`
+
+`dataset` is the data contract: later steps read table paths, label, and
+split roles from it, never from prose. One model per project folder.
 
 For the full chain, invoke each in order. For a single-step ask ("engineer
 features for this dataset"), invoke that skill directly — it reads whatever the

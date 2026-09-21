@@ -192,7 +192,13 @@ ml-<topic>-<n>/
     .port                    This project's Streamlit port (per-project,
                              so two dashboards never collide)
   modeling/                 01-data(.md/.json) → 02-features → 03-train →
-                             04-evaluate(.md/.json), .json feeds dashboard
+                             04-evaluate(.md/.json), .json feeds dashboard;
+                             01-data.json also carries the `dataset` contract
+                             (train/test paths, label, id, split) every later
+                             step reads. One model per project folder.
+    datasets/                <task>_train.csv, <task>_test.csv - built or
+                             registered by ml-modeling-data
+    build_dataset.py         Present when the table is built from raw logs
     experiments.json         experiment_tracker log, always via --log-file
     autoresearch/            Optional, after 04-evaluate.json exists, 3
                              self-contained modes, see above; has its own

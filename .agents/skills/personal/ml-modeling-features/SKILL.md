@@ -15,6 +15,11 @@ Reads `<project-folder>/design/deep-dive.md`'s Features section (required) and
 `<project-folder>/modeling/02-features.md`. First, run the "Deep-dive changed?"
 check from `../ml-modeling/SKILL.md`.
 
+Input table: `01-data.json` -> `dataset.train`. Never open `dataset.test`
+here. If you write a transformed table, save it under `modeling/datasets/`
+and record its path in `02-features.md` under "Output table" so train picks
+it up.
+
 Mode: Regular tries the transforms `design/deep-dive.md` named and checks
 importance before finalizing. Quick POC picks the most obviously useful
 transforms and moves on — see `ml-modeling` router for the keyword rule.
