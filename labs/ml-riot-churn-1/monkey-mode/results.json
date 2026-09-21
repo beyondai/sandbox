@@ -1,0 +1,16 @@
+{
+  "n_players_csv": 12000,
+  "n_activity_rows": 748811,
+  "n_campaign_rows": 3150,
+  "train_cutoff": 135,
+  "test_cutoff": 180,
+  "train_n": 4954,
+  "train_churn_rate": 0.08195397658457812,
+  "test_n": 4675,
+  "test_churn_rate": 0.08684491978609625,
+  "pr_auc": 0.47739391839946305,
+  "precision": 0.3366778149386845,
+  "recall": 0.7438423645320197,
+  "f1": 0.4635456638526477,
+  "pred_pos_rate": 0.1918716577540107
+}
