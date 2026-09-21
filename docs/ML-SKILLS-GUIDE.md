@@ -33,6 +33,8 @@ topic
   |
   |--> /ml-system-design-monkey-mode   (optional, runs in the background,
   |      3 questions -> monkey-mode/report.md; touches nothing else)
+  |--> /ml-system-design-monkey-mlp    (optional, sibling of monkey-mode -
+  |      embedding-MLP instead of tree/linear -> monkey-mlp/report.md)
   v
 /ml-system-design-prd          -> prd/<topic>.md
   v
@@ -74,6 +76,12 @@ Three things to know:
   never `design/deep-dive.md`.
 - **One model per project folder.** If the framing yields two models, the
   second gets its own folder.
+- **`/ml-modeling <topic>` checkpoints by default.** It runs step 1, reports
+  the result, and waits for you before running step 2, and so on through
+  step 4 - the same review-after-each-step pattern as `-prd` and
+  `-high-level`. Say "full chain" (or "run all four steps") to get the old
+  uninterrupted data -> features -> train -> evaluate pass in one go
+  instead.
 
 ## Two speeds
 
@@ -98,7 +106,10 @@ labeled table or builds one from logs (`modeling/build_dataset.py` ->
 `modeling/datasets/<task>_{train,test}.csv`), then records paths, label, id,
 and split rule in `01-data.json`'s `dataset` block. Every later step reads
 that block: features and train see only the train table, evaluate scores the
-test table, and cross-validation folds never cross the split.
+test table, and cross-validation folds never cross the split. Profiling also
+cleans genuine errors it finds (impossible values, a missingness sentinel,
+exact duplicates) and re-profiles - a legitimately extreme-but-real value
+stays flagged, not touched (0007).
 
 ## Project folder
 
@@ -112,7 +123,7 @@ labs/ml-<topic>-<n>/
   adr/000N-*.md            One decision per file
   spec/<topic>.md          Synthesized when modeling starts; pins design hashes
   modeling/
-    01-data.md/.json       Profile + `dataset` contract
+    01-data.md/.json       Profile, clean + `dataset` contract
     02-features.md         Feature decisions
     03-train.md            Model, loss, class weighting
     04-evaluate.md/.json   Metrics vs. baseline; feeds the dashboard
@@ -138,8 +149,9 @@ run only by command, the rest also trigger from plain language.
 | `sd-delivery`         | Rollout, eval, monitoring, fallback           |
 | `sd-post-delivery`    | Analysis, explainability, iteration           |
 | `sd-monkey-mode` cmd  | Fast autonomous baseline, background          |
-| `mm`                  | Router: data -> features -> train -> evaluate |
-| `mm-data`             | Build or register the table, profile it       |
+| `sd-monkey-mlp` cmd   | Fast autonomous embedding-MLP baseline, background |
+| `mm`                  | Router: data -> features -> train -> evaluate, one step at a time by default |
+| `mm-data`             | Build or register the table, profile and clean it |
 | `mm-features`         | Engineer features                             |
 | `mm-train`            | Train one model                               |
 | `mm-multiagent`       | Train N candidates in parallel                |
@@ -156,16 +168,20 @@ Free text after the command, no flags. Three kinds of words are recognized:
   anything else -> Regular.
 - **training** - `parallel` or `multiagent` -> `mm-multiagent`; otherwise
   `mm-train`. Only matters when going through `/mm`.
+- **continuation** (only for `/mm`) - `full chain` or `run all four steps` ->
+  run data -> features -> train -> evaluate in one uninterrupted pass;
+  anything else -> stop and wait for you after each step.
 
-| Command                              | Takes                             |
-|--------------------------------------|-----------------------------------|
-| `/sd <topic>`                        | topic, speed                      |
-| `/sd-prd <topic>`                    | topic (required), speed           |
-| `/sd-definition` .. `-post-delivery` | project*, speed, `review`         |
-| `/sd-monkey-mode <topic>`            | topic (required)                  |
-| `/mm <topic>`                        | topic or project, speed, training |
-| `/mm-data` .. `/mm-evaluate`         | project*, speed                   |
-| `/mm-autoresearch <project> ...`     | project (required), stop, count   |
+| Command                              | Takes                                  |
+|--------------------------------------|-----------------------------------------|
+| `/sd <topic>`                        | topic, speed                           |
+| `/sd-prd <topic>`                    | topic (required), speed                |
+| `/sd-definition` .. `-post-delivery` | project*, speed, `review`              |
+| `/sd-monkey-mode <topic>`            | topic (required)                       |
+| `/sd-monkey-mlp <topic>`             | topic (required)                       |
+| `/mm <topic>`                        | topic or project, speed, training, continuation |
+| `/mm-data` .. `/mm-evaluate`         | project*, speed                        |
+| `/mm-autoresearch <project> ...`     | project (required), stop, count        |
 
 \* only when the project is not clear from the conversation. `review` runs
 the section in review mode instead of drafting. Autoresearch stop rule:
@@ -192,3 +208,6 @@ Each has an ADR in `.agents/skills/personal/adr/`.
   duration, no external scheduler (0003, 0005).
 - **Skill fixes are logged, not applied mid-run** - `SKILL-IMPROVEMENTS.md`
   per project, reviewed on request (0004).
+- **Cleaning lives inside the data step** - genuine errors get fixed and
+  re-profiled there, not left to feature engineering or split into a
+  separate step (0007).

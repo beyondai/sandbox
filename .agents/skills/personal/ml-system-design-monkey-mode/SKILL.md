@@ -19,6 +19,12 @@ only the project-folder root with both, nothing else. Doesn't read
 path to have run first. The point: one line in, a runnable baseline out, in the
 background, while you keep working on the real design.
 
+For tasks with high-cardinality identity columns (user/item ids,
+recommendation-shaped problems), see the sibling
+`ml-system-design-monkey-mlp` — same contract, an embedding-MLP instead of
+this skill's tree/linear default, writes to a disjoint `monkey-mlp/` folder
+so both can run on the same project.
+
 ## Process
 
 1. Resolve the project folder: same numbering as `ml-system-design-prd` — check
@@ -34,6 +40,27 @@ background, while you keep working on the real design.
    the fast defaults below, the deliverable list, and the output path. Tell the
    user it's running in the background and they can keep working on the regular
    flow.
+
+   The project folder may be populated concurrently by other in-progress work
+   (PRD/design running in the foreground session) and must be treated as
+   shared, not owned: instruct the agent to never delete or reset the
+   project-folder root or any sibling directory (`prd/`, `design/`, `adr/`,
+   `spec/`, `modeling/`) — only ever create `monkey-mode/` additively with
+   `mkdir -p` and write inside it. A prompt phrase like "the project folder
+   does not exist yet" describes the folder's state before this run, not
+   permission to reset it if it appears mid-run.
+
+   Instruct the agent to verify `pandas`/`scikit-learn`/`numpy` import via
+   `uv run python3 -c "import pandas, numpy, sklearn"` run from inside the
+   project folder — this resolves the sandbox root's shared `pyproject.toml`/
+   `.venv` (confirmed already stocked with pandas, numpy, scikit-learn,
+   matplotlib, plotly, streamlit, and more), not the bare ambient `python3`.
+   Only if that genuinely fails (a package truly isn't in the shared env) run
+   `uv add <pkg>` from the sandbox root (not the project folder) so the fix
+   lands in the shared `pyproject.toml`/`uv.lock` and benefits every future
+   project — never bootstrap a project-local `.venv` as the first move; that
+   duplicates work and silently diverges from the shared environment. Note
+   any such addition in the report's Learnings.
 4. When it reports back, surface the results.
 
 ## The 3 questions — never blocking
@@ -51,7 +78,9 @@ background, while you keep working on the real design.
    three ways to answer: a number the user already has; "look one up" — a
    quick web search for a domain benchmark (typical model performance for
    this kind of task, cited), translated into the chosen metric and stated as
-   a soft target; or leave it to the fallback. Watch for benchmarks that
+   a soft target; or leave it to the fallback. Time-box the "look one up"
+   search to 2 minutes — take the best citation found in that window rather
+   than continuing to search for a perfect match. Watch for benchmarks that
    measure a different population than the task (e.g. new-install churn vs.
    retained-player lapse) and say so rather than adopting the number.
    Self-inferred fallback: an actual assumed target number based on the problem
@@ -74,7 +103,13 @@ paths.
   a single small tree ensemble for tabular data). Not a comparison — one model,
   trained once.
 - **Eval**: a held-out split (or a small sampled subset if the dataset is
-  large), scored on the resolved primary metric.
+  large), scored on the resolved primary metric. If a sample was taken,
+  state its size **as an explicit, bolded percentage of the full source**
+  in `report.md`'s Requirements/Input sections - not just the raw row
+  count buried in a Suggested Next Steps aside (e.g. "**a 600,000-row
+  sample, ~8.1% of the full 7,377,419-row `train.csv`**"). This has gone
+  unnoticed before when only the raw count was given up front, and it
+  matters for judging results later.
 
 ## Deliverable
 

@@ -22,6 +22,20 @@ never blocks - unanswered questions fall back to self-inferred defaults:
 Writes only `monkey-mode/report.md`. Reads nothing under `design/`, `prd/`,
 or `modeling/`. Detail: `ml-system-design-monkey-mode/SKILL.md`.
 
+## Monkey-MLP
+
+A sibling of monkey-mode, same three-question/never-blocks contract, for
+tasks with high-cardinality identity columns (user/item ids,
+recommendation-shaped problems) where a learned embedding is a better fit
+than one-hot + a tree model. Writes only `monkey-mlp/report.md`, disjoint
+from `monkey-mode/report.md`, so both can run in the same project folder for
+a direct comparison. Two eval rules are non-negotiable (unlike the rest of
+its fast defaults): early stopping is chosen from an internal validation
+split carved out of train only, never from the test set, and the test set is
+scored exactly once - skipping either silently inflates the reported AUC (a
+real leak of ~0.004 AUC was caught and fixed this way on the KKBOX project).
+Detail: `ml-system-design-monkey-mlp/SKILL.md`.
+
 ## Autoresearch
 
 Optional follow-up once `modeling/04-evaluate.json` exists. User-invoked
@@ -108,6 +122,7 @@ folder split, not a git checkout:
 | Pattern | Writes | Shared |
 |---|---|---|
 | Design path + monkey-mode, one project | `design/`, `prd/`, `adr/` vs. `monkey-mode/` | `SKILL-IMPROVEMENTS.md` (append-only) |
+| Monkey-mode + monkey-mlp, one project | `monkey-mode/` vs. `monkey-mlp/` | `SKILL-IMPROVEMENTS.md` (append-only) |
 | Design continues while `ml-modeling-*` runs | `design/`, `prd/` vs. `modeling/`, `spec/`, `dashboard/` | `prd/<topic>.md`, `design/high-level.md` - read by every modeling step, hence the drift check |
 | You edit by hand while autoresearch loops | Yours: `program.md`, `modeling/01-03*`, `design/`. The loop's: `autoresearch/experiment.py`, `best_metrics.json`, `rounds/`, `04-evaluate.*` | Nothing, if each side stays on its side |
 | Two projects at once | Two disjoint folders | Only process/git state: dashboard port, git index |
@@ -143,3 +158,5 @@ edits stay on `main` regardless.
 | 0004 | Skill improvement log: per-project, log-and-review, never auto-apply |
 | 0005 | Autoresearch self-contained looping (no `/loop`) |
 | 0006 | Fork after high-level; deep-dive and ml-modeling are alternatives |
+| 0007 | Cleaning is a phase inside `ml-modeling-data`, not a new step |
+| 0008 | Monkey-MLP: sibling skill to monkey-mode, not a model option on it |
