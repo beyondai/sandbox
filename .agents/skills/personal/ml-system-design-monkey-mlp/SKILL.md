@@ -47,9 +47,8 @@ explicitly. Treat that gap as a reasonable expectation, not a guarantee:
 
 ## Process
 
-1. Resolve the project folder — same as `ml-system-design-monkey-mode`: check
-   for `ml-<topic-slug>-*`, use `-1` if none exist, ask which to use if some
-   do.
+1. Resolve the project folder — same as `ml-system-design-monkey-mode`: use
+   `../ml-system-design/SKILL.md`, "Project folder".
 2. Fire the same 3 questions as `ml-system-design-monkey-mode` via
    AskUserQuestion (task + data, primary metric, success bar) — same
    fallback philosophy, never block. See that skill's "The 3 questions"

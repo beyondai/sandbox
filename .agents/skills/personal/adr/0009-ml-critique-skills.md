@@ -53,15 +53,16 @@ and record the decisions and the trade-offs.
 7. **Definition of done.** Each finding has a resolution. Each decision has
    its trade-off. Each deferred item has a reason, an owner, an unblock
    condition, and a risk. A conclusion gives a verdict. The user confirms.
-8. **2 modes, selected by keyword.** Brief (45 minutes, caps for each part,
-   `[C]` catalog items, P1 and P2 only, 2 rounds maximum, no checkpoints) and Normal (a
-   few hours, the full catalog, command evidence for the modeling lens,
-   checkpoints at each phase and round). In Normal mode, the user can go to
-   the next step at a checkpoint. Then all open items go to Deferred with
-   the reason "the user went to the next step".
+8. **2 modes, selected by keyword.** Brief (45 minutes, caps for each
+   part, `[C]` catalog items, P1 and P2 only, 2 rounds maximum, no
+   checkpoints) and Normal (a few hours, the full catalog, command evidence
+   for the modeling lens, checkpoints at each phase and round). In Normal
+   mode, the user can go to the next step at a checkpoint. Then all open
+   items go to Deferred with the reason "the user went to the next step".
 9. **Output.** One file, `<project-folder>/critique/<date>-<lens>.md`, or
-   `notes/critique-<slug>-<date>.md` with no project folder. The critique
-   does not edit the write-up.
+   `critique/<date>-<slug>.md` in the write-up's folder with no project
+   folder (never `notes/`, which holds only user-written content). The
+   critique does not edit the write-up.
 
 10. **Optional reference design.** The user can give their own design at
     any phase. The skill asks for it once at the start, and never searches

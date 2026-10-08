@@ -27,8 +27,9 @@ so both can run on the same project.
 
 ## Process
 
-1. Resolve the project folder: same numbering as `ml-system-design-prd` — check
-   for `ml-<topic-slug>-*`, use `-1` if none exist, ask which to use if some do.
+1. Resolve the project folder with `../ml-system-design/SKILL.md`, "Project
+   folder" (name, parent, and new-attempt rules, same as
+   `ml-system-design-prd`).
 2. Fire the 3 questions below via AskUserQuestion, each with a recommended
    default. **Never block**: whether answered, partially answered, or skipped,
    proceed immediately — an unanswered item falls back to its self-inferred

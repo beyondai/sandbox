@@ -6,7 +6,7 @@ description: >-
   the ml-modeling-* chain (data → features → train → evaluate), the sequential
   alternative to ml-modeling-multiagent. Trigger on "train a model for this,"
   "pick an algorithm," or continuing modeling work in an existing
-  ml-<topic>-<n>/ project.
+  ML project folder.
 ---
 
 # Train (sequential)

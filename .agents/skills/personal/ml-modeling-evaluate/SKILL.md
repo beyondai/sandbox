@@ -6,7 +6,7 @@ description: >-
   dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain
   (data → features → train → evaluate). Trigger on "evaluate this model,"
   "compare to baseline," "is this overfitting," or continuing modeling work in
-  an existing ml-<topic>-<n>/ project.
+  an existing ML project folder.
 ---
 
 # Evaluate

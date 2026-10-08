@@ -54,13 +54,11 @@ skills: this one is the interview (hand-run, creates the folder, writes
 `prd/`); `-definition` owns the checklist and the drafted section, and this
 skill reuses its checklist rather than keeping a copy.
 
-Each topic gets its own project folder, `labs/ml-<topic-slug>-<n>/` (e.g.
-`labs/ml-ecommerce-search-1/`) — every design artifact for that project (PRD,
-ADRs, later design-doc sections) lives under it, so a repo with multiple
-practice projects stays sorted by project rather than by doc type. Before
-writing, check for existing `ml-<topic-slug>-*` folders: if none exist, use
-`-1`; if some exist, ask the user whether this continues an existing one or
-starts a new numbered attempt at the same topic.
+This skill creates the project folder. Use the name and parent rules in
+`../ml-system-design/SKILL.md`, "Project folder": the user's project name
+(or a proposed `ml-<topic-slug>`), under `labs/` unless the user names
+another parent. If a folder with that name exists, ask whether this
+continues it or starts a new attempt (`-<n>`).
 
 When the frontier empties, write the settled answers to
 `<project-folder>/prd/<topic-slug>.md`, one heading per checklist bullet, in the

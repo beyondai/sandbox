@@ -53,10 +53,8 @@ scratch, even on a brand-new project. A background agent told a shared path
 creating its own `monkey-mode/` subdirectory, destroying a PRD the foreground
 session had just written.
 
-Each practice project is one folder under `labs/`, `labs/ml-<topic-slug>-<n>/`
-(e.g. `labs/ml-ecommerce-search-1/`) — every artifact for that project (PRD,
-ADRs, design-doc sections from the five skills above) lives under it, not
-scattered into repo-wide `docs/`. Write ADRs for a project's architectural
+Every artifact for a project lives in its project folder (see "Project
+folder" below), not scattered into repo-wide `docs/` or `notes/`. Write ADRs for a project's architectural
 decisions into `<project-folder>/adr/`, following the numbering and
 when-to-write rules in the `domain-modeling` skill's ADR format — only the
 location is project-scoped, the format itself is unchanged. ADRs stay
@@ -64,14 +62,50 @@ one-per-decision even as a project accumulates several - never a single running
 project-decisions log, and never the home for a whole design section (each
 section has its own file under `design/`).
 
-## Which project folder
+## Project folder
 
-Use, in order: the folder named in the request; else the `labs/ml-*` folder
-whose files this conversation has already been reading or writing; else, if
-exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
-step skills never create a folder - that is `/ml-system-design-prd`'s job.
+This section is the single source of truth for where all `ml-*` and
+`ml-critique*` skills save local docs and designs.
+
+```
+<parent>/                  default: labs/ (the user can name another)
+  <project>/               for example: proj1/
+    prd/  design/  adr/  spec/  modeling/  dashboard/
+    critique/  research/  monkey-mode/  monkey-mlp/
+```
+
+- **Project name.** Use the name that the user gives (for example
+  `proj1`), as a lowercase slug. If the user gives only a topic, propose
+  `ml-<topic-slug>` and confirm it. Add `-<n>` only for a new attempt at a
+  project that already exists: ask "continue the existing project, or
+  start a new attempt?" first.
+- **Parent folder.** The default is `labs/`. The user can name another
+  parent in the request (for example "put proj1 in ~/work/designs"). Use
+  that parent for the project. Later requests name the project by its path.
+- **Subfolders.** A skill creates its subfolder the first time that it
+  writes there. Every other file generated for the project (research,
+  notes for the project, test records) goes in a subfolder of the project
+  folder. Never in `notes/`: it holds only what the user typed or pasted.
+
+### Which project folder
+
+Use the first rule that applies:
+1. The project named in the request. A path is used as given. A name with
+   no path is looked up under `labs/`.
+2. The project folder that this conversation already read or wrote.
+3. If exactly one project folder exists under `labs/`, that one. A
+   project folder is a direct child of the parent that has at least one of
+   the subfolders above.
+4. Ask the user.
+
+Only `/ml-system-design-prd` and the monkey tracks create a new project
+folder. Section and step skills never create one.
 
 ## Output docs
+
+Every file that a skill in this family creates goes in the project folder.
+`notes/` holds only content that the user typed or pasted: read it, but do
+not create files there.
 
 Every file written under the project folder (`prd/`, `design/`, `adr/`,
 `spec/`, `modeling/`, `monkey-mode/`, `critique/`) wraps prose at 80

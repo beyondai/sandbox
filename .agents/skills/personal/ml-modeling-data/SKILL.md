@@ -8,7 +8,7 @@ description: >-
   Streamlit dashboard. Step 1 of the ml-modeling-* chain (data → features →
   train → evaluate). Trigger on "profile this data," "check data quality,"
   "clean this data," "set up a dashboard for this," or continuing modeling
-  work in an existing ml-<topic>-<n>/ project. Builds the labeled table first
+  work in an existing ML project folder. Builds the labeled table first
   when the source is raw logs rather than a flat labeled table, and records
   the table paths, label, and split in `01-data.json`'s `dataset` block - the
   contract every later step reads.

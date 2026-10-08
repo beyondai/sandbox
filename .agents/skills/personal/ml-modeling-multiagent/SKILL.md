@@ -5,8 +5,8 @@ description: >-
   one at a time — dispatches one subagent per candidate, then merges results.
   Parallel alternative to ml-modeling-train for step 3 of the ml-modeling-*
   chain. Trigger on "try a few models in parallel," "compare multiple algorithms
-  at once," or "multiagent"/"concurrent" training for an ml-<topic>-<n>/
-  project.
+  at once," or "multiagent"/"concurrent" training in an existing ML project
+  folder.
 ---
 
 # Train (parallel, multiple candidates)

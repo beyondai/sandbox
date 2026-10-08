@@ -6,7 +6,7 @@ description: >-
   features, time-based/cyclical features, importance-based selection. Step 2
   of the ml-modeling-* chain (data → features → train → evaluate). Trigger on
   "engineer features for this," "encode these columns," or continuing
-  modeling work in an existing ml-<topic>-<n>/ project.
+  modeling work in an existing ML project folder.
 ---
 
 # Engineer Features

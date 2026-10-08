@@ -79,8 +79,8 @@ Order rules:
 
 1. Mode by keyword: "brief", "quick", or "45 min" selects **Brief**. All
    other requests select **Normal**.
-2. Find the write-up: a file, pasted text, or a `labs/ml-*` folder. Use
-   "Which project folder" in `../ml-system-design/SKILL.md`.
+2. Find the write-up: a file, pasted text, or a project folder. Use
+   "Project folder" in `../ml-system-design/SKILL.md`.
 3. Lens by content: design (`prd/`, `design/`) gets `ml-critique-system`.
    Results (`spec/`, `modeling/`, code) get `ml-critique-modeling`. Both
    types of content get both lenses, run in parallel.
@@ -123,7 +123,9 @@ a notes file" in `../ml-system-design-prd/SKILL.md`).
 ### 4. Document
 
 1. Write `<project-folder>/critique/<YYYY-MM-DD>-<lens>.md`. With no
-   project folder, write `notes/critique-<slug>-<YYYY-MM-DD>.md`. Use
+   project folder, write `critique/<YYYY-MM-DD>-<slug>.md` in the folder
+   of the write-up. For pasted text, ask the user where to write it. Never
+   write in `notes/`: it holds only what the user typed or pasted. Use
    "Output docs" in `../ml-system-design/SKILL.md`.
 2. Sections: Summary (top 3 changes), Done well, Change or fix, Missing,
    Questions, Decisions and trade-offs, Deferred, Conclusion.
@@ -144,7 +146,7 @@ A reference design is the reviewer's own design, system, or folder for the
 same problem. It is optional. Sometimes a fresh view is the goal.
 
 - **Ask first.** Use a reference design only if the user gives its path or
-  text in this session. Do not search for one. Do not use other `labs/`
+  text in this session. Do not search for one. Do not use other project
   folders, `monkey-mode/` output, or earlier critiques as a reference
   unless the user names them.
 - **Any phase.** The user can give it at the start or in any later phase.

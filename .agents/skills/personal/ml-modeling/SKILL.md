@@ -8,13 +8,13 @@ description: >-
   Entry point for the whole data-to-evaluated-model chain; for one step only,
   trigger that step's own skill directly instead. Trigger on "let's
   build/train/prototype a model for X," "quick ML POC," or continuing modeling
-  work in an existing ml-<topic>-<n>/ project folder.
+  work in an existing ML project folder.
 ---
 
 # ML Modeling
 
 Four sequential steps, each its own skill, chained by files under
-`ml-<topic>-<n>/modeling/` — not conversation memory, so any step can be invoked
+`<project-folder>/modeling/` — not conversation memory, so any step can be invoked
 standalone in a fresh session:
 
 1. `ml-modeling-data` — build or register the labeled table, record it in
@@ -40,10 +40,8 @@ already wrote and continues from there.
 
 ## Which project folder
 
-Use, in order: the folder named in the request; else the `labs/ml-*` folder
-whose files this conversation has already been reading or writing; else, if
-exactly one `labs/ml-*` folder exists, that one; otherwise ask. Section and
-step skills never create a folder - that is `/ml-system-design-prd`'s job.
+Use `../ml-system-design/SKILL.md`, "Project folder": the name, the parent
+folder (default `labs/`), the subfolders, and how to find the folder.
 
 ## Output docs
 
