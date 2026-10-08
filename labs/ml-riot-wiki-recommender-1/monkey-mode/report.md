@@ -258,6 +258,65 @@ final run == previous run (seed 42): True
 
 ## Results
 
+### Results at K = 5 (the panel size)
+
+The PRD sets the panel to 5 pages, so @5 is the primary cutoff. The same
+script re-ran with `MONKEY_K=5`: same seed, same split and same models.
+Output: `metrics_k5.json` and `run_k5.log`. All asserts passed again. The
+B1 sweep picked the same setting: min_h = 1, alpha = 1.
+
+```
+model            bucket   nDCG@5   recall@5  recall_w@5  hit@5   coverage
+B0               overall  0.0097   0.0021    0.0012      0.0524  0.0000
+B1 (tuned)       overall  0.9725   0.7638    0.8547      0.9921  0.0470
+B1 (tuned)       cold     0.0014   0.0014    0.0014      0.0014  0.0000
+B1 (tuned)       tail     0.9794   0.9522    0.9609      1.0000  0.0241
+B1 (tuned)       torso    0.9800   0.4168    0.6686      1.0000  0.0194
+B1 (tuned)       head     0.9979   0.0928    0.4968      1.0000  0.0070
+Reranker (plan)  overall  0.8946   0.7684    0.7651      0.9943  0.0666
+Reranker_graded  overall  0.9773   0.7686    0.8601      0.9944  0.0665
+Reranker_graded  cold     0.2567   0.2949    0.2950      0.2966  0.0026
+Reranker_graded  tail     0.9831   0.9558    0.9649      1.0000  0.0430
+Reranker_graded  torso    0.9809   0.4169    0.6697      1.0000  0.0198
+Reranker_graded  head     0.9975   0.0928    0.4963      1.0000  0.0070
+Hybrid           overall  0.9745   0.7661    0.8571      0.9944  0.0492
+```
+
+Bootstrap 95% CIs, nDCG@5 delta vs tuned B1:
+
+```
+model - B1        bucket   delta     95% CI               relative
+Reranker (plan)   overall  -0.0779   [-0.0786, -0.0771]   -8.01%
+Reranker (plan)   tail     -0.0078   [-0.0083, -0.0073]   -0.80%
+Reranker_graded   overall  +0.0048   [+0.0045, +0.0050]   +0.49% [+0.47, +0.52]
+Reranker_graded   cold     +0.2553   [+0.2443, +0.2661]   B1 = 0.0014
+Reranker_graded   tail     +0.0037   [+0.0034, +0.0041]   +0.38%
+Reranker_graded   torso    +0.0009   [+0.0007, +0.0011]   +0.09%
+Reranker_graded   head     -0.0004   [-0.0005, -0.0003]   -0.04%
+Hybrid            overall  +0.0020   [+0.0019, +0.0021]   +0.21%
+```
+
+Novel-pair slice, nDCG@5 (targets that history never showed from A):
+Reranker_graded scores cold 0.2567 and tail 0.0889. B1 scores 0.0014 and
+0.0000.
+
+What changes from @10 to @5:
+
+- **The verdict does not change.**
+  - +5% overall is still not reachable: B1 is at 0.9725, so a perfect
+    ranker gains only +2.8%.
+  - The plan's binary reranker fails, and it is worse at @5 (-8.0%).
+  - The graded reranker passes the second clause: it clearly wins on tail
+    and on cold.
+- **Recall drops more than nDCG.** B1 recall@5 is 0.764, against 0.864 at
+  @10. On head pages only 9% of next pages fit into 5 slots. For a busy
+  page, the panel can show only a small part of where readers go.
+- **The cold-page win stays the same size** (+0.255), because cold pages
+  have few relevant targets.
+
+### Results at K = 10 (first run)
+
+
 ### B1 noise sweep (val, 11,552 queries, overall nDCG@10)
 
 ```
@@ -470,3 +529,9 @@ pair_type    -0.0172               in_c          0.0000
     near-perfect on mature pages.
   - Success for Riot should be measured on cold and new pages, plus a
     temporal split, not on overall nDCG.
+
+## Change log
+
+- 2026-10-08: added results at K = 5 to match the PRD's 5-page panel.
+  `baseline.py` now reads the cutoff from `MONKEY_K` (default 10). The @10
+  results are unchanged and kept below the @5 results.

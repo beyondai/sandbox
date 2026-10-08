@@ -112,6 +112,33 @@ paths.
   unnoticed before when only the raw count was given up front, and it
   matters for judging results later.
 
+## Saved outputs: eval re-runs without modeling
+
+A metric or cutoff change (e.g. @10 to @5) must re-run eval only, never data
+prep or training. So the run saves its intermediate results, and the code has
+two entry points:
+
+```
+train:  prepare data -> split -> fit -> score -> save   (slow, run once)
+eval:   read saved outputs -> metrics at any K -> metrics file   (fast)
+```
+
+- Save, as parquet:
+  - the prepared and split data (with the split column);
+  - the ground truth for the eval rows or queries;
+  - the candidate sets, for ranking tasks;
+  - each model's scores. For ranking, save the top 50 items per query, not
+    only the top K. For classification or regression, save every eval row.
+- Save them under the sandbox-root `data/<dataset>/monkey-mode/`. Never save
+  them inside the project folder.
+- Generated data never goes into git. Before the run ends, check each saved
+  path with `git check-ignore -v <path>`. If a path is not ignored, move it
+  under `data/`. Do not edit `.gitignore` without asking the user.
+- The project folder keeps only small, readable files: the code, the
+  metrics file, the run log and `report.md`.
+- Name the saved paths and the `eval` command in the report's Implementation
+  section.
+
 ## Deliverable
 
 Write `<project-folder>/monkey-mode/report.md` (format:
@@ -138,6 +165,8 @@ assumed."
 
 Done when `report.md` exists with all six sections populated by a real run (real
 code, real numbers) — not placeholders.
+The saved outputs (see "Saved outputs") exist, are git-ignored, and the
+`eval` entry point reproduces the metrics file from them.
 
 If this run turns up a bug or a better design in this skill, or you ask for a
 change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill

@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -41,7 +42,7 @@ from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostin
 
 SEED = 42
 P_HIST = 7 / 30
-K = 10
+K = int(os.environ.get("MONKEY_K", "10"))  # panel size; MONKEY_K=5 for the 5-slot panel
 BUCKETS = ["cold", "tail", "torso", "head"]
 N_TRAIN, N_EVAL = 100_000, 50_000
 MIN_TRAIN_PER_BUCKET, MIN_EVAL_PER_BUCKET = 10_000, 5_000
@@ -577,7 +578,7 @@ def main() -> None:
     boot = bootstrap_delta(pqs["Reranker"], pqs["B1"], weights)
     boot_g = bootstrap_delta(pqs["Reranker_graded"], pqs["B1"], weights)
     boot_h = bootstrap_delta(pqs["Hybrid"], pqs["B1"], weights)
-    log("bootstrap Reranker_graded - B1 (nDCG@10): " + json.dumps(
+    log(f"bootstrap Reranker_graded - B1 (nDCG@{K}): " + json.dumps(
         {b: {k: round(v, 4) for k, v in boot_g[b]["ndcg"].items() if v is not None} for b in ["overall", *BUCKETS]}))
 
     # Novel-pair slice: truth pairs that had h == 0 (never seen from A in history).
@@ -606,7 +607,7 @@ def main() -> None:
     log(f"novel-pair slice queries {stats['novel_slice_queries']}, click share "
         f"{stats['novel_slice_click_share']:.4f}: " + json.dumps(
         {m: {b: round(v["ndcg"], 4) for b, v in d.items()} for m, d in novel.items()}))
-    log("bootstrap Reranker - B1 (nDCG@10): " + json.dumps(
+    log(f"bootstrap Reranker - B1 (nDCG@{K}): " + json.dumps(
         {b: {k: round(v, 4) for k, v in boot[b]["ndcg"].items() if v is not None} for b in ["overall", *BUCKETS]}))
 
     # ---- Permutation importance on a sample of eval queries (query-level nDCG@10 drop)
@@ -630,7 +631,7 @@ def main() -> None:
                 Xp[:, i] = Xp[rng.permutation(len(Xp)), i]
                 pi[f] = base - nd(Xp, mdl)
             perm[name] = {"base_ndcg": base} | dict(sorted(pi.items(), key=lambda kv: -kv[1]))
-            log(f"permutation importance {name} (nDCG@10 drop, {PERM_QUERIES} eval queries, "
+            log(f"permutation importance {name} (nDCG@{K} drop, {PERM_QUERIES} eval queries, "
                 f"base {base:.4f}): " + json.dumps({k: round(v, 4) for k, v in perm[name].items()}))
 
     # ---- Worked example: one torso source page, history vs truth
@@ -667,6 +668,7 @@ def main() -> None:
         "bootstrap_hybrid_minus_b1": boot_h,
         "novel_pair_slice": novel,
         "permutation_importance": perm,
+        "k": K,
         "runtime_s": time.time() - T0,
     }
     def rnd(x):

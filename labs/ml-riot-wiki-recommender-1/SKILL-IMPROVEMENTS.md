@@ -57,3 +57,19 @@
   session has saved `report.md`". Apply the same change to
   `ml-system-design-monkey-mlp` and to any other skill that has a subagent
   write a report file.
+
+## 2026-10-08 - ml-system-design-monkey-mode
+- **Source**: user-requested
+- **Status**: adopted (2026-10-08, as a new "Saved outputs" section in
+  the monkey-mode SKILL.md; monkey-mlp and ml-modeling-evaluate not yet)
+- **Finding**: the run saved only final metrics. When the PRD changed the
+  cutoff from @10 to @5, the full pipeline (data prep, training, scoring) had
+  to run again to recompute metrics. Eval changes should only re-run eval.
+- **Suggested change**: in "Deliverable", add: "Save intermediate data and
+  per-query model outputs under the gitignored data folder (parquet): the
+  prepared and split data, the candidate sets, and each model's scores for
+  its top 50 items per query. Split the code into two entry points: `train`
+  (prepare, fit, score, save) and `eval` (read the saved outputs, compute
+  metrics at any K, write the metrics file). A metric or cutoff change runs
+  `eval` only." Apply the same rule to `ml-system-design-monkey-mlp` and the
+  `ml-modeling-*` evaluate step.

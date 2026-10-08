@@ -129,11 +129,20 @@ Scaled to an internal tool. These numbers are assumptions to check.
 
 ## Metrics - offline
 
-- **Primary.** nDCG@10 on next-page replay from Riot wiki logs.
+- **Primary.** nDCG@5 on next-page replay from Riot wiki logs. K = 5
+  because the panel shows 5 pages. Order still matters inside the panel,
+  because readers scan from the top.
 - **Split.** A temporal split: history weeks, then future weeks. Do not use
   random thinning. The monkey-mode run showed that thinning makes the click
   baseline look near-perfect (nDCG@10 0.97).
-- **Secondary.** recall@10 and catalog coverage.
+- **Secondary.**
+  - recall@5: the share of the pages readers opened next that the panel
+    showed.
+  - hit@5: the share of pages where at least 1 of the 5 was opened next.
+  - catalog coverage.
+- **Candidate-stage diagnostic.** recall@100 of the candidate generators.
+  The ranker can only choose from candidates. Monkey mode showed that
+  candidates found only 30% of cold-page next clicks.
 - **Slices.**
   - cold and new pages;
   - **long-tail** pages (low traffic);
@@ -201,3 +210,5 @@ real Riot stack.
 - 2026-10-08: created from two Quick POC grilling rounds (Q1-Q12).
 - 2026-10-08: moved the two generated notes into `research/`. Notes/ keeps
   only content the user wrote or pasted.
+- 2026-10-08: offline metrics changed from @10 to @5 to match the 5-page
+  panel. Added recall@100 for the candidate stage.
