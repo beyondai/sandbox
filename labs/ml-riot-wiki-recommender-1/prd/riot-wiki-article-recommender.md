@@ -4,8 +4,8 @@
 - Project folder: `labs/ml-riot-wiki-recommender-1/`.
 - Inputs:
   - `notes/riot-wiki-article-recommender.md` (the brief);
-  - `notes/riot-wiki-personalization.md` (personalization notes);
-  - `notes/riot-wiki-proxy-datasets.md` (proxy data);
+  - `research/personalization.md` (personalization notes);
+  - `research/proxy-datasets.md` (proxy data);
   - `monkey-mode/report.md` (proxy baseline results).
 
 Task, in the brief's words: "Build a system that, given the article a user
@@ -89,7 +89,7 @@ V4  per-user    + user profile vector                   needs per-user logs
   - Join the viewer's team (from the directory) to the page owner team.
   - Boost pages that the viewer's team or adjacent teams own.
   - New hires get onboarding paths per role. Onboarding owners curate them.
-- **Rules for all phases** (from `notes/riot-wiki-personalization.md`):
+- **Rules for all phases** (from `research/personalization.md`):
   - A group aggregate needs at least 5 readers.
   - Never show who read what.
   - Users can opt out.
@@ -199,3 +199,5 @@ real Riot stack.
 ## Change log
 
 - 2026-10-08: created from two Quick POC grilling rounds (Q1-Q12).
+- 2026-10-08: moved the two generated notes into `research/`. Notes/ keeps
+  only content the user wrote or pasted.
