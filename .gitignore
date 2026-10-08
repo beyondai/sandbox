@@ -104,6 +104,9 @@ wandb/
 tensorboard/
 tb_logs/
 
+# Logs (run logs, dashboards, browser consoles)
+*.log
+
 # Hugging Face / caches
 .cache/
 .huggingface/
