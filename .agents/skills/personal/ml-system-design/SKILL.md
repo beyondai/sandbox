@@ -74,11 +74,19 @@ step skills never create a folder - that is `/ml-system-design-prd`'s job.
 ## Output docs
 
 Every file written under the project folder (`prd/`, `design/`, `adr/`,
-`spec/`, `modeling/`, `monkey-mode/`) wraps prose at 80 columns: hard line
-breaks inside paragraphs and list items, continuation lines indented under
-their bullet. Fenced code blocks are the exception. A table whose row would
-run past 80 columns becomes a list of headed paragraphs instead - the reader
-is a human in a terminal, not a renderer.
+`spec/`, `modeling/`, `monkey-mode/`, `critique/`) wraps prose at 80
+columns: hard line breaks inside paragraphs and list items, continuation
+lines indented under their bullet. Fenced code blocks are the exception. A
+table whose row would run past 80 columns becomes a list of headed
+paragraphs instead - the reader is a human in a terminal, not a renderer.
+
+Write the prose in approximately 80% of ASD-STE100: short sentences (20
+words or fewer for instructions, 25 for descriptions), one instruction in
+each sentence, active voice, one word for one meaning, and lists instead of
+long paragraphs. Keep technical names as they are. Add an ASCII diagram
+(fenced) next to the text when structure, data flow, sequence, or a timeline
+is easier to see than to read. The diagram is an addition: the text stays
+complete without it.
 
 ## Hand edits between steps
 
@@ -123,6 +131,18 @@ flagged back to `design/high-level.md`, not silently absorbed. See
 `ml-modeling` for the chain, `adr/0006-fork-after-high-level.md` for why the
 fork moved here, and `adr/0001-ml-modeling-family-and-continuity.md` for the
 family's origin.
+
+## Design principles
+
+`../ml-design-principles.md` holds the principles that every section and
+step skill applies, and that `ml-critique` reviews against. Principle 1:
+simple by default, complex only with evidence.
+
+## Critique a finished write-up: `ml-critique`
+
+The Review mode of each section skill examines coverage. To judge the
+quality of the decisions in a finished design, and to settle each finding
+with the user, use `ml-critique`. It writes `<project-folder>/critique/`.
 
 ## A third, independent track: `ml-system-design-monkey-mode`
 

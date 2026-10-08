@@ -25,8 +25,10 @@ never read here - it belongs to `ml-modeling-evaluate`.
 
 One candidate, chosen and trained in this single pass — see `ml-modeling` router
 if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent,
-compared). Mode: Regular starts simple and upgrades only if the simple model
-underperforms; Quick POC goes straight to the workhorse row below unless
+compared). Mode: Regular starts simple and upgrades only if the more complex model
+passes the complexity gate in `../ml-design-principles.md`, Principle 1
+(gain > noise, and value of the gain > added running, maintenance,
+explainability, and risk cost) - write the cost table in `03-train.md`; Quick POC goes straight to the workhorse row below unless
 high-level's Phasing says otherwise — see `ml-modeling` router for the keyword
 rule. Class imbalance: decide the handling here (class weights first, resampling
 only if weights underperform) from `01-data`'s class balance, and say why in
@@ -94,7 +96,8 @@ whatever directory the agent happens to be in, which scatters logs across
 projects.
 
 Done when `03-train.md` names the chosen model, states why it beat the
-alternatives in the matrix above (not just "it's the default"), includes the
+alternatives in the matrix above (not just "it's the default"), includes
+the cost table if the chosen model is not the simplest one tried, includes the
 training code actually run — not a template — and, if this step's choice of
 model/loss/class-weighting resolves a placeholder or contradicts an
 assumption in `spec/<topic>.md`, that spec line is updated to match (see

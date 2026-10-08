@@ -42,6 +42,8 @@ run directly against the current working tree.
 1. **List candidates**: every model class high-level's Phasing named across
    its phases, plus the algorithm-selection matrix's short-list from
    `ml-modeling-train` for this data size/scenario if Phasing named only one.
+   Always include one simple candidate (linear model or default GBDT) - see
+   `../ml-design-principles.md`, Principle 1.
 2. **Dispatch concurrently** — but only once the orchestrating session can
    actually execute. Spawned subagents inherit the orchestrator's permission
    state at dispatch time: a session still under plan mode (or any other
@@ -77,9 +79,12 @@ run directly against the current working tree.
    each candidate's `metrics.json`/`03-train.md` entry, not silently.
    Regular mode keeps the fuller defaults.
 3. **Compare**: once all candidates report back, build a comparison table (model
-   type, key metric, training cost/time). Pick a winner by the primary metric
-   `prd/<topic>.md`'s Metrics — offline section names — or, if the call is
-   close, present the comparison and let the user pick rather than guessing.
+   type, key metric with its noise, training cost/time, inference cost,
+   explainability). Rank by the primary metric `prd/<topic>.md`'s Metrics —
+   offline section names. Pick the simplest candidate inside the noise of
+   the best, unless a more complex one passes the complexity gate in
+   `../ml-design-principles.md`, Principle 1. If the call is close, present
+   the comparison and let the user pick rather than guessing.
    Before trusting the ranking, check whether any feature in the shared table
    was built from the target column without per-fold nesting (a leave-one-out
    or target-encoded aggregate computed once, globally — see

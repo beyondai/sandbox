@@ -54,9 +54,12 @@ but folds them into its single batched round.
 - **Features**: concrete feature list (user, item, contextual); nontrivial
   feature engineering called out (e.g. embeddings for high-cardinality
   `user_id`).
-- **Models**: candidate model types considered; tradeoffs between them
-  (performance vs. training cost vs. interpretability); chosen model justified
-  per phase, not just for the final version.
+- **Models**: candidate model types considered, always including the
+  simplest option that can work; tradeoffs between them (performance vs.
+  running cost vs. maintenance cost vs. explainability); chosen model
+  justified per phase, not just for the final version. A more complex
+  candidate wins only if it passes the complexity gate - fill the cost
+  table in `../ml-design-principles.md`, Principle 1.
 - **Training**: loss function optimized; training algorithm; source of
   ground-truth labels; sampling strategy if needed (e.g. class imbalance).
 

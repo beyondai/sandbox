@@ -288,7 +288,16 @@ the entry's `Status` flips to `adopted` or `declined`. Never delete an entry —
 and decided. Same convention on the `ml-system-design-*` side; full rationale in
 `../adr/0004-skill-improvement-log.md`.
 
+## Design principles
+
+Every step applies `../ml-design-principles.md`. Principle 1: start simple,
+and select a more complex model only when it passes the complexity gate.
+
 ## Where this leads
+
+To judge the quality of a finished modeling report (leakage, split,
+baseline, metric choice), use `ml-critique`. It runs the modeling lens and
+settles each finding with the user.
 
 After step 4: iterate (rerun step 2 or 3), reach for `ml-modeling-autoresearch`
 to keep improving the model automatically while you do other analysis, hand

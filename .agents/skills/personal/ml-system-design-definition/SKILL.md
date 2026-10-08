@@ -30,7 +30,10 @@ written to `design/` (see that skill). A project that already has
 - **Requirements — scope**: must-have features; explicit out-of-scope list for
   this version. Most-skipped item in review — check it first.
 - **Requirements — non-functional**: expected load, latency (e.g. p99),
-  availability target.
+  availability target, explainability need (hard or soft), and cost
+  sensitivity. An exact cost budget is often not available: a level
+  (`low`/`medium`/`high`) or `unknown` is a valid answer. See
+  `../ml-design-principles.md`, Principle 1.
 - **Metrics — offline**: static-dataset metrics (AUC, nDCG, precision/recall).
 - **Metrics — online**: live A/B metrics (CTR, conversion, session time) plus
   guardrail metrics that must not regress.
