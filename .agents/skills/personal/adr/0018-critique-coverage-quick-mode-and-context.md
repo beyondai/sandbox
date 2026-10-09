@@ -47,3 +47,5 @@ critique skills with the design and modeling skills found gaps:
   no critique check.
 - Select always waits for the view and context answers, so a run starts
   one message later.
+- New evals T5-T8 in `ml-critique/tests/2026-10-09-skill-test.md` test
+  these changes. They are written, not run.

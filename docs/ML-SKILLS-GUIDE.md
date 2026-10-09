@@ -431,6 +431,11 @@ in parentheses.
 - **Critique is different from Review mode.** It is a review by a reader
   with no context, with priorities, convergence, and a record of the
   decisions (0009).
+- **Critique covers every design step, most important first.** A
+  coverage map links each design and modeling skill item to a catalog
+  check. Quick mode limits the whole run to 2 hours. Each run asks for
+  the view (fresh or with your design) and a critique context; the
+  context wins only on a conflict, and each conflict is noted (0018).
 - **One folder for each project.** All generated files go in
   `<parent>/<project>/`, never in `notes/` (0010).
 - **Each skill checks its own output.** Intent questions, a format script,

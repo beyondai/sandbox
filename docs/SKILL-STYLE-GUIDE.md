@@ -117,7 +117,7 @@ Each skill family has at least 3 evals in 1 test file.
 family     test file                        tests
 design     ml-system-design/tests/<date>    D1-D3
 modeling   ml-modeling/tests/<date>         M1-M3
-critique   ml-critique/tests/<date>         T1-T4
+critique   ml-critique/tests/<date>         T1-T4, T5-T8
 ```
 
 - Each test has an input, an answer key, and pass criteria.
