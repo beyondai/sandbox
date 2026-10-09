@@ -58,6 +58,25 @@ Backing for the reranker:
     slice.
 - **Primary metric.** The PRD's: nDCG@5 on a temporal next-page replay
   (PRD, Metrics - offline). This design does not change it.
+- **Slices: age and traffic, query side and item side** (PRD, Slices).
+  Cold-start and long-tail are different problems:
+
+  ```
+  axis      slice       meaning                        main fix
+  age       new         created < 14 days before T;    structure candidates
+                        no evidence yet                (query side),
+                                                       exploration (item side)
+  traffic   dormant     established, 0 views in 28 d;  show only on strong
+                        evidence of no demand          structure signals
+            long-tail   views up to p50                smoothing, two-hop,
+                                                       borrowed clicks
+            torso/head  p50-p90 / top 10%              opened-next counts
+  ```
+
+  - Query side: the panel on page A. Item side: page C as a
+    recommendation, scored by recall@5 on true next pages in each slice.
+  - Features use page age and counts per day since creation, so a 3-day-old
+    page with 20 readers is hot, not long-tail.
 
 ## Architecture
 
@@ -172,22 +191,22 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
     readers of the 10 most similar warm pages went next).
   - A GBDT regression on `log1p(r)` over all candidate features: opened-next
     counts, link and tree relations, entity overlap, cosine similarity, page
-    age, views, owner team.
+    age, counts per day since creation, views, owner team.
 - **Model class.** First real model.
 - **Timeline** (assumption): 6-8 weeks after V0 has 4 weeks of logs.
 - **Headcount** (assumption): 1-2 MLE.
 - **Expected gain over V0.**
-  - Mostly on cold, new and long-tail pages.
+  - Mostly on new and long-tail pages, query side and item side.
   - On the Wikipedia proxy, the graded reranker scored cold-page nDCG@5 of
     0.257 against 0.0014. On warm pages it gained only +0.5% over
     opened-next counts.
 - **Complexity gate** (`../../.agents/skills/personal/ml-design-principles.md`,
   Principle 1):
-  - It must beat V0 on the cold and long-tail slices, with a CI that
-    excludes 0.
+  - It must beat V0 on the new and long-tail slices, query side and item
+    side, with a CI that excludes 0.
   - It must not be worse overall.
   - If it fails on warm pages, keep the V0 rule for warm pages and use the
-    model only for cold and long-tail pages (the monkey-mode hybrid
+    model only for new and long-tail pages (the monkey-mode hybrid
     pattern).
 
 ### V2 - session context and exploration for new pages
@@ -195,6 +214,9 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
 - **Ships.**
   - An exploration slot: 1 of 5 slots on related warm pages goes to a new
     page for up to 2 weeks, chosen by Thompson sampling.
+  - New pages only (age < 14 days). Dormant and long-tail pages don't get
+    the slot: their low demand is already known, so exploring them costs
+    traffic and teaches little.
   - Session context: candidates and features from the last 3-5 pages in the
     session.
 - **Model class.** The V1 reranker, a bandit for the slot, and new session
@@ -262,7 +284,7 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
     and for each traffic bucket.
   - Keep the nDCG gain fixed at `log1p` for every option, so the scores
     can be compared.
-  - Pick the option that wins on cold and long-tail pages without losing
+  - Pick the option that wins on new and long-tail pages without losing
     overall. If no option beats `log1p(r)` with a CI that excludes 0, keep
     the default.
   - A label change needs new training runs. The saved-outputs eval-only
@@ -273,3 +295,8 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
 - 2026-10-08: created (Quick POC).
 - 2026-10-08: added the label sweep to Open items (user decision: log1p
   default, sweep in modeling, model and loss follow the label).
+- 2026-10-08: "cold" split into an age axis (new) and a traffic axis
+  (dormant, long-tail, torso, head), on the query and item sides (PRD
+  Slices). Complexity gate and label sweep now use new and long-tail. The
+  exploration slot is for new pages only. Added per-day counts as a
+  feature.

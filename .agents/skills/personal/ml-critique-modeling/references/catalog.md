@@ -71,6 +71,14 @@ data (point-in-time correctness).**
 - Remedies: correct with the sampling rate, or recalibrate on data that was
   not sampled.
 
+**B6a [C]. Negatives are built correctly** (implicit labels only).
+- Mistakes: random negatives only. The user's own positives or items not
+  available at that time in the negative pool. Test negatives sampled the
+  same easy way as train, so offline metrics are too high.
+- Remedies: a mix of random and hard negatives (shown but not engaged),
+  a stated ratio and pool, a correction (logQ or the sampling rate), and
+  test candidates from the production distribution.
+
 **B7. Data cleaning does not remove a population without a record.**
 - Mistakes: drop rows with nulls, and remove all new users.
 - Remedies: report the rows removed by each rule and the population that
@@ -171,6 +179,15 @@ interpretability needs.**
   necessary.
 - Remedies: a smaller model, distillation, or a monotonic GBDT.
 
+**F2a. The architecture is justified.**
+- Mistakes: attention or a deep MLP with no sequence and no evidence that
+  it beats a shallow model. An MLP left to learn crosses that a cross
+  network models cheaply. Embedding sizes with no rule.
+- Remedies: shallow before deep; DCN-v2 or DeepFM for explicit crosses;
+  attention for sequences; an MLP head of 2-3 layers (for example 256 ->
+  128 -> 64); embedding dims tied to cardinality. An ablation for each
+  added block.
+
 **F3 [C]. A fair comparison justifies the choice.**
 - Mistakes: the winner got more tuning, more features, or a different
   split.
@@ -221,6 +238,18 @@ interpretability needs.**
 - Remedies: class weights or no change, then a threshold from the
   capacity. Recalibrate after resampling.
 
+**G5a. The training setup and hyperparameters are recorded.**
+- Mistakes: no record of the optimizer, learning rate, batch size,
+  epochs, dropout, or hardware. A random forest with defaults and no
+  stated depth or tree count. No training time.
+- Remedies: record them. Typical starts: AdamW at 1e-3 (MLP) or 2e-5 to
+  5e-5 (transformer fine-tuning) with warm-up and decay; batch 512-4096
+  for tabular data; early stopping with patience 2-5; dropout 0.1-0.3.
+  Random forest: 200-500 trees, full depth or 10-30, min leaf 1-5,
+  `max_features="sqrt"`. GBDT: learning rate 0.05-0.1 with early-stopped
+  rounds, 31-127 leaves, min child 20-100, subsampling 0.7-0.9. CPU for
+  trees and small MLPs, GPU for large embeddings and attention.
+
 **G6. Random seeds are set, and the results are deterministic.**
 - Mistakes: one run, no seed. The result changes on the next run.
 - Remedies: fixed seeds. Report the variance across 3 to 5 seeds.
@@ -231,7 +260,8 @@ interpretability needs.**
 - Mistakes: a grid on unimportant parameters. A learning rate on a linear
   scale.
 - Remedies: search the important parameters, on a log scale where
-  applicable. Random or Bayesian search.
+  applicable. Random or Bayesian search (Optuna), 30-100 trials for GBDT,
+  20-50 for a DNN.
 
 **H2. Each candidate gets the same tuning budget.**
 - Mistakes: 200 trials for the favorite, defaults for the others.

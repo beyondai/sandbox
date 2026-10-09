@@ -11,7 +11,8 @@ description: >-
 
 # Train (sequential)
 
-Contents: Algorithm selection | Quick POC time budget | Log each run | Check
+Contents: Algorithm selection | Record the training setup | Quick POC time
+budget | Log each run | Check
 
 - **Reads:** the Phasing in `<project-folder>/design/high-level.md` (the
   model class for each phase), `modeling/01-data.md` (class balance), and
@@ -44,7 +45,8 @@ Steps:
 1. Run "Design docs changed?" in `../ml-modeling/SKILL.md`.
 2. Select the candidate (matrix below). Decide the loss and the class
    imbalance handling: class weights first; resampling only if weights do
-   worse. Say why in `03-train.md`.
+   worse. Start from the hyperparameters, architecture, and training
+   setup in `../ml-model-training.md`. Say why in `03-train.md`.
 3. Check the CV for leaks (below).
 4. Train with CV. Log each run.
 5. Write `03-train.md`, with the cost table if the selected model is not
@@ -71,6 +73,18 @@ If yes, compute it again in each fold, or mark the CV ranking as
 provisional in `03-train.md` until `ml-modeling-evaluate`. A boosted model
 uses this leak more than a linear or bagged model, so the ranking can be
 wrong.
+
+## Record the training setup
+
+In `03-train.md`, write (the "What to record" list in
+`../ml-model-training.md`):
+- the architecture and why;
+- the key hyperparameters (trees: trees, depth, leaves, min leaf, learning
+  rate and rounds; linear: regularization `C`; neural network: framework,
+  optimizer, learning rate and schedule, batch size, epochs and early
+  stopping, dropout, weight decay);
+- the hardware (CPU, GPU, MPS), the wall-clock training time, and the
+  tuning budget (trials, search method).
 
 ## Quick POC time budget
 
@@ -108,6 +122,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 2. If the model is not the simplest one tried, does the cost table show
    that it passes the complexity gate?
 3. Does `03-train.md` hold the training code that ran, not a template?
+   Does it record the hyperparameters or training setup, the hardware,
+   and the training time?
 4. Did no step read `dataset.test`? Is the threshold from out-of-fold
    predictions, and is `model.joblib` saved? Is the CV free of the leak
    above, or marked provisional?

@@ -49,8 +49,9 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
   One diagram for both is the most common review finding. Name the real
   sources: "user data" is not a source.
 - **Phasing.** V0, V1, V2 (crawl, walk, run). For each phase: the
-  features, the model class (baseline, first real model, stretch), the
-  timeline, and the headcount.
+  features, the model class and its architecture family (for example
+  GBDT, then two-tower retrieval + DCN-v2 ranker; options in
+  `../ml-model-training.md`), the timeline, and the headcount.
   - V0 is the PRD's recommended baseline (Definition, "Baseline"), or the
     doc says why not.
   - Each later phase names its expected gain over the baseline: the gain

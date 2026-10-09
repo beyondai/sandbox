@@ -66,6 +66,13 @@ names several models, build the one that "This folder builds" names.
   - Assert that the positive rate is not near 0% or 100%. A degenerate
     rate shows a leak or a wrong rule. (This assert found a real 100%
     churn look-ahead bug.)
+  - **Implicit labels** (the logs hold only positives, such as clicks or
+    listens): build the negatives here, from the plan in high-level or
+    the "Negative sampling" section of `../ml-model-training.md`.
+    Exclude the user's own positives and items not available at that
+    time. Build test negatives from the production distribution (real
+    impressions or all candidates), not from the training negatives.
+    Record the types, ratio, and pool in `dataset.negatives`.
   - Keep the script small and able to run again. It is part of the
     record.
 
@@ -118,6 +125,8 @@ JSON, not the `.md`.
     "split": {"type": "cutoff|random", "train_cutoff": 0, "test_cutoff": 0,
               "horizon_days": 0, "seed": 0, "test_share": 0.0},
     "exclusions": ["<rule>"],
+    "negatives": {"types": ["random", "hard"], "ratio": 0, "pool": "<rule>",
+                  "correction": "<none|logQ|downsample rate>"},
     "built_by": "modeling/build_dataset.py|registered"
   },
   "shape": {"rows": 0, "columns": 0, "memory_mb": 0.0},
@@ -196,7 +205,8 @@ root.
 
 Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 1. Does the label follow the framing's definition, horizon, population,
-   and exclusions? Is the positive rate plausible?
+   and exclusions? Is the positive rate plausible? For implicit labels,
+   are the negatives recorded, and are test negatives from production?
 2. Can no train label overlap the test window? Is each feature from before
    its cutoff?
 3. Is each profile value a real number from the data, not "looks fine"?

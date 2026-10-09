@@ -25,6 +25,8 @@ dispatch you, run it first.
 2. Use the problem type's playbook in `../ml-playbooks.md`. Do its
    classic-mistakes check first. For complexity findings, use Principle 1
    in `../ml-design-principles.md` (the complexity gate, the cost table).
+   For negatives, architecture, and training setup, the typical options
+   and values are in `../ml-model-training.md`.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections are in priority order: A to D (baseline, labels, split,
    leakage) hold most P1 findings. Brief mode: `[C]` items, plus any P1

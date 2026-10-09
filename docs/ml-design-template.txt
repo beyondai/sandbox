@@ -1,59 +1,205 @@
 ML System Design Template
 
+The template has 5 sections:
+
+  1 Definition -> 2 High-level -> 3 Deep dive -> 4 Delivery -> 5 Post delivery
+  (why, what,     (framing,       (data,         (ship, run,   (learn, grow)
+   who)            architecture)   model)         protect)
+
+Contents
+
+  1. Definition ........ Problem, Requirements, Metrics, Team
+  2. High-level Design . ML framing, Architecture diagrams, Delivery phases
+  3. Design Deep Dive .. Data, Features, Models, Training
+  4. Delivery .......... Execution; Deployment, rollout, and testing;
+                         Evaluation; Monitoring; Fallback
+  5. Post Delivery ..... Analysis, Explainability, Iteration, Democratize
+
+
 1. Definition: Problem, Requirements, Metrics, Team
 
-This section sets the stage. It's about defining the "Why, What, How, and Who" of the project before any technical design begins.
-Problem: This is the most crucial section. It establishes the business and user context.
-business, user, company long/short term goals: I would define the core problem we are trying to solve. Why is this project important now? What specific user pain point are we addressing? How does this align with the company's broader quarterly goals (short-term) and 3-year strategy (long-term)?
-Reqs (Requirements): This defines the scope and constraints of the system.
-features, out-of-scope: I would list the specific capabilities the system must have (e.g., "must rank a list of items"). Just as importantly, I'd list what we are not building for the initial version to manage scope (e.g., "will not support real-time personalization in V1").
-scale, latency, availability: These are the critical non-functional requirements. I'd define the expected load (e.g., "must handle 10 million requests per minute"), the speed requirements (e.g., "p99 latency must be under 100ms"), and the uptime guarantee (e.g., "must have 99.99% availability").
-Metrics: This section defines how we will measure success.
-offline, online: I'd separate the metrics into two categories. Offline metrics (e.g., AUC, nDCG, Precision/Recall) are used during model development to evaluate performance on a static dataset. Online metrics (e.g., CTR, Conversion Rate, Session Time) are measured in live A/B tests and reflect the true impact on business goals. I would also include "guardrail" metrics to ensure we're not harming the user experience.
-Team: This maps out the human element of the project.
-stakeholder, collaborator, dependencies: Who are the key stakeholders we need to keep informed (e.g., a Director of Product)? Who are the collaborator teams we need to work with daily (e.g., the Ads team)? What are the dependencies on other teams (e.g., "we are blocked until the Data Platform team provides access to the new user logs")?
-re-use, x-func users: Can we re-use existing components or platforms? Who are the cross-functional users of our system (e.g., "the Data Science team will use our model's output for their analyses")?
+This section sets the context. Define the why, what, how, and who of the
+project. Do this before the technical design starts.
 
-2. High-level Design: ML Framing, Architecture Design, Phasing
+Problem
+  This is the most important section. It gives the business and user
+  context.
+  - Business, user, and company goals (long term and short term):
+    - Define the core problem that the project solves.
+    - Say why the project is important now.
+    - Name the user pain point that it fixes.
+    - Show how it aligns with the company goals for the quarter (short
+      term) and the 3-year strategy (long term).
 
-This section provides the high-level technical strategy and roadmap.
-ML framing: This is where I translate the business problem into a precise machine learning problem. For example, "The business problem of 'showing users better content' will be framed as a learning-to-rank problem, where we predict the probability of a click for each item."
-Architecture diagram: I would create two clear diagrams: one for the online inference pipeline (showing the real-time request/response flow) and one for the offline training pipeline (showing how data is processed and models are trained).
-Delivery Phases: I would break down the project into a phased "Crawl, Walk, Run" approach (e.g., V0, V1, V2). For each phase, I'd specify the features to be delivered, a rough timeline, and the number of Team Members (TMs) needed. This demonstrates a pragmatic, iterative approach to execution.
+Requirements
+  This part defines the scope and the constraints of the system.
+  - Features and out-of-scope:
+    - List the capabilities that the system must have. Example: "must
+      rank a list of items".
+    - List what V1 does not include. This controls the scope. Example:
+      "no real-time personalization in V1".
+  - Scale, latency, and availability:
+    - These are the critical non-functional requirements.
+    - Scale: the expected load. Example: "10 million requests per
+      minute".
+    - Latency: the speed. Example: "p99 latency under 100 ms".
+    - Availability: the uptime. Example: "99.99% availability".
 
-3. Design DeepDive: data, features, models and training
+Metrics
+  This part defines how you measure success.
+  - Offline and online:
+    - Offline metrics measure the model on a static dataset during
+      development. Examples: AUC, nDCG, precision, recall.
+    - Online metrics measure the real business effect in live A/B tests.
+      Examples: CTR, conversion rate, session time.
+    - Guardrail metrics make sure that the system does not harm the user
+      experience.
 
-This is the technical core of the design, where we get into the details of the ML system.
-Data:
-online and offline data usage, data engineering: I would detail the specific data sources to be used. What data is needed for real-time inference (online)? What data is needed for batch training (offline)? I'd also describe the necessary data engineering work (e.g., "build a new ETL pipeline to join impression and conversion logs").
-Features:
-features and feature engineering: I would list the specific features to be used in the model (e.g., user features, item features, contextual features). I'd also describe any complex feature engineering required, such as creating embeddings for high-cardinality features like user_id.
-Models:
-what are candidate models? trade-offs?: I would discuss the different types of models considered for the problem (e.g., Logistic Regression, GBDT, Deep Neural Network) and explain the trade-offs between them (e.g., performance vs. training cost vs. interpretability). I would then justify the final model choice for each phase of the project.
-Training:
-loss functions, algorithm chosen, data labeling, sampling strategy: I would get into the specifics of how the chosen model is trained. What is the loss function we are optimizing? What is the specific training algorithm? How do we get our ground truth labels? Do we need a special sampling strategy to handle issues like class imbalance?
+Team
+  This part maps the people of the project.
+  - Stakeholders, collaborators, and dependencies:
+    - Stakeholders: the people to keep informed. Example: a Director of
+      Product.
+    - Collaborators: the teams that you work with each day. Example: the
+      Ads team.
+    - Dependencies: the work that you need from other teams. Example: "we
+      are blocked until the Data Platform team gives access to the new
+      user logs".
+  - Reuse and cross-functional users:
+    - Find existing components or platforms that you can reuse.
+    - Name the cross-functional users of the system. Example: "the Data
+      Science team uses the model output for its analyses".
 
-4. Delivery : execution, deployment, eval, monitoring and fallback plans
 
-This section covers the practical aspects of getting the system into production and keeping it running.
-Execution:
-roadmap and plans. specific timelines and process: This is a more detailed project plan than the high-level phasing. I would break down the work into epics or milestones with specific timelines and outline the team's agile process (e.g., "we will run two-week sprints with weekly stakeholder reviews").
-Deployment, Rollout, Testing plans: I would describe the strategy for safely deploying the new system. This includes the rollout plan (e.g., "start with 1% of users and ramp up over two weeks"), the testing plan (unit tests, integration tests, load tests), and the CI/CD strategy.
-Eval (Evaluation):
-detailed evaluation approach and metrics for both online and offline: This expands on the earlier metrics section. I would describe the specific design of our A/B test and how we will measure statistical significance. I'd also detail the offline evaluation methodology (e.g., "we will use a held-out test set from the last 7 days of data").
-Monitoring:
-online monitoring of the system health: I would list the key metrics to be monitored in real-time dashboards after launch. This includes system health metrics (latency, error rate) and model health metrics (prediction distribution, feature drift).
-Fallback:
-fall-back plans: This is the critical "what if it breaks?" plan. What happens if the new model fails in production? I would define the fallback mechanism (e.g., "if the new ML model service is down, the system will automatically fall back to the old model" or "fall back to a simple popularity-based ranking").
+2. High-level Design: ML Framing, Architecture, Phasing
 
-5. Post Delivery: analysis, explainability, iteration and democratize
+This section gives the high-level technical strategy and the roadmap.
 
-This final section focuses on the lifecycle of the project after it has been successfully launched.
-Analysis:
-result analysis: After the A/B test is complete, how will we analyze the results? I would describe the deep-dive analysis plan to understand not just what happened, but why.
-Explainability:
-for others to understand: How can we make our model's decisions understandable to humans? I would discuss using techniques like SHAP or LIME to explain individual predictions, which is important for debugging and for building trust with stakeholders.
-Iteration:
-future versions: Based on the analysis, what are the plans for the next version of the system (V2, V3)? I would outline the future roadmap.
-Democratize:
-how does this work benefit other team or orgs?: This is about multiplying the impact of our work. Can the features we built, the model architecture we designed, or the platform components we created be shared with or reused by other teams at the company? I would identify opportunities to "democratize" our solution.
+ML framing
+  Change the business problem into a precise ML problem.
+  Example: the business problem "show users better content" becomes a
+  learning-to-rank problem. The model predicts the probability of a click
+  for each item.
+
+Architecture diagrams
+  Make 2 clear diagrams:
+  - The online inference pipeline: the real-time request and response
+    flow.
+  - The offline training pipeline: how the data is processed and how the
+    models are trained.
+
+Delivery phases
+  Divide the project into phases: crawl, walk, run (V0, V1, V2).
+  For each phase, give:
+  - the features that the phase delivers;
+  - a rough timeline;
+  - the number of team members (TMs).
+  This shows a practical, iterative plan.
+
+
+3. Design Deep Dive: Data, Features, Models, Training
+
+This section is the technical core of the design. It gives the details of
+the ML system.
+
+Data
+  - Online and offline data use, and data engineering:
+    - List the data sources.
+    - Online: the data that real-time inference needs.
+    - Offline: the data that batch training needs.
+    - Describe the data engineering work. Example: "build a new ETL
+      pipeline that joins the impression logs and the conversion logs".
+
+Features
+  - Features and feature engineering:
+    - List the features of the model: user features, item features, and
+      context features.
+    - Describe the difficult feature engineering. Example: embeddings for
+      high-cardinality features such as user_id.
+
+Models
+  - Candidate models and trade-offs:
+    - List the model types that you considered. Examples: logistic
+      regression, GBDT, deep neural network.
+    - Explain the trade-offs between them: performance, training cost,
+      and interpretability.
+    - Give the reason for the model that you select for each phase.
+
+Training
+  - Loss function, algorithm, labels, and sampling:
+    - Loss function: what the training optimizes.
+    - Algorithm: the training algorithm.
+    - Labels: how you get the ground-truth labels.
+    - Sampling: the strategy for problems such as class imbalance, if
+      the data needs one.
+
+
+4. Delivery: Execution, Deployment, Evaluation, Monitoring, Fallback
+
+This section covers how the system goes to production and how it keeps
+running.
+
+Execution
+  - Roadmap, plans, timelines, and process:
+    - This plan has more detail than the high-level phases.
+    - Divide the work into epics or milestones, each with a timeline.
+    - Describe the team process. Example: "two-week sprints, with a
+      stakeholder review each week".
+
+Deployment, rollout, and testing
+  Describe how to deploy the new system safely:
+  - Rollout plan. Example: "start with 1% of users, and increase over two
+    weeks".
+  - Testing plan: unit tests, integration tests, load tests.
+  - CI/CD strategy.
+
+Evaluation
+  - Detailed online and offline evaluation:
+    - This part adds detail to the Metrics part of section 1.
+    - Online: describe the A/B test design, and how you measure
+      statistical significance.
+    - Offline: describe the evaluation method. Example: "a held-out test
+      set from the last 7 days of data".
+
+Monitoring
+  - Online monitoring of system health:
+    - List the metrics on the real-time dashboards after launch.
+    - System health: latency, error rate.
+    - Model health: prediction distribution, feature drift.
+
+Fallback
+  - Fallback plans:
+    - This is the critical "what if it breaks?" plan.
+    - Say what happens when the new model fails in production.
+    - Define the fallback mechanism. Examples: "if the new model service
+      is down, the system automatically uses the old model", or "use a
+      simple ranking by popularity".
+
+
+5. Post Delivery: Analysis, Explainability, Iteration, Democratize
+
+This section covers the life of the project after a successful launch.
+
+Analysis
+  - Result analysis:
+    - Say how you analyze the results after the A/B test ends.
+    - Describe the deep-dive analysis plan. It must find why a result
+      occurred, not only what occurred.
+
+Explainability
+  - For other people to understand:
+    - Make the model decisions clear to people.
+    - Use methods such as SHAP or LIME to explain each prediction.
+    - This helps debugging, and it builds trust with stakeholders.
+
+Iteration
+  - Future versions:
+    - Use the analysis to plan the next versions (V2, V3).
+    - Give the future roadmap.
+
+Democratize
+  - Benefit to other teams or organizations:
+    - This part increases the effect of the work.
+    - Find what other teams can share or reuse: the features, the model
+      architecture, or the platform components.
+    - Name these opportunities to "democratize" the solution.

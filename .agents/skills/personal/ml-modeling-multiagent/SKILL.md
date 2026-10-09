@@ -43,9 +43,11 @@ git worktree is necessary.
 4. **Dispatch.** One subagent for each candidate, all in the same turn
    (parallel tool calls). Each subagent:
    - reads `modeling/02-features.md`;
-   - trains its candidate with CV inside the input table;
+   - trains its candidate with CV inside the input table, starting from
+     `../ml-model-training.md` and the same tuning budget as the others;
    - computes the metrics that `ml-modeling-evaluate` uses;
-   - writes code and `metrics.json` to `train-candidates/<model-type>/`;
+   - writes code and `metrics.json` (with its hyperparameters, hardware,
+     and training time) to `train-candidates/<model-type>/`;
    - reports its metrics.
 
    Quick POC: tell each candidate to target about 3 minutes. Use 3-fold CV

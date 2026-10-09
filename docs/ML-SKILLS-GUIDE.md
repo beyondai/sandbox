@@ -1,26 +1,47 @@
 # ML Skills Guide
 
-Contents: How it works | The shape | Two speeds | Data | Project folder |
-Command reference | Key design decisions
+## Contents
 
-Orientation for the `ml-system-design-*` / `ml-modeling-*` skill family in
-`.agents/skills/personal/`: design an ML system, build and evaluate a model
-hands-on, or get a fast autonomous baseline. Everything is chained through
-files in a project folder, not conversation memory, so any step can be picked
-up in a fresh session by opening the right file.
+- [What the skills do](#what-the-skills-do)
+- [How a step works](#how-a-step-works)
+- [The flow](#the-flow)
+- [Rules to know](#rules-to-know)
+- [Two speeds](#two-speeds)
+- [Data](#data)
+- [Project folder](#project-folder)
+- [Command reference](#command-reference)
+  - [Bundled scripts](#bundled-scripts)
+  - [Parameters](#parameters)
+- [Key design decisions](#key-design-decisions)
 
-Operational detail (concurrency, worktrees, autoresearch modes, the skill
-improvement log's mechanics) lives in `.agents/skills/personal/README.md`.
-To review a finished design or modeling report, see
-`docs/ML-CRITIQUE-GUIDE.md`.
-Design rationale lives in `.agents/skills/personal/adr/`.
+## What the skills do
 
-The skills are written for and tested on Claude Opus 5.5.
+The `ml-system-design-*` and `ml-modeling-*` skills are in
+`.agents/skills/personal/`. Use them to do these tasks:
+- Design an ML system.
+- Build and evaluate a model with real data.
+- Get a fast baseline that runs in the background.
 
-## How it works
+The steps share files in a project folder, not the conversation. Thus, you
+can continue any step in a new session. Open the correct file, and run the
+next skill.
 
-Every step has the same shape: **invoke -> it writes a file -> you read it ->
-invoke the next step**, which reads what the previous one wrote.
+Other docs:
+- Operation details (concurrency, worktrees, autoresearch modes, the skill
+  improvement log): `.agents/skills/personal/README.md`.
+- Review of a finished design or modeling report:
+  `docs/ML-CRITIQUE-GUIDE.md`.
+- The reasons for the design decisions: `.agents/skills/personal/adr/`.
+
+The skills are written for Claude Opus 5.5, and tested on it.
+
+## How a step works
+
+Each step has the same 4 parts:
+1. You run the skill.
+2. The skill writes a file.
+3. You read the file.
+4. You run the next skill. It reads the file from the step before it.
 
 ```
 /ml-modeling-data
@@ -30,237 +51,280 @@ invoke the next step**, which reads what the previous one wrote.
   -> reads 01-data, writes modeling/02-features.md
 ```
 
-## The shape
+## The flow
 
 ```
-/ml-system-design <topic> [poc]   (entry point: picks the mode, offers the
-  |                                two commands below, then runs the sections)
+/ml-system-design <topic> [poc]   (entry point: selects the mode, offers
+  |                                the 2 commands below, runs the sections)
   v
 topic
   |
-  |--> /ml-system-design-monkey-mode   (optional, runs in the background,
-  |      3 questions -> monkey-mode/report.md; touches nothing else)
-  |--> /ml-system-design-monkey-mlp    (optional, sibling of monkey-mode -
-  |      embedding-MLP instead of tree/linear -> monkey-mlp/report.md)
+  |--> /ml-system-design-monkey-mode   (optional, background,
+  |      3 questions -> monkey-mode/report.md; changes nothing else)
+  |--> /ml-system-design-monkey-mlp    (optional, background,
+  |      embedding MLP -> monkey-mlp/report.md)
   v
 /ml-system-design-prd          -> prd/<topic>.md
   v
--high-level                    -> design/high-level.md  (fork-grade ML framing)
-  v  FORK - pick one
+-high-level                    -> design/high-level.md  (ML framing)
+  v  FORK: select one route
   |--> -deep-dive              -> design/deep-dive.md    (paper)
   |
   '--> ml-modeling-data -> -features -> -train | -multiagent -> -evaluate
                                                 -> modeling/01..04  (hands-on)
-  v  both routes land here
--delivery                      (cites 04-evaluate.md if modeling ran)
-  v
--post-delivery
+  v  the 2 routes join here
+-delivery                      -> design/delivery.md
+  v                               (uses 04-evaluate.md if modeling ran)
+-post-delivery                 -> design/post-delivery.md
 ```
 
-Three things to know:
+The diagram shows the order. The text below gives the rules.
 
-- **Start with `/ml-system-design <topic>`.** It picks Regular vs. Quick POC
-  from your wording, then asks two questions: run
-  `/ml-system-design-monkey-mode` in parallel? scope with
-  `/ml-system-design-prd` first? Both are hand-run commands; answer them, then
-  come back to `/ml-system-design` and it continues at high-level - the PRD
-  is the Definition section, so `-definition` is not run again. (`-prd` is the
-  interview: hand-run, creates the folder, writes `prd/`. `-definition` is the
-  checklist and the drafted section for a project without a PRD.)
-- **Every file is yours to edit between steps.** Open any `prd/`, `design/`,
-  `adr/`, `spec/` or `modeling/` file, change it, and tell Claude which one;
-  it re-reads it and re-runs the downstream steps that cite it, noting the
-  change in that file's `## Change log`. On the hands-on route the hash
-  check in the spec catches edits to `prd/` and `design/high-level.md` even
-  if you forget to say.
-- **Docs wrap at 80 columns.** Every file the skills write is meant to be
-  read in a terminal: prose hard-wrapped, code blocks exempt, wide tables
-  turned into headed paragraphs.
-- **After high-level, choose paper or hands-on.** `-deep-dive` and
-  `ml-modeling-*` answer the same four questions (data, features, models,
-  training). One writes a design section; the other does the work and records
-  it in `modeling/`. `ml-modeling-*` reads `prd/` + `design/high-level.md`,
-  never `design/deep-dive.md`.
-- **One model per project folder.** If the framing yields two models, the
-  second gets its own folder.
-- **`/ml-modeling <topic>` checkpoints by default.** It runs step 1, reports
-  the result, and waits for you before running step 2, and so on through
-  step 4 - the same review-after-each-step pattern as `-prd` and
-  `-high-level`. Say "full chain" (or "run all four steps") to get the old
-  uninterrupted data -> features -> train -> evaluate pass in one go
-  instead.
+## Rules to know
+
+1. **Start with `/ml-system-design <topic>`.**
+   - It selects Regular or Quick POC from your words.
+   - It asks 2 questions: run `/ml-system-design-monkey-mode` in the
+     background? Scope with `/ml-system-design-prd` first?
+   - You type these 2 commands yourself. Then run `/ml-system-design`
+     again. It continues at high-level.
+   - The PRD is the Definition section, so `-definition` does not run
+     again.
+   - `-prd` is the interview. It creates the project folder and writes
+     `prd/`. `-definition` is for a project with no PRD, or for a review
+     of a Definition.
+2. **You can edit each file between steps.**
+   - Edit any file in `prd/`, `design/`, `adr/`, `spec/`, or `modeling/`.
+     Then tell Claude which file changed.
+   - Claude reads the file again, and runs again each later step that uses
+     it. It adds a line to the `## Change log` of each changed file.
+   - On the hands-on route, a hash check finds edits to `prd/` and
+     `design/high-level.md`, also when you do not say.
+3. **Docs wrap at 80 columns.** You read the files in a terminal. Prose
+   has hard line breaks. Code blocks are not wrapped. A wide table becomes
+   a list of headed paragraphs.
+4. **After high-level, select paper or hands-on.**
+   - `-deep-dive` and `ml-modeling-*` answer the same 4 questions: data,
+     features, models, training.
+   - `-deep-dive` writes a design section. `ml-modeling-*` does the work
+     and records it in `modeling/`.
+   - `ml-modeling-*` reads `prd/` and `design/high-level.md`. It never
+     reads `design/deep-dive.md`.
+5. **One model for each project folder.** If the framing gives 2 models,
+   the second model gets its own folder.
+6. **`/ml-modeling <topic>` stops after each step.**
+   - It runs step 1, reports the result, and waits for you. Then it runs
+     step 2, and continues to step 4.
+   - To run the 4 steps without stops, say "full chain" or "run all four
+     steps".
+7. **Each skill checks its own output.** The last step of each skill:
+   1. **Intent:** answers 2-5 questions for that skill, each yes or no.
+   2. **Format:** runs `check_doc.py` on each `.md` file that the skill
+      wrote.
+   3. **Fix:** fixes the output and checks again, at most 2 times. It
+      reports the items that stay open.
+   4. **Reflect:** writes each gap in the skill to
+      `SKILL-IMPROVEMENTS.md`.
+
+   The skills with many steps also show a progress checklist. They tick
+   each line.
 
 ## Two speeds
 
-Every skill runs in **Regular** mode (full rigor, asks when unknown) or
-**Quick POC** (a one-hour MVP: batched questions, first reasonable choice).
-Pick by keyword in the request: "poc", "quick", "mvp", "fast" -> Quick POC;
-anything else -> Regular. Monkey-mode is separate: always fast, always
-background, never blocks.
+Each skill has 2 modes:
+- **Regular:** full rigor. The skill asks when a fact is unknown.
+- **Quick POC:** a one-hour MVP at the same quality. The skill asks fewer
+  questions and takes the first reasonable choice.
+
+A keyword in your request selects the mode:
+- "poc", "quick", "mvp", "prototype", "fast", "one hour", "1 hour" select
+  Quick POC.
+- All other words select Regular.
+
+Monkey-mode is different. It is always fast, always runs in the
+background, and never waits for you.
 
 ## Data
 
-**Practice datasets** are under `data/riot-synthetic/synthetic-data/data/`:
-`lifecycle/` (players, per-day activity, purchases, a randomized offer
-campaign, a content calendar), `shop/` (items, champion play, purchases,
-storefront impressions), `ranked/`, `newplayer/`. The generator is
-`data/riot-synthetic/synthetic-data/scripts/riot_practice_data.py`. Each
-dataset has a `_truth/` folder with the simulator's latent state - a grading
-key, never a modeling input.
+**Practice datasets** are in `data/riot-synthetic/synthetic-data/data/`:
+- `lifecycle/`: players, activity for each day, purchases, a randomized
+  offer campaign, a content calendar.
+- `shop/`: items, champion play, purchases, storefront impressions.
+- `ranked/` and `newplayer/`.
 
-**How data enters a project.** `ml-modeling-data` either registers an existing
-labeled table or builds one from logs (`modeling/build_dataset.py` ->
-`modeling/datasets/<task>_{train,test}.csv`), then records paths, label, id,
-and split rule in `01-data.json`'s `dataset` block. Every later step reads
-that block: features and train see only the train table, evaluate scores the
-test table, and cross-validation folds never cross the split. Profiling also
-cleans genuine errors it finds (impossible values, a missingness sentinel,
-exact duplicates) and re-profiles - a legitimately extreme-but-real value
-stays flagged, not touched (0007).
+The generator is
+`data/riot-synthetic/synthetic-data/scripts/riot_practice_data.py`. Each
+dataset has a `_truth/` folder with the hidden state of the simulator. Use
+it only to grade results. Never use it as a model input.
+
+**How data enters a project:**
+1. `ml-modeling-data` registers an existing labeled table, or builds one
+   from logs: `modeling/build_dataset.py` writes
+   `modeling/datasets/<task>_{train,test}.csv`.
+2. It records the paths, the label, the id, and the split rule in the
+   `dataset` block of `01-data.json`. For implicit labels (only positives
+   in the logs), it also builds and records the negatives.
+3. Each later step reads that block. Features and train use only the
+   train table. Evaluate scores the test table. Cross-validation folds
+   never cross the split.
+4. The data step also cleans real errors (impossible values, a code for
+   "missing", exact duplicates), and then profiles again. An extreme but
+   real value keeps its flag, and stays unchanged (ADR 0007).
 
 ## Project folder
 
-Every project gets one folder, `<parent>/<project>/`. The project name is
-the one you give (for example `proj1`), and the parent is `labs/` unless you
-name another. Full rule: `ml-system-design/SKILL.md`, "Project folder"
-(0010).
+Each project has one folder: `<parent>/<project>/`.
+- The project name is the name that you give, for example `proj1`.
+- The parent is `labs/`, unless you name another parent.
+- Full rule: `ml-system-design/SKILL.md`, "Project folder" (ADR 0010).
 
 ```
 labs/proj1/
   prd/<topic>.md           Definition (problem, scope, metrics, team)
   design/high-level.md     ML framing, architecture diagrams, phasing
-  design/deep-dive.md      Paper deep dive (only on the paper route)
-  adr/000N-*.md            One decision per file
-  spec/<topic>.md          Synthesized when modeling starts; pins design hashes
+  design/deep-dive.md      Paper deep dive (paper route only)
+  design/delivery.md       Rollout, evaluation, monitoring, fallback
+  design/post-delivery.md  Analysis, explainability, iteration
+  adr/000N-*.md            One decision in each file
+  spec/<topic>.md          Made when modeling starts; holds the design hashes
   modeling/
-    01-data.md/.json       Profile, clean + `dataset` contract
-    02-features.md         Feature decisions
-    03-train.md            Model, loss, class weighting
-    04-evaluate.md/.json   Metrics vs. baseline; feeds the dashboard
+    01-data.md/.json       Profile, cleaning, and the `dataset` contract
+    02-features.md         Feature decisions; features.py
+    03-train.md            Model, loss, training setup; model.joblib
+    04-evaluate.md/.json   Metrics against the baseline; test_scores.csv
     datasets/, build_dataset.py, experiments.json, autoresearch/
-  dashboard/               eda.ipynb + app.py (Streamlit), per-project port
+  dashboard/               eda.ipynb + app.py (Streamlit), own port
   monkey-mode/report.md    Independent fast baseline
   critique/<date>-<lens>.md  Critiques from ml-critique
   research/                Research notes for this project
-  SKILL-IMPROVEMENTS.md    Proposed fixes to the skills themselves
+  SKILL-IMPROVEMENTS.md    Proposed changes to the skills
 ```
 
 ## Command reference
 
-`sd-*` is short for `ml-system-design-*`, `mm-*` for `ml-modeling-*`. Every
-skill runs as `/<full name>` (e.g. `/ml-modeling-data`); those marked `cmd`
-run only by command, the rest also trigger from plain language.
+`sd-*` is short for `ml-system-design-*`. `mm-*` is short for
+`ml-modeling-*`. You run each skill as `/<full name>`, for example
+`/ml-modeling-data`. A skill marked `cmd` runs only by command. The other
+skills also start from plain language.
 
-| Skill                 | What it does                                  |
-|-----------------------|-----------------------------------------------|
-| `sd`                  | Router for the whole design doc               |
-| `sd-prd` cmd          | Grill the Definition, write `prd/`            |
-| `sd-definition`       | Definition section, no grilling               |
-| `sd-high-level`       | Framing, architecture, phasing; the fork      |
-| `sd-deep-dive`        | Paper deep dive (alternative to `mm-*`)       |
-| `sd-delivery`         | Rollout, eval, monitoring, fallback           |
-| `sd-post-delivery`    | Analysis, explainability, iteration           |
-| `sd-monkey-mode` cmd  | Fast autonomous baseline, background          |
-| `sd-monkey-mlp` cmd   | Fast autonomous embedding-MLP baseline, background |
-| `mm`                  | Router: data -> features -> train -> evaluate, one step at a time by default |
-| `mm-data`             | Build or register the table, profile and clean it |
-| `mm-features`         | Engineer features                             |
-| `mm-train`            | Train one model                               |
-| `mm-multiagent`       | Train N candidates in parallel                |
-| `mm-evaluate`         | Evaluate against a baseline                   |
-| `mm-autoresearch` cmd | Optional auto-improvement loop                |
-| `ml-critique`         | Critique a finished write-up (see critique guide) |
-
-### Every skill ends with a Check
-
-The last step of each skill reads the output again and checks it:
-
-1. **Intent:** 2-4 questions for that skill, each answered yes or no.
-2. **Format:** `check_doc.py` on each file that the skill wrote.
-3. **Fix:** fix and check again, at most 2 times. Open items are reported.
-4. **Reflect:** a gap in the skill goes to `SKILL-IMPROVEMENTS.md`.
-
-The multi-step skills also show a progress checklist that they tick.
+| Skill                 | What it does                                   |
+|-----------------------|------------------------------------------------|
+| `sd`                  | Router for the full design doc                 |
+| `sd-prd` cmd          | Interview on the Definition, writes `prd/`     |
+| `sd-definition`       | Definition section, no interview               |
+| `sd-high-level`       | Framing, architecture, phasing; the fork       |
+| `sd-deep-dive`        | Paper deep dive (the other route is `mm-*`)    |
+| `sd-delivery`         | Rollout, evaluation, monitoring, fallback      |
+| `sd-post-delivery`    | Analysis, explainability, iteration            |
+| `sd-monkey-mode` cmd  | Fast baseline in the background                |
+| `sd-monkey-mlp` cmd   | Fast embedding-MLP baseline, background        |
+| `mm`                  | Router: data, features, train, evaluate        |
+| `mm-data`             | Builds the table, profiles and cleans it       |
+| `mm-features`         | Makes the features                             |
+| `mm-train`            | Trains one model                               |
+| `mm-multiagent`       | Trains N candidates in parallel                |
+| `mm-evaluate`         | Evaluates against a baseline                   |
+| `mm-autoresearch` cmd | Optional automatic improvement loop            |
+| `ml-critique`         | Critiques a finished write-up (critique guide) |
 
 ### Bundled scripts
 
-Paths are under `.agents/skills/personal/`. Run them from the sandbox
-root.
+The paths start at `.agents/skills/personal/`. Run the scripts from the
+sandbox root.
 
-- `ml-system-design/scripts/check_doc.py <files|dirs>`: checks the output
-  format (80 columns, wide tables, em dashes). Prints `OK` or
-  `file:line: reason`. Python stdlib.
-- `ml-modeling/scripts/spec_hash_check.sh <project>`: has the PRD or
-  high-level changed since the spec? Prints `MATCH` or `CHANGED`.
-  `--refresh prd|high-level` updates the hash. Bash and git.
-- `ml-modeling-data/scripts/launch_dashboard.sh <project>`: starts or
-  reuses the project dashboard on a free port and prints the URL.
-  `--stop` stops it. Bash, lsof, curl, uv.
-- `ml-modeling/scripts/experiment_tracker.py`, `feature_selector.py`,
-  `hypothesis_tester.py`: experiment log, feature ranking, significance
-  tests. Python stdlib.
+- `ml-system-design/scripts/check_doc.py <files or dirs>`
+  - Checks the output format: 80 columns, wide tables, em dashes, code
+    fences, required sections (`--sections`).
+  - Prints `OK` or `file:line: reason`.
+  - Needs: Python stdlib.
+- `ml-modeling/scripts/spec_hash_check.sh <project>`
+  - Finds a change to the PRD or high-level since the spec.
+  - Prints `MATCH`, or `CHANGED` with both SHAs. `--refresh prd` or
+    `--refresh high-level` updates the hash.
+  - Needs: Bash, git.
+- `ml-modeling-data/scripts/launch_dashboard.sh <project>`
+  - Starts the project dashboard on a free port, or uses the one that
+    runs. Prints the URL. `--stop` stops it.
+  - It stops or uses only its own process.
+  - Needs: Bash, lsof, curl, uv.
+- `ml-modeling/scripts/experiment_tracker.py`: the experiment log. "Best"
+  is the lowest value for error and loss metrics. Python stdlib.
+- `ml-modeling/scripts/feature_selector.py`: a rough feature ranking.
+  Python stdlib.
+- `ml-modeling/scripts/hypothesis_tester.py`: significance tests for
+  means and proportions. Python stdlib.
 
 On a new clone, run `uv sync` at the sandbox root first.
 
 ### Parameters
 
-Free text after the command, no flags. Four kinds of words are recognized:
+Type free text after the command. There are no flags. The skills know 4
+types of words:
+- **Topic or project.** `churn prediction` starts a new folder.
+  `labs/ml-riot-churn-2` continues an existing folder.
+- **Speed.** The Quick-POC keywords (see "Two speeds"). All other words
+  select Regular.
+- **Training.** `parallel` or `multiagent` selects `mm-multiagent`. All
+  other words select `mm-train`. This applies only through `/mm`.
+- **Continuation** (only for `/mm`). `full chain` or `run all four steps`
+  runs data -> features -> train -> evaluate without stops. All other
+  words make the skill stop and wait after each step.
 
-- **topic or project** - `churn prediction` starts a new folder;
-  `labs/ml-riot-churn-2` continues an existing one.
-- **speed** - `poc`, `quick`, `mvp`, `fast`, `one hour` -> Quick POC;
-  anything else -> Regular.
-- **training** - `parallel` or `multiagent` -> `mm-multiagent`; otherwise
-  `mm-train`. Only matters when going through `/mm`.
-- **continuation** (only for `/mm`) - `full chain` or `run all four steps` ->
-  run data -> features -> train -> evaluate in one uninterrupted pass;
-  anything else -> stop and wait for you after each step.
+| Command                          | Takes                                   |
+|----------------------------------|-----------------------------------------|
+| `/sd <topic>`                    | topic, speed                            |
+| `/sd-prd <topic>`                | topic (required), speed                 |
+| `/sd-definition`..`-post-delivery` | project*, speed, `review`             |
+| `/sd-monkey-mode <topic>`        | topic (required)                        |
+| `/sd-monkey-mlp <topic>`         | topic (required)                        |
+| `/mm <topic>`                    | topic or project, speed, training, cont. |
+| `/mm-data` .. `/mm-evaluate`     | project*, speed                         |
+| `/mm-autoresearch <project> ...` | project (required), stop, count         |
 
-| Command                              | Takes                                  |
-|--------------------------------------|-----------------------------------------|
-| `/sd <topic>`                        | topic, speed                           |
-| `/sd-prd <topic>`                    | topic (required), speed                |
-| `/sd-definition` .. `-post-delivery` | project*, speed, `review`              |
-| `/sd-monkey-mode <topic>`            | topic (required)                       |
-| `/sd-monkey-mlp <topic>`             | topic (required)                       |
-| `/mm <topic>`                        | topic or project, speed, training, continuation |
-| `/mm-data` .. `/mm-evaluate`         | project*, speed                        |
-| `/mm-autoresearch <project> ...`     | project (required), stop, count        |
-
-\* only when the project is not clear from the conversation. `review` runs
-the section in review mode instead of drafting. Autoresearch stop rule:
-`until plateau`, `for N minutes`, or nothing (one round); count: `N
-candidates`.
+Notes:
+- "cont." is continuation.
+- \* Give the project only when the conversation does not make it clear.
+- `review` reviews the section. It does not write a draft.
+- Autoresearch stop rule: `until plateau`, `for N minutes`, or no words
+  (one round). Count: `N candidates`.
 
 ## Key design decisions
 
-Each has an ADR in `.agents/skills/personal/adr/`.
+Each decision has an ADR in `.agents/skills/personal/adr/`. The number is
+in parentheses.
 
-- **Files, not memory, between steps** - so any step resumes in a fresh
-  session (0001).
-- **The fork is after high-level, and it is either/or** - deep-dive on paper
-  or ml-modeling hands-on, both feed delivery (0006).
-- **A data contract, one model per folder** - `01-data.json`'s `dataset`
-  block says where the tables are and how they are split; no step guesses
+- **Files, not memory, connect the steps.** Thus, any step can continue
+  in a new session (0001).
+- **The fork is after high-level, and you select one route.** The paper
+  deep dive or the hands-on ml-modeling chain. Both go to delivery
+  (0006).
+- **A data contract, and one model for each folder.** The `dataset` block
+  in `01-data.json` gives the table paths and the split. No step guesses
   from prose (0006, and `ml-modeling-data`).
-- **Design drift is detected, then asked about** - the spec pins hashes of
-  the PRD and high-level; a changed design doc triggers a question, never a
-  silent re-read (0001, 0006).
-- **The dashboard is deliberately narrow** - EDA and final results only
-  (0002).
-- **Autoresearch is self-contained** - one round, until plateau, or for a
-  duration, no external scheduler (0003, 0005).
-- **Skill fixes are logged, not applied mid-run** - `SKILL-IMPROVEMENTS.md`
-  per project, reviewed on request (0004).
-- **Simple by default, complex only with evidence** - the complexity gate
+- **The skills find design changes, then ask.** The spec holds hashes of
+  the PRD and high-level. A changed design doc starts a question. The
+  skill never reads the change silently (0001, 0006).
+- **The dashboard is small on purpose.** It shows the EDA and the final
+  results only (0002).
+- **Autoresearch controls its own loop.** One round, until plateau, or for
+  a time. No external scheduler (0003, 0005).
+- **Skill changes go to a log during a run.** `SKILL-IMPROVEMENTS.md` in
+  each project. You review the entries when you want (0004).
+- **One reference for model and training choices.** `ml-model-training.md`
+  holds negative sampling, architecture (shallow or deep, MLP, cross
+  network, attention), the neural network training setup, and tree
+  hyperparameters. Deep-dive, train, and the critique lenses check that a
+  write-up states them.
+- **Simple by default, complex only with evidence.** The complexity gate
   in `ml-design-principles.md` applies to design, training, and critique.
-- **Critique is separate from Review mode** - a cold-reader review with
-  priorities, convergence, and a decisions record (0009).
-- **One folder per project** - all generated files in `<parent>/<project>/`,
-  never in `notes/` (0010).
-- **Every skill checks its own output** - intent questions, a format
-  script, a fix loop, and a skill-issue log; fragile steps are scripts
+- **Critique is different from Review mode.** It is a review by a reader
+  with no context, with priorities, convergence, and a record of the
+  decisions (0009).
+- **One folder for each project.** All generated files go in
+  `<parent>/<project>/`, never in `notes/` (0010).
+- **Each skill checks its own output.** Intent questions, a format script,
+  a fix loop, and a log of skill issues. Scripts do the fragile steps
   (0011).
-- **Cleaning lives inside the data step** - genuine errors get fixed and
-  re-profiled there, not left to feature engineering or split into a
+- **Cleaning is part of the data step.** The data step fixes real errors
+  and profiles again. Feature engineering does not do it, and it is not a
   separate step (0007).

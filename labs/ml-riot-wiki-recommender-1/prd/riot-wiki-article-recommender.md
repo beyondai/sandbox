@@ -172,10 +172,33 @@ floor        space  -> most-read pages in the space      -----------------> top 
 - **Candidate-stage diagnostic.** recall@100 of the candidate generators.
   The ranker can only choose from candidates. Monkey mode showed that
   candidates found only 30% of cold-page next clicks.
-- **Slices.**
-  - cold and new pages;
-  - **long-tail** pages (low traffic);
-  - new-hire readers.
+- **Slices.** Two axes, on two sides. Cold-start (new) and long-tail (rarely
+  used) are different problems, so they are separate slices.
+  - **Age axis.** `new`: created less than 14 days before the cutoff T
+    (from `wiki.pages.created`). Every other page is established.
+  - **Traffic axis** (established pages only, 28-day feature window):
+    - `dormant`: 0 page views;
+    - `long-tail`: above 0, up to the 50th percentile of pages with views;
+    - `torso`: the 50th to 90th percentile;
+    - `head`: the top 10%.
+    - Percentiles, not fixed counts, until Riot's scale is known
+      (assumption).
+  - **Query side** (the panel on page A): the traffic tier uses the
+    distinct readers who opened any page right after A. Metric: nDCG@5
+    and recall@5 per slice.
+  - **Item side** (page C as a recommendation): the traffic tier uses the
+    distinct readers who arrived at C from another wiki page. Metric:
+    recall@5 on the true next pages in each slice, so a new or long-tail
+    page that readers wanted is counted when the panel misses it.
+  - **new-hire readers.**
+
+  ```
+                   query side (panel on A)    item side (C as a rec)
+  new              no evidence yet            needs exploration slot
+  dormant          no demand (old page)       show only on strong signals
+  long-tail        sparse counts              sparse counts, diversity
+  torso / head     warm                       warm
+  ```
 - **Before logs exist.** A judged set of about 200 seed pages. Domain experts
   choose the top 5 relevant pages for each. Score with nDCG@5.
 
@@ -244,3 +267,7 @@ real Riot stack.
 - 2026-10-08: added the Baseline section (new Definition checklist item).
 - 2026-10-08: renamed "co-view" to "opened-next" (B came right after A in
   the same session), with distinct-reader counting and a 3-reader minimum.
+- 2026-10-08: split the "cold and new / long-tail" slices into an age axis
+  (new) and a traffic axis (dormant, long-tail, torso, head), on the query
+  side and the item side (user decision: cold-start and long-tail are
+  different problems).

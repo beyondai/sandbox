@@ -261,7 +261,10 @@ definition.**
 **G2. The model choice is justified.**
 - Mistakes: a deep model on 50k tabular rows. A choice by fashion.
 - Remedies: justify with data size, data type, latency, and
-  interpretability. GBDT is the default for tabular data.
+  interpretability. GBDT is the default for tabular data. Name the
+  architecture and why: shallow before deep; a cross network (DCN-v2,
+  DeepFM) for explicit feature crosses; a two-tower model for retrieval;
+  attention only for sequences or history-candidate relations.
 
 **G2a [C]. Each complex choice passes the complexity gate.**
 - Mistakes: a deep model, a real-time pipeline, or a new data dependency
@@ -284,10 +287,25 @@ definition.**
 - Remedies: a ranking loss for ranking. Log loss with calibration where
   thresholds or auctions use the score.
 
-**G5. There is a plan for class imbalance and sampling.**
-- Mistakes: no plan for 1% positives. Random negatives only.
-- Remedies: class weights or threshold tuning. Hard negatives. Correct
-  the probabilities after down-sampling.
+**G5. There is a plan for class imbalance and negative sampling.**
+- Mistakes: no plan for 1% positives. Implicit labels (clicks only) with
+  no stated negatives. Random negatives only. Unlabeled items treated as
+  sure negatives. Evaluation on the training negatives.
+- Remedies: class weights or threshold tuning. A negative plan: types
+  (random, popularity-weighted, in-batch, hard: shown but not engaged),
+  a ratio (often 4-10 per positive), the pool, and a correction (logQ, or
+  the down-sampling rate). Evaluate on the production distribution.
+
+**G5a. The training setup is stated.**
+- Mistakes: "we will train a DNN" with no optimizer, learning rate,
+  epochs, or hardware. A random forest with no depth or tree count. No
+  training-time or compute estimate, so no running cost.
+- Remedies: for a neural network: framework, optimizer (AdamW), learning
+  rate and schedule (for example 1e-3 with warm-up and cosine decay),
+  batch size, epochs with early stopping on validation, dropout (0.1-0.3)
+  and weight decay. For trees: trees, depth or leaves, min leaf size,
+  learning rate and rounds with early stopping. The hardware (CPU or
+  GPU), the expected training time, and the tuning budget.
 
 **G6 [C]. The evaluation plan mirrors production.**
 - Mistakes: a random split for a time-dependent problem.

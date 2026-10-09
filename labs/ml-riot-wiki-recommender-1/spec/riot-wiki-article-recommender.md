@@ -1,5 +1,5 @@
-prd-hash: 53935f1fb2ee5e70b5ae45c9f7e31bc957f5cc02
-high-level-hash: 1dba2a6f6da6ad6713a86da4e4c7d46362e54bdd
+prd-hash: 84910b6cbe81b1d298fc7edd2b36912fc35b0076
+high-level-hash: be358105f7ff18f9c876e397635397679d401c2d
 
 # Spec: Riot wiki article recommender
 
@@ -70,8 +70,11 @@ time spent looking for docs and faster onboarding for new hires.
 - **Secondary.** recall@5, `recall_w@5` (weighted by clicks), hit@5,
   catalog coverage.
 - **Candidate diagnostic.** recall@100 of the candidate generators.
-- **Slices.** cold and new pages, long-tail pages, new-hire readers (not
-  available on the proxy).
+- **Slices.** Age axis (`new`: created < 14 days before T) and traffic
+  axis (`dormant`, `long-tail` up to p50, `torso` p50-p90, `head` top 10%),
+  each on the query side (panel on A: nDCG@5, recall@5) and the item side
+  (C as a recommendation: recall@5 on true next pages). New-hire readers
+  are not available on the proxy.
 - **Comparison.** Against the V0 baseline (opened-next counts, with
   popularity backfill) and the floor (popularity). Bootstrap 95% CIs.
 - **Split rule.** Set by `ml-modeling-data`: train = features 2026-07,

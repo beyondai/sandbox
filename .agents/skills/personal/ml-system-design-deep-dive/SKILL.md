@@ -63,9 +63,19 @@ keyword selects the speed (the list is in "Regular and Quick-POC mode" in
   work. The trade-offs: performance, running cost, maintenance cost,
   explainability. Select a model for each phase. A more complex candidate
   wins only if it passes the complexity gate: fill the cost table in
-  `../ml-design-principles.md`, Principle 1.
+  `../ml-design-principles.md`, Principle 1. Name the architecture and why
+  (shallow or deep; MLP, cross network, two-tower, or attention).
 - **Training:** the loss, the algorithm, the source of the labels, and
-  the sampling (for example for class imbalance).
+  the sampling: class imbalance, and the negative sampling plan when the
+  logs hold only positives (types, ratio, correction). The training
+  setup: for a neural network the framework, optimizer, learning rate and
+  schedule, batch size, epochs with early stopping, dropout and weight
+  decay; for trees the key hyperparameters. Also the hardware (CPU or
+  GPU) and the expected training time.
+
+Starting values and the options for each choice:
+`../ml-model-training.md`. Give rough values; mark each one as a starting
+point to tune.
 
 ## Check
 
@@ -76,5 +86,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 3. Does a complex choice have the cost table, and does it pass the gate?
 4. Can the label source be traced to a real data pipeline? Does the loss
    match the PRD primary metric?
+5. Does Training state the negative sampling plan (if the labels are
+   implicit) and the training setup or tree hyperparameters, with the
+   hardware and the time?
 
-Done when the 4 answers are yes and `check_doc.py` prints `OK`.
+Done when the 5 answers are yes and `check_doc.py` prints `OK`.
