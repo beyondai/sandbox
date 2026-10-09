@@ -61,6 +61,11 @@ grilling rounds, and nothing is written to `design/`.
   precision/recall).
 - **Metrics, online:** live A/B metrics (CTR, conversion, session time),
   and guardrail metrics that must not get worse.
+- **Metrics, intended behavior:** one or two lines on what the model must
+  do in user terms, and the ways the model can game the primary metric
+  (for example the same popular items for all users), each with a
+  guardrail. If the goal is a target level, not a maximum, say so. See
+  `../ml-design-principles.md`, Principle 2.
 - **Team:** stakeholders to inform, collaborating teams, blocking and
   blocked dependencies.
 - **Team, reuse:** existing components to reuse, and the downstream
@@ -75,7 +80,7 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 1. Does each bullet have a concrete answer, not only a heading?
 2. Does the problem name the decision that the model controls?
 3. Is there one primary offline metric, with a threshold? Does it connect
-   to the online metric?
+   to the online metric? Does each way to game it have a guardrail?
 4. Is the out-of-scope list specific? Does the baseline section recommend
    one baseline?
 

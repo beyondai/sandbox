@@ -37,6 +37,9 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
   example sprint length, review cadence).
 - **Deployment:** the rollout plan (ramp %, schedule), the test plan
   (unit, integration, load), CI/CD.
+  - When the quality is partly subjective (the user experience), put an
+    internal or opt-in stage before the random ramp. It collects feedback
+    and tests the guardrails before random users see the model.
   - The serving design comes from the route, like Eval: hands-on,
     `modeling/05-serve.md` and `.json`; paper, the Serving section of
     `design/deep-dive.md`. Cite it; do not design serving again here.

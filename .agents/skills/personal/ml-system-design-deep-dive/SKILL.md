@@ -74,7 +74,9 @@ keyword selects the speed (the list is in "Regular and Quick-POC mode" in
   setup: for a neural network the framework, optimizer, learning rate and
   schedule, batch size, epochs with early stopping, dropout and weight
   decay; for trees the key hyperparameters. Also the hardware (CPU or
-  GPU) and the expected training time.
+  GPU) and the expected training time. Compare the retrain time and cost
+  with the cadence of scheduled upstream changes (releases, catalog or
+  rule updates): one retrain must fit inside one change cycle.
 - **Serving:** the mode (batch or online) and the reason from the scoring
   cadence; the stages; the PRD p99 divided into a budget for each stage;
   how online features are fetched with the training feature code; the

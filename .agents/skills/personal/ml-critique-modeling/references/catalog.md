@@ -358,6 +358,15 @@ truth** (ranking and recommendation only).
   segments on the query side and the item side; a paired bootstrap over
   queries.
 
+**I12. A sample of outputs is read for degenerate patterns.**
+- Mistakes: only aggregate metrics. Nobody reads what the model outputs,
+  so a model that games the metric (the same items for all users,
+  near-duplicates, one class for a hard segment) looks good.
+- Remedies: read the top outputs for a sample of typical and edge-case
+  inputs (new users, rare segments, empty history). Name each degenerate
+  pattern, and add a guardrail or an output check for it. See
+  `../../ml-design-principles.md`, Principle 2.
+
 ## J. Interpretability and sanity
 
 **J1. Feature importances and SHAP values agree with domain knowledge.**

@@ -1,7 +1,9 @@
 # ML design and review principles
 
-Contents: Rule | The cost table | Budgets in the PRD | Why | How each skill uses
-this principle
+Contents: Principle 1, simple by default (Rule | The cost table | Budgets in
+the PRD | Why | How each skill uses this principle) | Principle 2, the
+intended behavior, not the metric (Rule | Why | How each skill uses this
+principle)
 
 This file is the single source of truth for the principles that the `ml-*`
 skills use to design and to review ML systems. The design skills apply them
@@ -103,3 +105,49 @@ These forms are all valid:
 | `ml-modeling-train` | Starts simple. Selects a more complex model only if it passes the gate. Writes the cost table in `03-train.md`. |
 | `ml-modeling-multiagent` | Always includes a simple candidate. Selects the simplest candidate inside the noise of the best, unless a more complex one passes the gate. |
 | `ml-critique` and lenses | No simple baseline: P1. Complexity that does not pass the gate: P2. |
+
+---
+
+## Principle 2: The objective is the intended behavior, not the metric.
+
+```
+   intended behavior ---> primary metric ---> optimizer
+          ^                                       |
+          |      the optimizer finds outputs      |
+          +---- that score well but miss the  <---+
+                 intent: name them, check them
+```
+
+### Rule
+
+1. Write the intended behavior in one or two lines, next to the primary
+   metric. It is what the product needs the model to do, in user terms.
+2. List the ways the model can game the primary metric: outputs that
+   score well and still miss the intent. Examples: the same popular items
+   for every user, repeat loops, clickbait, near-duplicate results, a
+   score that stays high because the model avoids hard cases.
+3. Give each item a guardrail metric or an output check. A counter-metric
+   for a side effect is not enough when the model itself exploits the
+   metric.
+4. Before launch, a person reads a sample of outputs: typical inputs and
+   edge-case inputs (new users, rare segments, empty history). Reason:
+   aggregate metrics hide degenerate outputs.
+5. When the goal is a target level and not a maximum, say so and optimize
+   to the target. Examples: a difficulty or price matched to the user, a
+   diversity floor, a share of new items.
+
+### Why
+
+- An optimizer improves the number it gets, not the intent behind it.
+  The stronger the optimizer, the more it finds the gaps between the two.
+- A model with the best offline score can still harm the user experience,
+  and the users leave before the long-term metrics show it.
+
+### How each skill uses this principle
+
+| Skill | Use |
+|---|---|
+| `ml-system-design-definition` | Success metrics: states the intended behavior, and lists the ways the model can game the primary metric, each with a guardrail. |
+| `ml-modeling-evaluate` | Output review: reads a sample of top outputs for typical and edge-case inputs, and reports the degenerate patterns. |
+| `ml-critique-system` | B7: no named ways to game the metric, or no check for each. |
+| `ml-critique-modeling` | I12: no output sample was read. |

@@ -63,6 +63,13 @@ Metrics
       Examples: CTR, conversion rate, session time.
     - Guardrail metrics make sure that the system does not harm the user
       experience.
+  - Intended behavior:
+    - Write what the model must do, in user terms, in one or two lines.
+    - List the ways that the model can game the primary metric. Example:
+      "it shows the same popular items to all users". Give each one a
+      guardrail.
+    - If the goal is a target level and not a maximum, say so. Example:
+      "a share of new items of at least 10%".
 
 Team
   This part maps the people of the project.
@@ -102,7 +109,11 @@ Delivery phases
   For each phase, give:
   - the features that the phase delivers;
   - a rough timeline;
-  - the number of team members (TMs).
+  - the number of team members (TMs);
+  - the gate to the next phase: the metric, the stability across runs,
+    the segment coverage, and the cost.
+  If a date depends on a method that is not proven on this problem, keep
+  the last proven phase ready to ship until the new method passes.
   This shows a practical, iterative plan.
 
 
@@ -145,6 +156,9 @@ Training
       the logs hold only positives.
     - Setup: the key hyperparameters, the hardware, and the training
       time.
+    - Retraining: the retrain time and cost, compared with the cadence
+      of scheduled upstream changes. Example: "one retrain takes 4 hours;
+      the catalog changes each week".
 
 Serving
   - Inference mode, latency, scaling, and cost:
@@ -172,7 +186,8 @@ Execution
 Deployment, rollout, and testing
   Describe how to deploy the new system safely:
   - Rollout plan. Example: "start with 1% of users, and increase over two
-    weeks".
+    weeks". When the quality is partly subjective, start with an internal
+    or opt-in group.
   - Testing plan: unit tests, integration tests, load tests. The load
     test runs at the peak load, with the capacity from Serving.
   - CI/CD strategy.

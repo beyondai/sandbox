@@ -93,6 +93,18 @@ K Cross-section consistency.
   lose retention.
 - Remedies: a long-term metric or holdout as a counter-metric.
 
+**B7 [C]. The ways the model can game the metric are named, each with a
+check.**
+- Mistakes: no intended behavior next to the primary metric. The model
+  can score well with degenerate outputs (the same popular items for all
+  users, repeat loops, near-duplicates, avoidance of hard cases), and no
+  check would see it.
+- Remedies: write the intended behavior in user terms. List the ways to
+  game the metric, each with a guardrail or an output check. A person
+  reads a sample of outputs for typical and edge-case inputs before
+  launch. If the goal is a target level, not a maximum, optimize to the
+  target. See `../../ml-design-principles.md`, Principle 2.
+
 ## C. Requirements and scope
 
 **C1 [C]. The out-of-scope list is real and specific.**
@@ -271,6 +283,16 @@ definition.**
 - Mistakes: no way to know which model and data made a prediction.
 - Remedies: a model registry, a model version in each prediction log.
 
+**F7. Retraining fits the cadence of scheduled changes.**
+- Mistakes: only a drift trigger. The scheduled upstream changes
+  (product releases, catalog or rule updates, pricing or policy changes)
+  are not listed. One retrain takes longer, or costs more, than one
+  change cycle. Only the authors of the model can run it.
+- Remedies: list the scheduled changes and their cadence. Give the
+  retrain time and cost for each cycle, and show that it fits. Make each
+  scheduled change a retrain or re-check trigger. Name the post-launch
+  owner, who runs it from the runbook (I9).
+
 ## G. Modeling plan
 
 **G0. The baseline has all its parts.**
@@ -358,11 +380,19 @@ definition.**
 
 **H2. Each phase gives measurable value.**
 - Mistakes: a phase that is only infrastructure, with no metric.
-- Remedies: each phase has a metric target and a decision gate.
+- Remedies: each phase has a metric target and a decision gate. The
+  gate checks more than the metric: the stability across seeds or
+  retrains, the coverage of segments and edge cases, and the running
+  cost.
 
 **H3. The stretch work is separate.**
-- Mistakes: research mixed into the commitments.
-- Remedies: put the research in a stretch phase.
+- Mistakes: research mixed into the commitments. A committed launch
+  date depends on a method that the team has not yet shown to work on
+  this problem.
+- Remedies: put the research in a stretch phase. Keep the last proven
+  version (the baseline or the previous phase) shippable, and keep
+  improving it while the new method is tested. Name the date and the
+  evidence that decide which version ships.
 
 **H4. The timeline and the headcount are realistic.**
 - Mistakes: 3 stages and a feature store in 4 weeks with 1 person.
@@ -391,7 +421,10 @@ definition.**
 
 **I5. The rollout has a ramp with a shadow or canary stage.**
 - Mistakes: 0% to 100% in one step.
-- Remedies: shadow, then 1%, 5%, 25%, 50%, 100%, each with a gate.
+- Remedies: shadow, then 1%, 5%, 25%, 50%, 100%, each with a gate. When
+  the quality is partly subjective (the user experience), add an internal
+  or opt-in stage before the random ramp: collect feedback and test the
+  guardrails.
 
 **I6 [C]. The fallback has a trigger and a target, and there is a kill
 switch.**

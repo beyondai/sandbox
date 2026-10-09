@@ -57,6 +57,12 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
   - Each later phase names its expected gain over the baseline: the gain
     that pays for the added complexity (`../ml-design-principles.md`,
     Principle 1).
+  - Each phase gate checks the metric, the stability across seeds or
+    retrains, the segment and edge-case coverage, and the running cost.
+  - If a committed date depends on a method not yet shown to work on this
+    problem, keep the last proven phase shippable and improving in
+    parallel. Name the date and the evidence that decide which ships.
+    Reason: the launch must not depend on an unproven method.
 
 ## Write the file
 

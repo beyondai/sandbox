@@ -433,6 +433,11 @@ in parentheses.
   on Opus only. Scripts have no unexplained numbers (0015).
 - **Simple by default, complex only with evidence.** The complexity gate
   in `ml-design-principles.md` applies to design, training, and critique.
+- **The intended behavior, not the metric.** Principle 2: the design
+  names the ways the model can game its metric, each with a guardrail,
+  and the evaluation reads a sample of outputs. Retraining fits the
+  cadence of scheduled changes. Phase gates check more than the metric
+  (0022).
 - **Critique is different from Review mode.** It is a review by a reader
   with no context, with priorities, convergence, and a record of the
   decisions (0009).

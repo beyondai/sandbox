@@ -31,6 +31,7 @@ check, and nobody sees the gap.
 | Baseline: recommended baseline | sys G1; mod A2, A3 |
 | Metrics: offline | sys B1, B2, B5; mod I1, I2 |
 | Metrics: online and guardrails | sys B3, B4, B6 |
+| Metrics: intended behavior, ways to game | sys B7; mod I12 |
 | Team: stakeholders, dependencies, reuse | sys C7 |
 
 `ml-system-design-high-level`:
@@ -57,6 +58,7 @@ check, and nobody sees the gap.
 | Models: candidates, gate, architecture | sys G2, G2a, G3; mod F1-F4 |
 | Training: loss, labels, sampling | sys G4, G5; mod G1, G5, B6, B6a |
 | Training: setup and hardware | sys G5a; mod G5a |
+| Training: retrain time vs change cadence | sys F7 |
 | Serving: mode, stages, budget | sys C4, F3, F4; mod K5 |
 | Serving: capacity and cost at peak | sys F4a, C5; mod K4, K5 |
 
@@ -71,7 +73,7 @@ check, and nobody sees the gap.
 | Eval: A/B design and significance | sys I1, I2, I3, I4 |
 | Eval: offline method | sys G6; mod C1 |
 | Monitoring: health, drift, alerts | sys I7, I8 |
-| Retraining, versioning, runbook | sys F5, F6, I9 |
+| Retraining, versioning, runbook | sys F5, F6, F7, I9 |
 
 `ml-system-design-post-delivery`:
 
@@ -109,6 +111,7 @@ Across sections: sys K1, K2, K3.
 | `ml-modeling-evaluate`: baseline | mod A2, A3 |
 | `ml-modeling-evaluate`: noise, overfit | mod I5, I6, I8 |
 | `ml-modeling-evaluate`: slices, errors | mod I7, I9, I10 |
+| `ml-modeling-evaluate`: output review | mod I12; sys B7 |
 | `ml-modeling-evaluate`: A/B test | sys I1, I2 |
 | `ml-modeling-serve`: mode, serve.py | mod K5, K3 |
 | `ml-modeling-serve`: measure, capacity | mod K4, K5 |
@@ -121,7 +124,7 @@ Across sections: sys K1, K2, K3.
 | `ml-modeling-autoresearch`: keep a win | mod I6, F4 |
 | `ml-system-design-monkey-mode`: baseline | sys G1; mod A2 |
 | `ml-system-design-monkey-mlp`: baseline | sys G1; mod A2, F2a |
-| Shared: `ml-design-principles.md` | sys G2a; mod F4 |
+| Shared: `ml-design-principles.md` | sys G2a, B7; mod F4, I12 |
 | Shared: `ml-model-training.md` | sys G5, G5a; mod G5a |
 | Shared: `ml-serving.md` | sys F4, F4a; mod K4, K5 |
 | Shared: `ml-playbooks.md` | classic mistakes, all lenses |

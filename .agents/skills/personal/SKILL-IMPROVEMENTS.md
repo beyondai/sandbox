@@ -6,7 +6,7 @@ metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
 estimates | tag user findings | Done well filter | share-out and merge
-skills | skill-check fixes
+skills | skill-check fixes | intended behavior and change cadence
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -457,3 +457,17 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   The user decided: "credit before criticism", "don't cut p1", fix the
   rest.
 - **Suggested change**: as applied (ADR 0021).
+
+## 2026-10-09 - ml-design-principles.md, design and critique skills (intended behavior and change cadence)
+- **Project**: none (lessons from a conference talk in the user's notes)
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): Principle 2; sys B7, F7; mod I12;
+  sys H2, H3, I5 remedies; definition, high-level, deep-dive, delivery,
+  and evaluate pointers (ADR 0022).
+- **Finding**: the skills had no check that the model can game its
+  metric, no check that one retrain fits inside the cadence of scheduled
+  upstream changes, phase gates on the metric only, and no proven
+  version kept shippable when a date depends on an unproven method. The
+  user asked for general ML wording, with no domain words from the
+  source and no names.
+- **Suggested change**: as applied (ADR 0022).

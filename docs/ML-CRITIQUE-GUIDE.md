@@ -172,6 +172,11 @@ The review applies Principle 1: simple by default, complex only with
 evidence. A complex model that wins by less than the noise, or that costs
 more than its gain is worth, is a P2 finding.
 
+The review also applies Principle 2: the objective is the intended
+behavior, not the metric. A design that names no ways for the model to
+game its metric, or reads no sample of outputs, gets a finding (system
+B7, modeling I12) (0022).
+
 ## Checkpoints
 
 There is one mode. Each run checks the full catalog, because the agent

@@ -104,6 +104,12 @@ For (query, candidate) rows (`dataset.group` set):
   `hypothesis_tester.py` covers means and proportions, not AUC or top-k.
 - **Overfit.** Give the train-vs-test gap on the primary metric. A large
   gap makes the test number unreliable.
+- **Output review.** Read the top outputs for about 10 typical and 10
+  edge-case inputs (new users, rare segments, empty history). Name each
+  degenerate pattern (the same items for all, near-duplicates, one class
+  for a hard segment) in `04-evaluate.md`. Reason: aggregate metrics hide
+  a model that games the metric (`../ml-design-principles.md`,
+  Principle 2).
 - **Class imbalance.** For an imbalanced target, lead with F1,
   precision-recall, or AUC-ROC, not accuracy.
 - **Log the comparison.** Put `--log-file` before the subcommand:
@@ -153,7 +159,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    on the same test split, not only with the floor?
 2. Does the 95% interval of the lift exclude zero? If not, does the
    verdict say "inside the noise"?
-3. Does the overfit check give a real train/test gap number?
+3. Does the overfit check give a real train/test gap number? Does the
+   output review name the patterns it found, or say "none found"?
 4. Does `04-evaluate.md` say plainly if the model is good enough for the
    PRD bar, not only the numbers? Does `04-evaluate.json` match it?
 
