@@ -65,10 +65,12 @@ never `prd/`, `adr/`, `design/`, or `spec/`. Detail:
 ## Skill improvement log
 
 Any skill in either family can log a proposed change to *itself* (not to the
-project it is working on) in `<project-folder>/SKILL-IMPROVEMENTS.md`:
+project it is working on) in the one shared log,
+`.agents/skills/personal/SKILL-IMPROVEMENTS.md`:
 
 ```markdown
 ## <date> - <skill-name>
+- **Project**: <project folder where it was found>
 - **Source**: agent-found bug | agent-found better design | user-requested
 - **Status**: proposed
 - **Finding**: <what's wrong or what could be better, concretely>
@@ -80,7 +82,12 @@ automatically: a `SKILL.md` is shared by every future project, so a silent
 edit from one run would change behavior everywhere. At the end of a run, any
 skill checks for `proposed` entries and offers a review; adopting one applies
 the edit to `.agents/skills/personal/<skill>/SKILL.md` and flips the entry to
-`adopted` (or `declined`), with an "Applied to" note. Rationale: `adr/0004`.
+`adopted` (or `declined`), with an "Applied to" note. At the end of every
+session that used an ml-* skill, the agent also reflects on the whole
+session, logs new skill issues, and offers the review (the sandbox
+`CLAUDE.md` has the same rule). Older entries stay in
+`labs/<project>/SKILL-IMPROVEMENTS.md` as history. Rationale: `adr/0004`,
+`adr/0016`.
 
 ## Design drift: detect, then ask
 
@@ -129,8 +136,8 @@ folder split, not a git checkout:
 
 | Pattern | Writes | Shared |
 |---|---|---|
-| Design path + monkey-mode, one project | `design/`, `prd/`, `adr/` vs. `monkey-mode/` | `SKILL-IMPROVEMENTS.md` (append-only) |
-| Monkey-mode + monkey-mlp, one project | `monkey-mode/` vs. `monkey-mlp/` | `SKILL-IMPROVEMENTS.md` (append-only) |
+| Design path + monkey-mode, one project | `design/`, `prd/`, `adr/` vs. `monkey-mode/` | the shared `SKILL-IMPROVEMENTS.md` (append-only) |
+| Monkey-mode + monkey-mlp, one project | `monkey-mode/` vs. `monkey-mlp/` | the shared `SKILL-IMPROVEMENTS.md` (append-only) |
 | Design continues while `ml-modeling-*` runs | `design/`, `prd/` vs. `modeling/`, `spec/`, `dashboard/` | `prd/<topic>.md`, `design/high-level.md` - read by every modeling step, hence the drift check |
 | You edit by hand while autoresearch loops | Yours: `program.md`, `modeling/01-03*`, `design/`. The loop's: `autoresearch/experiment.py`, `best_metrics.json`, `rounds/`, `04-evaluate.*` | Nothing, if each side stays on its side |
 | Two projects at once | Two disjoint folders | Only process/git state: dashboard port, git index |
@@ -175,3 +182,4 @@ edits stay on `main` regardless.
 | 0013 | Serving on both routes: deep-dive item + `ml-modeling-serve` step 5 |
 | 0014 | Style guide; `check_skill_style.py` and `check_docs.py`; when to run them |
 | 0015 | Anthropic skill checklist: evals per family, named constants, 3 more checks |
+| 0016 | One shared skill improvement log; reflect at the end of every session |

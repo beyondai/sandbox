@@ -144,3 +144,11 @@
   design section (features, reason, cost, model choice, how to test), and
   point to a feasibility note for getting the data. Never list them as
   dropped.
+
+## Moved
+
+The 11 entries logged on 2026-10-09 from the end-of-session reflection
+(ranking path, LightGBM check, evaluate ranking metrics, bench_serve,
+history cache, feature_selector, chain mode, spec refresh, gate per
+slice, age and traffic slices, proxy rule) moved to the shared log,
+`.agents/skills/personal/SKILL-IMPROVEMENTS.md` (ADR 0016).

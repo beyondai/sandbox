@@ -87,7 +87,8 @@ no em dashes                         no em dashes
    1. Intent: 2-6 yes/no questions for that skill.
    2. Format: `check_doc.py` on each `.md` output.
    3. Fix: fix and check again, at most 2 times.
-   4. Reflect: write each skill gap to `SKILL-IMPROVEMENTS.md`.
+   4. Reflect: write each skill gap to the shared
+      `.agents/skills/personal/SKILL-IMPROVEMENTS.md`.
 9. **Declare the dependencies.**
    - Each script has a `Requires:` line.
    - Each number in a script that is not obvious is a named constant

@@ -130,8 +130,12 @@ The diagram shows the order. The text below gives the rules.
       wrote.
    3. **Fix:** fixes the output and checks again, at most 2 times. It
       reports the items that stay open.
-   4. **Reflect:** writes each gap in the skill to
-      `SKILL-IMPROVEMENTS.md`.
+   4. **Reflect:** writes each gap in the skill to the shared
+      `.agents/skills/personal/SKILL-IMPROVEMENTS.md`.
+
+   At the end of every session that used an ml-* skill, the agent also
+   reflects on the whole session and offers to review the proposed
+   entries (sandbox `CLAUDE.md`).
 
    The skills with many steps also show a progress checklist. They tick
    each line.
@@ -148,8 +152,8 @@ A keyword in your request selects the mode:
   Quick POC.
 - All other words select Regular.
 
-Monkey-mode is different. It is always fast, always runs in the
-background, and never waits for you.
+Monkey-mode is different. It is always fast and always runs in the
+background. It waits for you only on one question: which data to use.
 
 ## Training: one model or several in parallel
 
@@ -227,7 +231,8 @@ it only to grade results. Never use it as a model input.
 **How data enters a project:**
 1. `ml-modeling-data` registers an existing labeled table, or builds one
    from logs: `modeling/build_dataset.py` writes
-   `modeling/datasets/<task>_{train,test}.csv`.
+   `modeling/datasets/<task>_{train,test}.csv`, or parquet under
+   `data/<dataset>/modeling/` for tables over about 1M rows.
 2. It records the paths, the label, the id, and the split rule in the
    `dataset` block of `01-data.json`. For implicit labels (only positives
    in the logs), it also builds and records the negatives.
@@ -265,7 +270,8 @@ labs/proj1/
   monkey-mode/report.md    Independent fast baseline
   critique/<date>-<lens>.md  Critiques from ml-critique
   research/                Research notes for this project
-  SKILL-IMPROVEMENTS.md    Proposed changes to the skills
+  SKILL-IMPROVEMENTS.md    Older skill proposals (history; new ones go
+                           to the shared log in .agents/skills/personal/)
 ```
 
 ## Command reference
@@ -390,8 +396,10 @@ in parentheses.
   results only (0002).
 - **Autoresearch controls its own loop.** One round, until plateau, or for
   a time. No external scheduler (0003, 0005).
-- **Skill changes go to a log during a run.** `SKILL-IMPROVEMENTS.md` in
-  each project. You review the entries when you want (0004).
+- **Skill changes go to one shared log.**
+  `.agents/skills/personal/SKILL-IMPROVEMENTS.md`, for all projects. The
+  agent reflects at the end of each session and offers a review (0004,
+  0016).
 - **One reference for model and training choices.** `ml-model-training.md`
   holds negative sampling, architecture (shallow or deep, MLP, cross
   network, attention), the neural network training setup, and tree

@@ -12,6 +12,18 @@
 - If the file is for no project, ask the user where to put it. Use the
   session scratchpad for temporary files.
 
+## Skill improvements
+
+- The ml-* skills improve from every session. The log is about the
+  skills, not about a project: `.agents/skills/personal/SKILL-IMPROVEMENTS.md`.
+- When the user corrects how a skill works, log it at once.
+- At the end of every session that used an `ml-*` or `ml-critique*`
+  skill, before the final summary: reflect on the whole session (skill
+  runs, discussion, user corrections), log each new skill issue that
+  helps future projects, then list the `proposed` entries and offer a
+  review. Full rule: `.agents/skills/personal/ml-system-design/SKILL.md`,
+  "Skill improvement log".
+
 ## Skill and docs changes
 
 Steps are in `docs/SKILL-STYLE-GUIDE.md`, "How to check". Run them before

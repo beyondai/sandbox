@@ -212,19 +212,25 @@ Reason:
 This section is the single source of truth for all `ml-*` and
 `ml-critique*` skills.
 
-Log an entry when one of these occurs during a run:
+The log is about the skills, not about a project: each entry changes a
+skill that every future project uses. Project decisions stay in the
+project's own docs.
+
+Log an entry when one of these occurs, in a skill run or between runs
+(discussion, follow-up work):
 1. **Agent-found:** a bug in the skill's instructions, or a better method
    than the one written.
 2. **User-requested:** the user asks to change how the skill works (not a
-   one-time request for this project).
+   one-time request for this project). Log it at once.
 
-Add the entry to `<project-folder>/SKILL-IMPROVEMENTS.md`. Create the file
-at the first entry. Do not edit the `SKILL.md` during the run, unless the
-user asks: a skill file serves every future project, so a drive-by edit
-from one run changes behavior everywhere. The log gives a batch to review.
+Add the entry to the one shared log, `.agents/skills/personal/SKILL-IMPROVEMENTS.md`.
+Do not edit the `SKILL.md` during the run, unless the user asks: a skill
+file serves every future project, so a drive-by edit from one run changes
+behavior everywhere. The log gives a batch to review.
 
 ```markdown
 ## <date> - <skill-name>
+- **Project**: <project folder where it was found>
 - **Source**: agent-found bug | agent-found better design | user-requested
 - **Status**: proposed
 - **Finding**: <what is wrong or what can be better>
@@ -235,5 +241,15 @@ from one run changes behavior everywhere. The log gives a batch to review.
 `Status: proposed`. If there are any, say so and offer to review them. For
 each entry, ask: adopt or decline? Apply an adopted entry to
 `.agents/skills/personal/<skill>/SKILL.md`. Then set `Status` to `adopted`
-or `declined`. Never delete an entry. Reason:
-`../adr/0004-skill-improvement-log.md`.
+or `declined`, and follow "Skill and docs changes" in the sandbox
+`CLAUDE.md`. Never delete an entry.
+
+**Session end.** At the end of every session that used an `ml-*` or
+`ml-critique*` skill, before the final summary: reflect on the whole
+session (skill runs, discussion, user corrections), log each new skill
+issue, then offer the review above. The sandbox `CLAUDE.md` has the same
+rule, so it applies even when no skill run is active.
+
+Reasons: `../adr/0004-skill-improvement-log.md`,
+`../adr/0016-shared-log-and-session-end-reflection.md`. Older entries stay
+in `labs/<project>/SKILL-IMPROVEMENTS.md` as history.

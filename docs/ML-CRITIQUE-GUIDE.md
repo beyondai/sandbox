@@ -281,6 +281,6 @@ labs/proj1/                 (the parent is labs/ unless you name another)
   later if you want a comparison.
 - Use Brief mode first. Then use Normal mode on the lens that found the
   most P1 items.
-- A skill problem found during a run goes to the project's
-  `SKILL-IMPROVEMENTS.md`. The skill does not change itself during the
-  run.
+- A skill problem found during a run goes to the shared
+  `.agents/skills/personal/SKILL-IMPROVEMENTS.md`. The skill does not
+  change itself during the run.
