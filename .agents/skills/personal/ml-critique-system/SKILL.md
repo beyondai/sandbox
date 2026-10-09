@@ -21,7 +21,7 @@ dispatch you, run it first.
    end. An ADR that justifies a decision well is a strength, not a
    question.
 2. Use the problem type's playbook in
-   `../ml-critique/references/playbooks.md`. Do its classic-mistakes check
+   `../ml-playbooks.md`. Do its classic-mistakes check
    first.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections A (goal), B (metrics), and D (framing and labels) hold most P1

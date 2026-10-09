@@ -23,7 +23,7 @@ dispatch you, run it first.
    metrics. Use `01-data.json`'s `dataset` block for paths, label, and
    split.
 2. Use the problem type's playbook in
-   `../ml-critique/references/playbooks.md`. Do its classic-mistakes check
+   `../ml-playbooks.md`. Do its classic-mistakes check
    first.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections are in priority order: A to D (baseline, labels, split,
