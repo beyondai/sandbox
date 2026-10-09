@@ -1,8 +1,8 @@
 ---
 name: ml-modeling-data
 description: >-
-  Use to profile a dataset before feature engineering — row counts, null rates,
-  class balance, feature distributions, data-quality flags — and clean genuine
+  Use to profile a dataset before feature engineering - row counts, null rates,
+  class balance, feature distributions, data-quality flags - and clean genuine
   errors it finds (impossible values, sentinel-coded missingness, exact
   duplicates). Also creates the project's EDA notebook and bootstraps its
   Streamlit dashboard. Step 1 of the ml-modeling-* chain (data → features →
@@ -16,87 +16,98 @@ description: >-
 
 # Profile Data
 
-Reads `<project-folder>/design/high-level.md` (ML framing: target, label +
-horizon, population, exclusions; Architecture: the named source tables) and
-`prd/<topic>.md` (scope) — both required, see `ml-modeling` router if either is
-missing. Writes `<project-folder>/modeling/01-data.md` and
-`modeling/01-data.json`, and (Regular/Quick-POC only — see below) creates
-`dashboard/eda.ipynb` and `dashboard/app.py`. Project folder and output format: see `../ml-modeling/SKILL.md`,
-"Which project folder" and "Output docs". First, run the "Design docs
-changed?" check from `../ml-modeling/SKILL.md` (spec exists and its hash
-matches? proceed; otherwise ask).
+Contents: 1. Design docs changed? | 2. Build or register the labeled table | 3.
+Profile | 4. Clean | 5. Dashboard | 6. Check
 
-Mode: Regular asks about anything the data doesn't make obvious (e.g. why a null
-rate is high). Quick POC states a reasonable read and moves on — see
-`ml-modeling` router for the keyword rule.
+- **Reads:** `<project-folder>/design/high-level.md` (ML framing,
+  Architecture source tables) and `prd/<topic>.md` (scope). Both are
+  required (see `../ml-modeling/SKILL.md`, "Required upstream").
+- **Writes:** `modeling/01-data.md`, `modeling/01-data.json`. Regular and
+  Quick POC also write `dashboard/eda.ipynb` and `dashboard/app.py`.
+- **Rules:** `../ml-system-design/SKILL.md`, "Project folder", "Output
+  docs", "Check the output", "Skill improvement log".
+- **Mode:** Regular asks about each fact that the data does not make
+  clear (for example, a high null rate). Quick POC states a reasonable
+  reading and continues.
 
-## Build or register the labeled table
+Progress (copy into your reply, tick each line):
 
-Read high-level's ML framing (target, label definition and horizon, scoring
-population, unit of prediction, exclusions) and its Architecture diagram (the
-named source tables). One model per project folder; one `dataset` block. If
-the framing names several models, build the one "This folder builds" points
-at.
+```
+[ ] 1 Design docs changed? (spec_hash_check.sh)
+[ ] 2 Build or register the labeled table; set the split
+[ ] 3 Profile the train table
+[ ] 4 Clean; profile again
+[ ] 5 Dashboard (not in monkey-mode)
+[ ] 6 Check
+```
 
-- **Flat labeled table exists** (CSV with the label column): register it -
-  fill the `dataset` block with its path(s), label, id, and the split you
-  will use. If there is no test split yet, make one here (random with a
-  fixed seed unless the labels are time-windowed) and record it.
-- **Source is raw logs** (events, activity rows, transactions; no label
-  column): write `modeling/build_dataset.py` and run it with
-  `uv run python3`. It takes label definition, horizon, population rule, and
-  exclusions from the framing, and writes `modeling/datasets/<task>_train.csv`
-  and `<task>_test.csv`. Features use only rows strictly before the cutoff;
-  labels use only rows at or after it. Assert the positive rate is not
-  degenerate (nowhere near 0% or 100%) - a degenerate rate means a leak or a
-  drifted rule; this check has caught a real 100%-churn look-ahead bug. Keep
-  the script small and re-runnable; it is part of the project's record.
+## 1. Design docs changed?
 
-  `uv run python3 ...` invoked from inside the project folder auto-discovers
-  the sandbox root's shared `pyproject.toml`/`.venv` (already stocked with
-  pandas, numpy, scikit-learn, and the notebook/dashboard packages below) - no
-  ambient-`python3` check and no project-local venv needed. If a genuinely new
-  package is required, run `uv add <pkg>` from the sandbox root (not this
-  project folder) so it's added to the shared environment for every future
-  project too.
+Run the check in `../ml-modeling/SKILL.md`, "Design docs changed?".
 
-**The split is this step's decision.** No design doc states cutoffs; you do.
-For time-windowed labels use two cutoffs: a test cutoff late enough that its
-label window still closes inside the data, and a train cutoff at least one
-horizon earlier so no training label overlaps the test window. Avoid cutoffs
-that sit inside a known seasonal event if the framing names any. Record the
-cutoffs in the `dataset` block and the reasoning in `01-data.md`.
+## 2. Build or register the labeled table
 
-Then fill the `dataset` block (schema below) in `01-data.json` and add a
-"Dataset" section to `01-data.md` with the same facts in prose. Profile the
-train table only - never look at test rows while profiling.
+Read the ML framing (target, label definition and horizon, scoring
+population, unit, exclusions) and the Architecture source tables. One
+model and one `dataset` block for each project folder. If the framing
+names several models, build the one that "This folder builds" names.
 
-**If the built/registered table is a sample of a larger source table**,
-state the sample's size **as an explicit, bolded percentage of the
-source** in that Dataset section - not just raw row counts left for the
-reader to compute (e.g. "**takes a 600,000-row sample (~8.1% of the full
-7,377,419-row `train.csv`)**"). This matters for judging results later
-(e.g. against a benchmark that used the full dataset) and has gone
-unnoticed before when only the raw counts were given.
+- **A flat labeled table exists** (a CSV with the label column): register
+  it. Fill the `dataset` block with its paths, label, id, and split. If no
+  test split exists, make one here: random with a fixed seed, unless the
+  labels have time windows.
+- **The source is raw logs** (events, activity, transactions; no label
+  column): write `modeling/build_dataset.py`, and run it with `uv run
+  python3`. It applies the label definition, horizon, population, and
+  exclusions from the framing. It writes
+  `modeling/datasets/<task>_train.csv` and `<task>_test.csv`.
+  - Features use only rows before the cutoff. Labels use only rows at or
+    after the cutoff.
+  - Assert that the positive rate is not near 0% or 100%. A degenerate
+    rate shows a leak or a wrong rule. (This assert found a real 100%
+    churn look-ahead bug.)
+  - Keep the script small and able to run again. It is part of the
+    record.
 
-## Profile
+Run code with `uv run --project <sandbox root>`, so a project outside the
+repo also uses the shared venv (pandas, numpy, scikit-learn, the dashboard
+packages). For a new package, run `uv add <pkg>` at the sandbox root.
 
-- **Shape**: row count, column count, memory footprint.
-- **Nulls**: per-column null rate; flag any column above ~20% as a modeling
-  risk, not just a number to report.
-- **Target/label**: class balance (classification) or distribution shape
-  (regression) — this is what decides whether class-imbalance handling matters
-  later.
-- **Feature distributions**: numeric columns — min/max/mean/median/std,
-  skew; categorical columns — cardinality, top values.
-- **Quality flags**: duplicated rows, obvious outliers, sources or columns that
-  don't match what `design/high-level.md`'s Architecture named (a real source
-  drifted from the design, or the design was wrong — either way, surface it
-  and offer to update high-level per the router's "Closing the loop"; don't
-  silently reconcile).
+**The split is this step's decision.** For labels with time windows, use
+2 cutoffs:
+- The test cutoff is late enough that its label window closes inside the
+  data.
+- The train cutoff is at least one horizon earlier. No train label
+  overlaps the test window.
+- Do not put a cutoff inside a seasonal event that the framing names.
 
-Write the same facts to `modeling/01-data.json` (the dashboard reads this, not
-the `.md`):
+Record the cutoffs in the `dataset` block. Add a "Dataset" section to
+`01-data.md`: the same facts as the block, in prose, with the reasons for
+the cutoffs.
+
+**A sample of a larger table:** state its size in "Dataset" as a bold
+percentage of the source. Example: "**takes a 600,000-row sample (~8.1% of
+the full 7,377,419-row `train.csv`)**". Results are compared with
+benchmarks on the full data later.
+
+## 3. Profile
+
+Profile the train table only. Never read test rows here.
+
+- **Shape:** rows, columns, memory.
+- **Nulls:** the null rate for each column. A column over ~20% is a
+  modeling risk: say why.
+- **Target:** the class balance (classification) or the distribution
+  (regression). This decides if imbalance handling is necessary.
+- **Distributions:** numeric: min, max, mean, median, std, skew.
+  Categorical: cardinality, top values.
+- **Quality flags:** duplicate rows, outliers, and sources or columns that
+  are different from the Architecture in `design/high-level.md`. Tell the
+  user about a difference, and offer to update high-level (see "Closing the
+  loop" in `../ml-modeling/SKILL.md`).
+
+Write the same facts to `modeling/01-data.json`. The dashboard reads the
+JSON, not the `.md`.
 
 ```json
 {
@@ -120,86 +131,82 @@ the `.md`):
 }
 ```
 
-## Clean
+## 4. Clean
 
-Not every `quality_flags` entry gets the same treatment. Split them with one
-test: **would a domain expert call this impossible, or just unusual?**
+For each quality flag, ask: would a domain expert call this impossible,
+or only unusual? Reason: `../adr/0007-clean-phase-in-data-step.md`.
 
-- **Impossible → fix it here.** A negative or 200-year-old age, a sentinel
-  value standing in for missing (e.g. `0` meaning "unknown" in a field where
-  `0` is otherwise a valid value), an exact duplicate row. Mask invalid
-  values to null (never drop the row for a single bad column - that discards
-  every other feature the row carries) or drop exact duplicates, in the same
-  build step that produced the table (`build_dataset.py`, or the
-  registration step for a flat table). Then **re-run the profile** so
-  `01-data.md`/`01-data.json` reflect the cleaned numbers, not the pre-clean
-  ones - a stale profile next to a cleaned table is worse than no cleaning
-  at all.
-- **Unusual → leave it flagged, not touched.** A long-but-real song, a
-  large-but-real purchase, a legitimately old account. These are signal, not
-  error; cleaning them would delete real variance the model should learn
-  from. They stay exactly as `quality_flags` already handles them today -
-  surfaced, not silently fixed.
+- **Impossible: fix it here.** Examples: a negative or 200-year age, a
+  sentinel for missing (`0` for "unknown" where `0` is also valid), an
+  exact duplicate row, a null made by the reader (pandas reads the string
+  "NA", for example North America, as null; use `keep_default_na=False`
+  for that column).
+  - Set the invalid value to null. Do not drop the row: it has other
+    valid features. Drop only exact duplicates.
+  - Fix it in the build step (`build_dataset.py`, or the registration).
+  - Profile again, so `01-data.md` and `01-data.json` show the cleaned
+    numbers. A stale profile next to a cleaned table misleads every later
+    step. Mark each flag in `quality_flags` as cleaned or kept.
+- **Unusual: keep it, and keep the flag.** Examples: a long but real song,
+  a large but real purchase, an old account. It is signal, not error.
 
-When a fix changes the data meaningfully, record it in `01-data.md`: what
-changed, why, and a before/after stat (e.g. skew, null rate) as evidence the
-fix mattered - "191858 rows masked" is a count; "skew dropped from 22.26 to
-1.3 once the corrupted rows were excluded" is evidence.
+For a fix that changes the data, record in `01-data.md` what changed, why,
+and a before/after statistic. Example: "skew dropped from 22.26 to 1.3",
+not only "191858 rows masked".
 
-Quick POC applies the impossible-vs-unusual calls without asking and moves
-on. Regular asks when a flag's classification is genuinely ambiguous (e.g. a
-value that's extreme but not obviously impossible) rather than guessing.
+Quick POC classifies the flags without questions. Regular asks when a
+flag is ambiguous.
 
-## Dashboard (Regular/Quick-POC only)
+## 5. Dashboard
 
-Never in monkey-mode, which stays fully separate per
-`ml-system-design-monkey-mode`. Deliberately narrow — the dashboard's job is
-"understand the project and progress at a glance," not mirror every file. Only
-two sections exist: this one (EDA) and Results (from `ml-modeling-evaluate`),
-plus an optional model-comparison section if `ml-modeling-multiagent` ran. Full
-rationale in `../adr/0002-modeling-dashboard.md`. Feature engineering and
-training detail deliberately stay out — `ml-modeling-features`/`-train`/
-`-multiagent` are untouched by this and don't write anything for the dashboard.
+Regular and Quick POC only. Never in monkey-mode. Scope: EDA here, and
+Results from `ml-modeling-evaluate`. Reason:
+`../adr/0002-modeling-dashboard.md`.
 
-**EDA notebook**: build `dashboard/eda.ipynb` with real code cells (shape,
-nulls, target balance, distributions — the same facts as above, as executable
-cells) using `nbformat`, then run `uv run jupyter nbconvert --to notebook
---execute --inplace dashboard/eda.ipynb` so it has real executed outputs, not
-empty template cells.
+Requires streamlit, plotly, pandas, and jupyterlab in the sandbox venv. If
+one is missing: `uv add streamlit plotly pandas jupyterlab` at the sandbox
+root.
 
-**Dashboard app** — copy `assets/dashboard_app.py` to
-`<project-folder>/dashboard/app.py` once (no later step ever edits this file,
-only the JSON it reads). It's a generic reader — nothing in it needs per-project
-editing, since it reads standardized paths (`../modeling/01-data.json`,
-`../modeling/04-evaluate.json`, `../modeling/train-candidates/*/metrics.json`)
-and renders one tab per file it finds. Design intent: compact and minimal — tabs
-instead of stacked sections, tightened CSS (small headers, small metric fonts,
-low padding), short chart heights (~220px). If the design ever needs another
-pass, edit `assets/dashboard_app.py` here (the single source of truth) and
-re-copy it into any project that should pick up the change — don't hand-edit a
-project's own `dashboard/app.py` and let it drift from the template.
+1. **EDA notebook.** Build `dashboard/eda.ipynb` with `nbformat`. Its code
+   cells compute the facts of step 3. Execute it:
 
-Launch it on a per-project port, so two projects' dashboards never collide: pick
-the first port from 8501 upward where `lsof -nP -iTCP:<port> -sTCP:LISTEN`
-prints nothing, write it to `dashboard/.port`, then `uv run streamlit run
-dashboard/app.py --server.headless true --server.port $(cat dashboard/.port) &`
-(background — don't block the conversation), capture its PID with `echo $! >
-dashboard/.pid`, and report `http://localhost:<port>` to the user.
-`dashboard/.port` is the one place the port lives; `ml-modeling-evaluate` reads
-it for its health check. `dashboard/.pid` lets a session-exit hook find and
-stop this exact process without guessing from the port alone.
+   ```
+   uv run --project <sandbox root> jupyter nbconvert --to notebook --execute --inplace dashboard/eda.ipynb
+   ```
 
-Done when every profile flag above is a real number from the actual data (not
-"looks fine"), `01-data.json` has a `dataset` block whose paths resolve,
-every quality flag is either cleaned-and-reprofiled or explicitly left as a
-documented risk (never silently ignored either way), `modeling/01-data.md`
-states which columns are risky and why, `01-data.json` matches it,
-`dashboard/eda.ipynb` has real executed outputs, the Streamlit process is
-actually running and reachable at the reported URL — not just files written —
-and, if this step resolved a split/cutoff decision `spec/<topic>.md` had
-deferred or assumed, that spec line is updated to match (see
-`../ml-modeling/SKILL.md`, "Spec self-staleness").
+2. **App.** Copy `assets/dashboard_app.py` to `dashboard/app.py` once.
+   No later step edits it. It reads `../modeling/01-data.json`,
+   `../modeling/04-evaluate.json`, and
+   `../modeling/train-candidates/*/metrics.json`. To change the design,
+   edit `assets/dashboard_app.py` (the single source of truth) and copy
+   it again.
+3. **Launch.** Run:
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
-improvement log.
+   ```
+   bash .agents/skills/personal/ml-modeling-data/scripts/launch_dashboard.sh <project-folder>
+   ```
+
+   It selects a free port from 8501, writes `dashboard/.port` and
+   `dashboard/.pid`, starts streamlit in the background, and prints the
+   URL. Give the URL to the user. `ml-modeling-evaluate` reads
+   `dashboard/.port`. An optional session-exit hook (in the user's
+   dotfiles) uses `dashboard/.pid`.
+
+## 6. Check
+
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does the label follow the framing's definition, horizon, population,
+   and exclusions? Is the positive rate plausible?
+2. Can no train label overlap the test window? Is each feature from before
+   its cutoff?
+3. Is each profile value a real number from the data, not "looks fine"?
+4. Is each quality flag either cleaned and profiled again, or recorded as
+   a risk? Does `01-data.json` match `01-data.md`?
+
+Done when:
+- The 4 answers are yes, and `check_doc.py` prints `OK`.
+- The `dataset` paths resolve.
+- `01-data.md` states the risky columns and why.
+- `dashboard/eda.ipynb` has executed outputs, and the URL responds.
+- A spec line that deferred or assumed the split is updated (see "Closing
+  the loop" in `../ml-modeling/SKILL.md`).

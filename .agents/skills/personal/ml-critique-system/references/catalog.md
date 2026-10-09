@@ -1,5 +1,10 @@
 # System lens catalog
 
+Contents: A. Business goal and problem | B. Success metrics | C. Requirements
+and scope | D. ML framing and labels | E. Data | F. Architecture | G. Modeling
+plan | H. Phasing | I. Delivery, experiments, and operations | J. Post-delivery
+and responsible ML | K. Cross-section consistency
+
 Each item is one check. Each item has:
 - **Check**: what to examine.
 - **Mistakes**: the common failures.
@@ -118,8 +123,8 @@ K Cross-section consistency.
 - Mistakes: no statement, so no reader can judge if a complex model is
   acceptable.
 - Remedies: state the explainability need (hard or soft) and the cost
-  sensitivity (a budget, or `low`/`medium`/`high`, or `unknown`). See
-  `../../ml-design-principles.md`, "Budgets in the PRD".
+  sensitivity (a budget, or `low`/`medium`/`high`, or `unknown`). A rough
+  level is enough.
 
 **C6. Privacy, compliance, and fairness constraints are identified.**
 - Mistakes: PII in features with no review. Protected attributes with no
@@ -261,7 +266,11 @@ definition.**
 **G2a [C]. Each complex choice passes the complexity gate.**
 - Mistakes: a deep model, a real-time pipeline, or a new data dependency
   with no comparison of its gain and its total cost.
-- Remedies: the cost table in `../../ml-design-principles.md`, Principle 1.
+- Remedies: the gate: the gain is larger than the noise; its value is
+  larger than the added cost; the comparison is with a fairly tuned
+  simpler option. Show a cost table: the value of the gain, running cost,
+  maintenance cost, explainability, and risk (rough values; `unknown` is
+  valid).
   If the gate fails, use the simpler option and keep the complex one as a
   later phase with a stated trigger.
 

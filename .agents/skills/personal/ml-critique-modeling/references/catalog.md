@@ -1,5 +1,10 @@
 # Modeling lens catalog
 
+Contents: A. Problem and baseline | B. Training dataset and labels | C. Split
+and validation | D. Leakage | E. Features | F. Model choice | G. Objective,
+optimizer, and training | H. Tuning | I. Evaluation | J. Interpretability and
+sanity | K. Reproducibility and handoff
+
 Each item is one check. Each item has:
 - **Check**: what to examine.
 - **Mistakes**: the common failures.
@@ -176,7 +181,11 @@ interpretability needs.**
 - Mistakes: a complex model is selected for a gain inside the noise, or
   for a gain smaller than its added running, maintenance, and
   explainability cost.
-- Remedies: the cost table in `../../ml-design-principles.md`, Principle 1.
+- Remedies: the gate: the gain is larger than the noise; its value is
+  larger than the added cost; the comparison is with a fairly tuned
+  simpler option. Show a cost table: the value of the gain, running cost,
+  maintenance cost, explainability, and risk (rough values; `unknown` is
+  valid).
   Select the simplest model inside the noise of the best. Show each added
   component with an ablation.
 
@@ -268,7 +277,7 @@ cost.**
 **I6 [C]. The lift is larger than the noise.**
 - Mistakes: a 0.002 AUC gain is called a win.
 - Remedies: a paired bootstrap or a significance test
-  (`../ml-modeling/scripts/hypothesis_tester.py`).
+  (`../../ml-modeling/scripts/hypothesis_tester.py`).
 
 **I7. Segment slices are reported.**
 - Mistakes: only the global metric. A failure on new users is hidden.
@@ -311,8 +320,9 @@ cost.**
 
 **K2. Experiments are recorded, and artifacts have versions.**
 - Mistakes: the winning model's parameters are not saved.
-- Remedies: an experiment log (`../ml-modeling/scripts/experiment_tracker.py`)
-  and versioned model files.
+- Remedies: an experiment log
+  (`../../ml-modeling/scripts/experiment_tracker.py`) and versioned model
+  files.
 
 **K3. The inference path uses the same code as the training path.**
 - Mistakes: features re-written for serving. A skew that nobody tests.

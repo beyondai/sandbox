@@ -1,12 +1,12 @@
 ---
 name: ml-system-design-monkey-mlp
 description: >-
-  One-shot, fully autonomous embedding-MLP baseline builder — ask up to 3
+  One-shot, fully autonomous embedding-MLP baseline builder - ask up to 3
   quick questions, then build and evaluate a fast (10-15 min) PyTorch
   embedding-MLP baseline in the background while you keep working. Never
-  blocks — proceeds with self-inferred assumptions if you don't answer. A
+  blocks - proceeds with self-inferred assumptions if you don't answer. A
   sibling to ml-system-design-monkey-mode: same fast/autonomous contract, but
-  learned categorical embeddings instead of one-hot + a tree/linear model —
+  learned categorical embeddings instead of one-hot + a tree/linear model -
   reach for it when the task has high-cardinality identity columns (user/item
   ids, recommendation-shaped problems). Run by hand only, e.g.
   /ml-system-design-monkey-mlp song repeat-listen prediction.
@@ -15,128 +15,122 @@ disable-model-invocation: true
 
 # Monkey MLP
 
-A sibling to `ml-system-design-monkey-mode` — same independent, background,
-never-blocks contract — but swaps the fast default model for a small PyTorch
-embedding-MLP: every categorical column, especially high-cardinality identity
-columns (a user id, an item/song id), gets a learned embedding instead of a
-one-hot column, concatenated with standardized numerics, through a small MLP
-head. Shares only the project-folder root with `monkey-mode`,
-`ml-system-design-*`, and `ml-modeling-*` — writes only `monkey-mlp/`, reads
-nothing under `design/`, `prd/`, or `modeling/`, and can run standalone or
-alongside `monkey-mode` in the same project folder (disjoint folders, so no
-write conflict — see `../README.md`'s "Running things concurrently") for a
-direct tree-model-vs-embedding-model comparison.
+Contents: When to use it | Steps | Fast defaults (build with these; do not ask)
+| Eval rules (mandatory) | Deliverable | Check
 
-## When to reach for this instead of (or alongside) monkey-mode
+The same contract as `ml-system-design-monkey-mode` (independent,
+background, never blocks), with a small PyTorch embedding-MLP as the
+model. Each categorical column gets a learned embedding, concatenated with
+standardized numerics, through a small MLP head.
 
-Prefer monkey-mode's tree/linear default in general — it needs no early
-stopping, no architecture choice, and is one `.fit()` call. Reach for
-monkey-MLP specifically when the task has **high-cardinality identity
-columns** (user ids, item/song ids, anything with thousands+ unique values)
-where an embedding can absorb identity-level signal a one-hot + tree model
-can't cheaply represent — recommendation, repeat-purchase/repeat-listen
-prediction, anything collaborative-filtering-shaped.
+- Writes only `monkey-mlp/`. Reads nothing in `design/`, `prd/`, or
+  `modeling/`. It can run alone or next to monkey-mode on the same project
+  (different folders), for a tree-vs-embedding comparison.
+- Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+  "Check the output", "Skill improvement log".
 
-On a real run (KKBOX repeat-listen prediction, 480K train / 120K test rows),
-a model built exactly this way landed within ~0.01 AUC of a properly
-feature-engineered Random Forest (0.7271 vs. 0.7361) with zero hand-built
-features — the embeddings implicitly captured what hand-built
-`msno_repeat_rate` / `song_repeat_rate` aggregate columns captured
-explicitly. Treat that gap as a reasonable expectation, not a guarantee:
-"get close to a tuned model for free," not "beat it."
+## When to use it
 
-## Process
+Use monkey-mode's tree or linear default in most cases: no early
+stopping, no architecture choice, one `.fit()`. Use monkey-MLP when the
+task has **high-cardinality identity columns** (user ids, item or song
+ids, thousands of unique values or more): recommendation, repeat purchase
+or repeat listen, problems shaped like collaborative filtering.
 
-1. Resolve the project folder — same as `ml-system-design-monkey-mode`: use
-   `../ml-system-design/SKILL.md`, "Project folder".
-2. Fire the same 3 questions as `ml-system-design-monkey-mode` via
-   AskUserQuestion (task + data, primary metric, success bar) — same
-   fallback philosophy, never block. See that skill's "The 3 questions"
-   section for the exact text and fallbacks; not duplicated here so the two
-   files can't drift out of sync silently.
-3. Dispatch a background `general-purpose` agent with everything it needs to
-   run unattended: the resolved task/data/metric/success-bar (each marked
-   answered-by-user or self-inferred), the fast defaults and the two
-   non-negotiable eval rules below, the deliverable list, the output path.
+Expect "close to a tuned model with no feature work", not "better". On
+KKBOX repeat-listen (480K train, 120K test rows), it got AUC 0.7271
+against 0.7361 for a feature-engineered Random Forest. The embeddings
+learned what the hand-built `msno_repeat_rate` and `song_repeat_rate`
+columns gave.
 
-   Same shared-folder etiquette as monkey-mode: the project folder may be
-   populated concurrently by other in-progress work and must be treated as
-   shared, not owned — never delete or reset the project-folder root or any
-   sibling directory (`prd/`, `design/`, `adr/`, `spec/`, `modeling/`,
-   `monkey-mode/`), only ever create `monkey-mlp/` additively with
-   `mkdir -p` and write inside it.
+## Steps
 
-   Instruct the agent to verify `pandas`/`numpy`/`scikit-learn`/`torch`
-   import via `uv run python3 -c "import pandas, numpy, sklearn, torch"` run
-   from inside the project folder — this resolves the sandbox root's shared
-   `pyproject.toml`/`.venv` (confirmed already stocked with `torch==2.2.2`,
-   MPS available, on this machine), not the bare ambient `python3`. Only if
-   that genuinely fails, run `uv add torch` from the sandbox root (never a
-   project-local `.venv` — same reasoning as monkey-mode). Device selection:
-   `torch.backends.mps.is_available()` -> `"mps"`, else
-   `torch.cuda.is_available()` -> `"cuda"`, else `"cpu"`.
-4. When it reports back, surface the results.
+Progress (copy into your reply, tick each line):
 
-## Fast defaults — build with these, don't ask
+```
+[ ] 1 Resolve the project folder
+[ ] 2 Ask the 3 questions (never block)
+[ ] 3 Dispatch the background agent
+[ ] 4 Report the results, the Check result, and the skill issues
+```
 
-- **Cleaning**: same as monkey-mode — drop or median-impute nulls, nothing
-  fancier.
-- **Features**: every categorical column gets a learned `nn.Embedding`
-  (`min(50, cardinality // 2 + 1)` dims — the cap keeps identity-column
-  embeddings from ballooning memory on huge vocabularies), concatenated with
-  standard-scaled numerics. No target encoding, no interaction features, no
-  aggregate/leave-one-out features — the embeddings are the feature
-  engineering here.
-- **Model**: one fixed architecture, not a search —
+1. **Project folder:** as in monkey-mode.
+2. **The 3 questions:** use "The 3 questions" in
+   `../ml-system-design-monkey-mode/SKILL.md` (task and data, primary
+   metric, success bar), with AskUserQuestion. Never block.
+3. **Dispatch** a background `general-purpose` agent. Give it the
+   resolved answers (each marked "answered by user" or "self-inferred"),
+   the fast defaults, the eval rules, the deliverable, the Check, and the
+   output path.
+   - The project folder is shared and in progress. Never delete or reset
+     the folder or a sibling (`prd/`, `design/`, `adr/`, `spec/`,
+     `modeling/`, `monkey-mode/`). Create only `monkey-mlp/` with
+     `mkdir -p`, and write only there.
+   - Run `uv run python3 -c "import pandas, numpy, sklearn, torch"` from
+     the project folder (the shared sandbox venv has `torch==2.2.2`, with
+     MPS). Only if it fails, run `uv add torch` at the sandbox root. Do
+     not make a project venv.
+   - Device: `"mps"` if `torch.backends.mps.is_available()`, else
+     `"cuda"` if `torch.cuda.is_available()`, else `"cpu"`.
+4. **Report** the results. Add each skill issue that the agent reports to
+   the skill improvement log.
+
+## Fast defaults (build with these; do not ask)
+
+- **Cleaning:** drop the nulls, or impute the median.
+- **Features:** an `nn.Embedding` for each categorical column, with
+  `min(50, cardinality // 2 + 1)` dims (the cap limits memory for large
+  vocabularies). Concatenate with standard-scaled numerics. No target
+  encoding, no interactions, no aggregates: the embeddings are the feature
+  work.
+- **Model:** one fixed architecture, no search:
   `embeddings -> concat -> Linear(256) -> ReLU -> Dropout(0.1) -> Linear(64)
-  -> ReLU -> Linear(1)`, `BCEWithLogitsLoss`, Adam `lr=2e-3`. Batch size 2048
-  under ~1M rows, 8192 above. Not a comparison — one architecture, trained
-  once (per the rules below).
-- **Eval — the two rules that are NOT optional, unlike everything else in
-  this list**:
-  1. Carve an internal validation split **out of the train rows only** (15%,
-     fixed seed) before touching the model at all. Fit categorical
-     vocabularies on the remaining fit-split only; unseen categories in
-     validation or test map to an explicit "unknown" code (`0`), never a
-     silently-included category. Train with early stopping on that internal
-     validation AUC (patience 3, max 25 epochs), and load only the
-     best-by-internal-validation epoch's weights afterward.
-  2. Score the held-out test set **exactly once**, after the model is
-     already fixed by step 1. Never pick an epoch, a checkpoint, or any
-     other choice by watching test-set AUC during training. This is the one
-     place a from-scratch network differs from monkey-mode's single-fit
-     tree model: a tree fit once has no epoch loop to leak through, but a
-     network's training loop does, and skipping this invisibly inflates the
-     reported number. Verified concretely on a real run: an MLP whose
-     stopping epoch was chosen by watching test AUC directly reported
-     0.7309; the identical architecture, retrained with the stopping point
-     chosen from internal validation only, scored a true 0.7271 — a leak of
-     about 0.004 AUC that would have gone unnoticed without this discipline.
-  3. If a sample was taken because the source table is large, state its
-     size **as an explicit, bolded percentage of the full source** in
-     `report.md`'s Requirements/Input sections — same rule and same reason
-     as monkey-mode's Eval bullet.
+  -> ReLU -> Linear(1)`, `BCEWithLogitsLoss`, Adam `lr=2e-3`. Batch size
+  2048 under ~1M rows, 8192 above.
+
+## Eval rules (mandatory)
+
+1. **Internal validation.** Before training, take 15% of the train rows
+   (fixed seed) as validation. Fit the category vocabularies on the rest
+   only. Map an unseen category to the code `0` ("unknown"). Use early
+   stopping on the validation AUC (patience 3, max 25 epochs). Load the
+   weights of the best validation epoch.
+2. **Test once.** Score the test set exactly once, after step 1
+   fixed the model. Never select an epoch or a checkpoint from the test
+   AUC. A network's epoch loop can leak test information; a tree fit once
+   cannot. (Measured: epoch chosen on test 0.7309; chosen on
+   validation 0.7271. The leak was 0.004 AUC.)
+3. **Sample.** For a sample of a large table, state its size in
+   Requirements and Input as a bold percentage of the full source.
 
 ## Deliverable
 
-Write `<project-folder>/monkey-mlp/report.md` (format: same seven sections as
-`ml-system-design-monkey-mode`'s Deliverable — Requirements, Input, Design,
-Implementation, Results, Learnings, Suggested Next Steps), with one addition
-to Results: state the internal-validation epoch selected and its AUC,
-separately from the final test AUC, and say explicitly that the test set was
-scored exactly once. If `monkey-mode/report.md` already exists in this
-project folder, add a one-line comparison against its reported metric in
-Learnings — say plainly whether it's a same-test-set comparison or only an
-approximate one (different sample, different split), since that distinction
-is easy to blur and matters for judging the result.
+`<project-folder>/monkey-mlp/report.md`, with the 7 sections of
+monkey-mode's Deliverable (Requirements, Input, Design, Implementation,
+Results, Learnings, Suggested Next Steps). Additions:
+- Results: the selected validation epoch and its AUC, separate from the
+  final test AUC. Say that the test set was scored exactly once.
+- Learnings: if `monkey-mode/report.md` exists, compare with its metric
+  in one line. Say if it is the same test set or only approximate
+  (different sample or split).
+- Requirements: mark each item "answered by user" or "self-inferred".
 
-Mark, per item in Requirements, whether it came from the user's answer or
-self-inference — same rule as monkey-mode.
+## Check
 
-Done when `report.md` exists with all seven sections populated by a real run
-(real code, real numbers, a final test AUC computed exactly once) — not
-placeholders.
+The background agent does "Check the output" in
+`../ml-system-design/SKILL.md`. It does not ask the user, and it reports
+each skill issue in its final message. Intent questions:
+1. Do all 7 sections hold results of a real run?
+2. Was the epoch selected on internal validation only, and was the test
+   set scored exactly once?
+3. Does each unseen category map to `0`, with vocabularies fit on the fit
+   split only?
+4. Is the comparison with monkey-mode labeled as same-test-set or
+   approximate?
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+Done when the 4 answers are yes and `check_doc.py` prints `OK` for
+`report.md` with:
+
+```
+--sections "Requirements,Input,Design,Implementation,Results,Learnings,Suggested Next Steps"
+```

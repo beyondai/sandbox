@@ -2,7 +2,7 @@
 name: ml-system-design-definition
 description: >-
   Use when writing or reviewing the Definition section of an ML system design
-  doc — problem statement, requirements (features, out-of-scope,
+  doc - problem statement, requirements (features, out-of-scope,
   scale/latency/availability), success metrics (offline/online/guardrail), or
   team/stakeholders/dependencies for an ML system. Trigger on requests to write
   or check an ML design doc's problem statement, scope/out-of-scope list,
@@ -12,57 +12,70 @@ description: >-
 
 # Definition
 
-Project folder and output format: see `../ml-system-design/SKILL.md`,
-"Which project folder" and "Output docs".
+Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+"Check the output", "Skill improvement log".
 
-Draft (Regular): answer each item below in the user's own numbers/words; ask if
-unknown, never invent. Quick POC: state each item's most likely answer in one
-pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs.
-"regular"/nothing), see `../adr/0001-ml-modeling-family-and-continuity.md`.
-Review: check each item is actually answered, not just headed; flag gaps, don't
-rewrite what's solid. When invoked from `ml-system-design-prd`, the one-pass
-POC draft is shown as a grilling round and the PRD is the output - nothing is
-written to `design/` (see that skill). A project that already has
-`prd/<topic>.md` skips this section's draft entirely.
+Writes `<project-folder>/design/definition.md`, one heading for each checklist
+item. Use this skill for a project without a PRD, or to review a Definition. A
+project with `prd/<topic>.md` does not draft this section: the PRD is the
+Definition. When `ml-system-design-prd` calls this skill, the POC draft becomes
+grilling rounds, and nothing is written to `design/`.
 
-- **Problem**: core problem, why now, user pain point, link to team/company
-  goals.
-- **Requirements — scope**: must-have features; explicit out-of-scope list for
-  this version. Most-skipped item in review — check it first.
-- **Requirements — non-functional**: expected load, latency (e.g. p99),
-  availability target, explainability need (hard or soft), and cost
-  sensitivity. An exact cost budget is often not available: a level
-  (`low`/`medium`/`high`) or `unknown` is a valid answer. See
-  `../ml-design-principles.md`, Principle 1.
-- **Baseline**: the simple approach the ML system must beat. It is often not
-  ML. It is a design decision, not a build step: building it can wait. Four
-  parts:
-  - **Status quo**: what users do today without the system.
-  - **Recommended baseline**: the strong simple baseline from the problem
-    type's playbook in `../ml-playbooks.md` (part 3, "Baseline"). Examples:
+## Modes
+
+- **Regular draft:** answer each item in the user's own numbers and
+  words. Ask when a fact is unknown. Do not invent.
+- **Quick POC draft** (keywords: "Regular and Quick-POC mode" in
+  `../ml-system-design/SKILL.md`): give the most
+  likely answer to each item in one pass, marked as an assumption.
+- **Review:** check that each item has a real answer, not only a heading.
+  Report the gaps. Do not rewrite what is good.
+
+## Checklist
+
+- **Problem:** the core problem, why now, the user pain point, the link
+  to team or company goals, and the event to predict in business terms
+  (what happens, to whom, by when). Metric thresholds depend on it;
+  high-level gives the exact label and horizon.
+- **Requirements, scope:** the must-have features, and an explicit
+  out-of-scope list for this version. Reviews skip this item most often:
+  check it first.
+- **Requirements, non-functional:** load, latency (for example p99),
+  availability, the explainability need (hard or soft), and the cost
+  sensitivity. A level (`low`/`medium`/`high`) or `unknown` is a valid
+  cost answer. See `../ml-design-principles.md`, Principle 1.
+- **Baseline:** the simple approach that the ML system must beat. It is
+  often not ML. It is a design decision: the build can wait.
+  - **Status quo:** what users do today without the system.
+  - **Recommended baseline:** the strong simple baseline from the problem
+    type's playbook (`../ml-playbooks.md`, part 3, "Baseline"). Examples:
     click popularity or co-occurrence for search and recommendation, a
-    recency rule for churn, seasonal naive for forecasting. Recommend one;
-    don't just list options.
-  - **Floor**: the most naive version (random, majority class, mean
-    prediction, global popularity). It shows whether the metric means
-    anything.
-  - **Build decision**: implement now, later, or never. "Later" is a valid
-    answer.
+    recency rule for churn, seasonal naive for forecasting. Recommend one.
+    If no playbook fits, use the closest one and say so, or state the
+    domain rule that people use today.
+  - **Floor:** the most naive version (random, majority class, mean
+    prediction, global popularity). It shows if the metric means anything.
+  - **Build decision:** now, later, or never.
+- **Metrics, offline:** metrics on a static dataset (AUC, nDCG,
+  precision/recall).
+- **Metrics, online:** live A/B metrics (CTR, conversion, session time),
+  and guardrail metrics that must not get worse.
+- **Team:** stakeholders to inform, collaborating teams, blocking and
+  blocked dependencies.
+- **Team, reuse:** existing components to reuse, and the downstream
+  consumers of the output.
 
-  Never skip this item, like out-of-scope.
-- **Metrics — offline**: static-dataset metrics (AUC, nDCG, precision/recall).
-- **Metrics — online**: live A/B metrics (CTR, conversion, session time) plus
-  guardrail metrics that must not regress.
-- **Team**: stakeholders to inform, collaborating teams, blocking/blocked
-  dependencies.
-- **Team — reuse**: existing components reusable instead of rebuilt; downstream
-  consumers of this system's output.
+Scale the depth to the system size. Out-of-scope, the baseline, and the
+offline/online metric split are always required.
 
-Done when every bullet above has a concrete answer in the doc, scaled to system
-size — a small internal model doesn't need 10M req/min-grade detail, but
-out-of-scope, the baseline, and the offline/online metric split are never
-optional.
+## Check
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does each bullet have a concrete answer, not only a heading?
+2. Does the problem name the decision that the model controls?
+3. Is there one primary offline metric, with a threshold? Does it connect
+   to the online metric?
+4. Is the out-of-scope list specific? Does the baseline section recommend
+   one baseline?
+
+Done when the 4 answers are yes and `check_doc.py` prints `OK`.

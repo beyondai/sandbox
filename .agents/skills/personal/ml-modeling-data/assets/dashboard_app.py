@@ -6,6 +6,15 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+LOWER_IS_BETTER = ("mae", "mse", "rmse", "mape", "wape", "smape", "loss",
+                   "logloss", "brier", "error")
+
+
+def lower_is_better(metric):
+    name = metric.lower().replace("-", "_")
+    return any(tok in name.split("_") or name.endswith(tok) for tok in LOWER_IS_BETTER)
+
+
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 MODELING_DIR = PROJECT_DIR / "modeling"
 
@@ -83,19 +92,19 @@ else:
                     bal_df = pd.DataFrame({"class": list(target["class_balance"].keys()),
                                             "share": list(target["class_balance"].values())})
                     st.plotly_chart(compact(px.bar(bal_df, x="class", y="share")),
-                                     use_container_width=True, config={"displayModeBar": False})
+                                     width="stretch", config={"displayModeBar": False})
 
             if d.get("numeric_distributions"):
                 with right:
                     st.subheader("Skew by feature")
                     num_df = pd.DataFrame(d["numeric_distributions"]).T.round(3)
                     st.plotly_chart(compact(px.bar(num_df.reset_index(), x="index", y="skew")),
-                                     use_container_width=True, config={"displayModeBar": False})
+                                     width="stretch", config={"displayModeBar": False})
 
             if d.get("numeric_distributions"):
                 st.subheader("Numeric summary")
                 st.dataframe(pd.DataFrame(d["numeric_distributions"]).T.round(3),
-                             use_container_width=True, height=150)
+                             width="stretch", height=150)
 
             if d.get("categorical_distributions"):
                 st.subheader("Categorical distributions")
@@ -121,7 +130,7 @@ else:
                                         xanchor="center", x=0.5, font=dict(size=9)),
                         )
                         with col:
-                            st.plotly_chart(fig, use_container_width=True,
+                            st.plotly_chart(fig, width="stretch",
                                              config={"displayModeBar": False})
 
             if d.get("quality_flags"):
@@ -173,22 +182,34 @@ else:
 
                 left, right = st.columns([1, 1])
                 with left:
-                    st.dataframe(cmp_df.round(4), use_container_width=True, height=150)
+                    st.dataframe(cmp_df.round(4), width="stretch", height=150)
                 with right:
                     if metric_col:
                         st.plotly_chart(compact(px.bar(cmp_df, x="model", y=metric_col)),
-                                         use_container_width=True, config={"displayModeBar": False})
+                                         width="stretch", config={"displayModeBar": False})
 
     if "Final Results" in tab_map:
         with tab_map["Final Results"]:
             e = json.loads(eval_json.read_text())
 
             verdict = e.get("verdict", "")
-            low = verdict.lower()
-            if "clears" in low or "beat" in low or "pass" in low:
+            # verdict_status (pass | partial | fail) sets the color. Older
+            # files have no status: guess from the words, "partial" first.
+            status = (e.get("verdict_status") or "").lower()
+            if not status:
+                low = verdict.lower()
+                if "partial" in low or "mixed" in low or "inside the noise" in low:
+                    status = "partial"
+                elif "misses" in low or "fail" in low or "below" in low:
+                    status = "fail"
+                elif "clears" in low or "beat" in low or "pass" in low:
+                    status = "pass"
+            if verdict and status == "pass":
                 st.success(verdict, icon="✅")
-            elif "misses" in low or "fail" in low or "below" in low:
+            elif verdict and status == "fail":
                 st.error(verdict, icon="⚠️")
+            elif verdict and status == "partial":
+                st.warning(verdict)
             elif verdict:
                 st.info(verdict)
 
@@ -199,26 +220,34 @@ else:
                 for name, value in metrics.items():
                     base_value = baseline.get(name)
                     delta = round(value - base_value, 4) if base_value is not None else None
-                    rows.append({"Metric": name.capitalize(), "Value": value, "Baseline": base_value, "Delta": delta})
+                    # Lower is better for error and loss metrics: flip the sign
+                    # used for the color, so green always means "better".
+                    better = -delta if (delta is not None and lower_is_better(name)) else delta
+                    rows.append({"Metric": name.capitalize(), "Value": value, "Baseline": base_value,
+                                 "Delta": delta, "_better": better})
                 df = pd.DataFrame(rows)
 
-                def color_delta(val):
+                def color_rows(row):
+                    val = row["_better"]
                     if pd.isna(val):
-                        return ""
-                    color = "#1a7f37" if val > 0 else ("#c62828" if val < 0 else "#666")
-                    return f"color: {color}; font-weight: 600;"
+                        color = ""
+                    else:
+                        color = "#1a7f37" if val > 0 else ("#c62828" if val < 0 else "#666")
+                    style = f"color: {color}; font-weight: 600;" if color else ""
+                    return ["" if c != "Delta" else style for c in row.index]
 
                 styled = (
                     df.style
-                    .format({"Value": "{:.3f}", "Baseline": "{:.3f}", "Delta": "{:+.3f}"}, na_rep="—")
-                    .map(color_delta, subset=["Delta"])
+                    .format({"Value": "{:.3f}", "Baseline": "{:.3f}", "Delta": "{:+.3f}"}, na_rep="-")
+                    .apply(color_rows, axis=1)
+                    .hide(["_better"], axis="columns")
                 )
-                st.dataframe(styled, use_container_width=True, hide_index=True, height=38 * (len(rows) + 1))
+                st.dataframe(styled, width="stretch", hide_index=True, height=38 * (len(rows) + 1))
 
             gap = e.get("overfit_gap")
             if gap and "train" in gap and "test" in gap:
                 delta = round(gap["train"] - gap["test"], 4)
-                st.caption(f"Overfit gap — train **{gap['train']:.3f}** → test **{gap['test']:.3f}** (Δ {delta:+.3f})")
+                st.caption(f"Overfit gap: train **{gap['train']:.3f}** → test **{gap['test']:.3f}** (Δ {delta:+.3f})")
             elif gap:
                 st.caption(f"Overfit gap: {gap}")
 

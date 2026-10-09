@@ -5,6 +5,8 @@ Computes feature importance via variance, correlation with target, cardinality,
 null rate, and information-theoretic measures.  Produces a ranked list with
 composite scores to guide feature selection.
 
+Requires: python3 standard library only (no venv needed).
+
 Usage:
     python feature_selector.py --file dataset.csv --target churn
     python feature_selector.py --file dataset.csv --target revenue --top 10 --json

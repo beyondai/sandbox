@@ -2,7 +2,7 @@
 name: ml-system-design-post-delivery
 description: >-
   Use when writing or reviewing the Post-Delivery section of an ML system design
-  doc — post-launch result analysis, model explainability (SHAP/LIME), the
+  doc - post-launch result analysis, model explainability (SHAP/LIME), the
   next-iteration roadmap, or democratizing/reusing ML components across teams.
   Trigger on requests to plan A/B test result analysis, add model
   explainability, sketch a V2/V3 roadmap, or identify what an ML system's
@@ -11,29 +11,39 @@ description: >-
 
 # Post Delivery
 
-Project folder and output format: see `../ml-system-design/SKILL.md`,
-"Which project folder" and "Output docs".
+Writes `<project-folder>/design/post-delivery.md`, one heading for each
+item.
 
-Draft (Regular): answer each item below in the user's own numbers/words; ask if
-unknown, never invent. Quick POC: state each item's most likely answer in one
-pass, flagged as an assumption — mode by keyword ("poc"/"quick"/"mvp"/"fast" vs.
-"regular"/nothing), see `../adr/0001-ml-modeling-family-and-continuity.md`.
-Review: check each item is actually answered, not just headed; flag gaps, don't
-rewrite what's solid.
+Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+"Check the output", "Skill improvement log".
 
-- **Analysis**: plan for the post-A/B deep-dive — not just what happened, but
-  why.
-- **Explainability**: how model decisions become human-understandable (e.g.
-  SHAP, LIME) — for debugging and stakeholder trust.
-- **Iteration**: forward roadmap (V2, V3, ...) based on the analysis plan above.
-- **Democratize**: specific components (features, model architecture, platform
-  pieces) other teams could reuse — name the team and the component, not "this
-  could help others."
+## Modes
 
-Done when Democratize names an actual team + component rather than staying
-generic, and Iteration lists concrete next-version items rather than "TBD based
-on results."
+- **Regular draft:** answer each item in the user's own numbers and
+  words. Ask when a fact is unknown. Do not invent.
+- **Quick POC draft** (keywords: "Regular and Quick-POC mode" in
+  `../ml-system-design/SKILL.md`): give the most
+  likely answer to each item in one pass, marked as an assumption.
+- **Review:** check that each item has a real answer. Report the gaps. Do
+  not rewrite what is good.
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+## Checklist
+
+- **Analysis:** the plan for the analysis after the A/B test: why it
+  happened, not only what happened.
+- **Explainability:** how model decisions become clear to people (for
+  example SHAP, LIME), for debugging and stakeholder trust.
+- **Iteration:** the roadmap (V2, V3, ...), based on the analysis plan.
+- **Democratize:** the components (features, model architecture, platform
+  parts) that other teams can reuse. Name the team and the component.
+
+## Check
+
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does the analysis plan look for causes and segments, not only the
+   headline result?
+2. Does Iteration list concrete next-version items, not "TBD based on
+   results"?
+3. Does Democratize name a real team and a real component?
+
+Done when the 3 answers are yes and `check_doc.py` prints `OK`.

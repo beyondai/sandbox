@@ -1,5 +1,8 @@
 # ML design and review principles
 
+Contents: Rule | The cost table | Budgets in the PRD | Why | How each skill uses
+this principle
+
 This file is the single source of truth for the principles that the `ml-*`
 skills use to design and to review ML systems. The design skills apply them
 when they write. The `ml-critique` skills judge write-ups against them.

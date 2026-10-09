@@ -1,5 +1,9 @@
 # ml-system-design-* / ml-modeling-* - operational reference
 
+Contents: Monkey-mode | Monkey-MLP | Autoresearch | Skill improvement log |
+Design drift: detect, then ask | Dashboard | Running things concurrently | When
+a git worktree earns its keep | ADR index
+
 Entry point for a new project: `/ml-system-design <topic> [poc]`. Read
 `docs/ML-SKILLS-GUIDE.md` first for orientation. This file holds the
 detail that guide deliberately leaves out: how the pieces behave when several
@@ -85,7 +89,8 @@ When `ml-modeling-*` first runs against a project, it synthesizes
 <file>`; `-w` stores the blob so the diff stays available even if that
 version was never committed).
 
-Every step recomputes both hashes before its own work. On a mismatch it
+Every step runs `ml-modeling/scripts/spec_hash_check.sh <project>` before
+its own work. On a mismatch it
 shows the diff, summarized to which sections moved, and asks two questions:
 re-synthesize the spec or keep it; apply the changed decisions going forward
 or proceed on the old ones. The answer is recorded as one line in the step's
@@ -111,8 +116,10 @@ results) plus a model comparison when multiagent ran - feature and training
 detail stay in their `.md` files. Rationale: `adr/0002`.
 
 Each project gets its own Streamlit port: the first free port from 8501 up,
-written to `dashboard/.port`. `ml-modeling-evaluate` health-checks that port,
-never bare `:8501`.
+written to `dashboard/.port`, with the PID in `dashboard/.pid`.
+`ml-modeling-data/scripts/launch_dashboard.sh` does this, and reuses a
+running dashboard. It kills or reuses only its own streamlit process.
+`ml-modeling-evaluate` runs it again, and never checks bare `:8501`.
 
 ## Running things concurrently
 
@@ -160,3 +167,6 @@ edits stay on `main` regardless.
 | 0006 | Fork after high-level; deep-dive and ml-modeling are alternatives |
 | 0007 | Cleaning is a phase inside `ml-modeling-data`, not a new step |
 | 0008 | Monkey-MLP: sibling skill to monkey-mode, not a model option on it |
+| 0009 | ml-critique: a core with system and modeling lenses, 2 modes |
+| 0010 | One folder per project, parent `labs/` unless the user names one |
+| 0011 | Skill-writing guides: Check step, scripts, checklists, TOCs |

@@ -2,87 +2,79 @@
 name: ml-system-design-deep-dive
 description: >-
   Use when writing or reviewing the Design Deep Dive section of an ML system
-  design doc — data sources (online/offline, data engineering), feature list and
+  design doc - data sources (online/offline, data engineering), feature list and
   feature engineering, candidate models and their tradeoffs, or training setup
   (loss function, algorithm, labeling, sampling). The paper alternative to the
-  ml-modeling-* execution family, which answers the same questions hands-on —
+  ml-modeling-* execution family, which answers the same questions hands-on -
   trigger on requests to pick a model, design features, specify training
   data/labels, or discuss model tradeoffs on paper.
 ---
 
 # Design Deep Dive
 
-Two axes, independent of each other: Draft vs. Review (what you're doing), and
-Regular vs. Quick-POC (how fast). Mode is chosen by keyword in the request —
-"poc"/"quick"/"mvp"/"prototype"/"fast"/"one hour" → Quick POC;
-"regular"/"full"/nothing → Regular (default). Full rationale in
+The paper route after `design/high-level.md`. `ml-modeling-*` answers the
+same 4 items by doing the work, and does not read this file.
+
+Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+"Check the output", "Skill improvement log".
+
+## Modes
+
+2 independent choices: Draft or Review, and Regular or Quick POC. The
+keyword selects the speed (the list is in "Regular and Quick-POC mode" in
+`../ml-system-design/SKILL.md`). Reason:
 `../adr/0001-ml-modeling-family-and-continuity.md`.
 
-Project folder and output format: see `../ml-system-design/SKILL.md`,
-"Which project folder" and "Output docs".
+- **Draft, Regular:** answer each item in the user's own numbers and
+  words. Ask when a fact is unknown. Do not invent.
+- **Draft, Quick POC (a one-hour MVP):** ask the essential questions for
+  all 4 items in one batched round. Give a default for the rest, marked as
+  an assumption. Target: a real but short answer to each item.
+- **Review:** check that each item has a real answer. Report the gaps. Do
+  not rewrite what is good.
 
-**Draft, Regular**: answer each item below in the user's own numbers/words; ask
-if unknown, never invent.
+## Steps
 
-**Draft, Quick POC — a one-hour MVP**: ask the essential questions from the four
-items below in one batched round, not sequential grilling; state a reasonable
-default for anything not essential and flag it as an assumption. Target: a real
-but surface-level answer to all four items, fast — enough for delivery to
-build on, not exhaustive.
+1. **Before the draft**, in one message (Quick POC: inside its one round):
+   - State the problem in 1-3 sentences, and name the prediction targets.
+     If there is no `prd/`, say so and offer `/ml-system-design-prd`
+     first.
+   - List the source files with row counts (a listing, not a profile).
 
-**Review** (either mode): check each item is actually answered, not just headed;
-flag gaps, don't rewrite what's solid.
+   Wait for the user's answer.
+2. **Draft the 4 items** (below).
+3. **Write** `<project-folder>/design/deep-dive.md`, one heading for each
+   item. `ml-system-design-delivery` uses it.
+4. **Offer an ADR** for a Models or Training decision that is hard to
+   reverse, would surprise a future reader, and was a real trade-off (the
+   `domain-modeling` ADR criteria). Put it in
+   `<project-folder>/adr/000N-*.md`.
+5. **Check.**
 
-## Before drafting (Regular mode)
+## The 4 items
 
-Two checks, in one message, before writing any of the four sections:
-
-1. Restate the problem definition in 1-3 sentences and name the prediction
-   target(s). If the project has no `prd/`, say so and offer
-   `/ml-system-design-prd` first rather than drafting on an unconfirmed
-   framing.
-2. Confirm the data actually exists: list the source files with row counts
-   (a listing, not a profile - profiling is `ml-modeling-data`'s job).
-
-Wait for the user's acknowledgement, then draft. Quick POC keeps both checks
-but folds them into its single batched round.
-
-## The four items
-
-- **Data**: sources feeding real-time inference vs. batch training; new data
-  engineering work needed (e.g. an ETL pipeline joining two logs).
-- **Features**: concrete feature list (user, item, contextual); nontrivial
-  feature engineering called out (e.g. embeddings for high-cardinality
+- **Data:** the sources for real-time inference and for batch training.
+  The new data engineering work (for example an ETL job that joins 2
+  logs).
+- **Features:** a concrete list (user, item, context). Name each
+  nontrivial transform (for example embeddings for a high-cardinality
   `user_id`).
-- **Models**: candidate model types considered, always including the
-  simplest option that can work; tradeoffs between them (performance vs.
-  running cost vs. maintenance cost vs. explainability); chosen model
-  justified per phase, not just for the final version. A more complex
-  candidate wins only if it passes the complexity gate - fill the cost
-  table in `../ml-design-principles.md`, Principle 1.
-- **Training**: loss function optimized; training algorithm; source of
-  ground-truth labels; sampling strategy if needed (e.g. class imbalance).
+- **Models:** the candidates, always with the simplest option that can
+  work. The trade-offs: performance, running cost, maintenance cost,
+  explainability. Select a model for each phase. A more complex candidate
+  wins only if it passes the complexity gate: fill the cost table in
+  `../ml-design-principles.md`, Principle 1.
+- **Training:** the loss, the algorithm, the source of the labels, and
+  the sampling (for example for class imbalance).
 
-Done when features are named (not "we'll use relevant features"), at least two
-model candidates are compared with a stated tradeoff, and the label source is
-traceable to a real data pipeline.
+## Check
 
-## Write the file
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Are the features named, not "relevant features"?
+2. Are 2 or more candidates compared, with the simplest one included and
+   a stated trade-off?
+3. Does a complex choice have the cost table, and does it pass the gate?
+4. Can the label source be traced to a real data pipeline? Does the loss
+   match the PRD primary metric?
 
-Write the settled answers to `<project-folder>/design/deep-dive.md`, one heading
-per item above — this is what `ml-system-design-delivery` builds on when the
-project took the paper route. Create `design/` if it doesn't exist. This skill
-and `ml-modeling-*` are alternatives after `design/high-level.md`:
-`ml-modeling-*` answers the same four items by doing the work and does not read
-this file.
-
-## Offer an ADR
-
-If a Models or Training decision is hard to reverse, would surprise a future
-reader, and was a real tradeoff (not the only reasonable option) — all three,
-per `domain-modeling`'s ADR criteria — offer to record it in
-`<project-folder>/adr/000N-*.md` rather than letting it live only in this file.
-
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+Done when the 4 answers are yes and `check_doc.py` prints `OK`.

@@ -1,7 +1,7 @@
 ---
 name: ml-modeling-features
 description: >-
-  Use to engineer and select features for an ML model — numerical transforms,
+  Use to engineer and select features for an ML model - numerical transforms,
   categorical encoding, leave-one-out aggregation features, interaction/cross
   features, time-based/cyclical features, importance-based selection. Step 2
   of the ml-modeling-* chain (data → features → train → evaluate). Trigger on
@@ -11,22 +11,39 @@ description: >-
 
 # Engineer Features
 
-Reads `<project-folder>/design/high-level.md`'s ML framing (population, unit of
-prediction — what one row is) and `modeling/01-data.md` (the profile and its
-risk flags). The feature list is this step's decision, recorded in
-`02-features.md`; there is no upstream list to copy. Writes
-`<project-folder>/modeling/02-features.md`. Project folder and output format: see `../ml-modeling/SKILL.md`,
-"Which project folder" and "Output docs". First, run the "Design docs
-changed?" check from `../ml-modeling/SKILL.md`.
+Contents: Numerical transforms | Categorical encoding | Aggregation features
+(leave-one-out) | Embeddings | Interaction and cross features | Cheap text
+signals | Time-based, with cyclical encoding | Selection | Check
 
-Input table: `01-data.json` -> `dataset.train`. Never open `dataset.test`
-here. If you write a transformed table, save it under `modeling/datasets/`
-and record its path in `02-features.md` under "Output table" so train picks
-it up.
+- **Reads:** the ML framing in `<project-folder>/design/high-level.md`
+  (population, unit of prediction: what one row is) and
+  `modeling/01-data.md` (profile, risk flags).
+- **Input table:** `01-data.json` -> `dataset.train`. Never open
+  `dataset.test` here.
+- **Writes:** `modeling/02-features.md` and `modeling/features.py` with
+  `transform(df)`, fit on train only; evaluate applies the same function
+  to test (see "Handoff" in `../ml-modeling/SKILL.md`). A transformed
+  train table goes in `modeling/datasets/`, and its path goes under
+  "Output table" in `02-features.md`, so train uses it.
+- **Aggregates from raw logs** (counts, recency, trends over events) need
+  the event rows, so `build_dataset.py` (data step) builds the base
+  aggregates. This step decides which to keep and how to transform them.
+- **Rules:** `../ml-system-design/SKILL.md`, "Project folder", "Output
+  docs", "Check the output", "Skill improvement log".
+- **Mode:** Regular proposes transforms from the profile and the framing,
+  and checks importance before it decides. Quick POC selects the most
+  useful transforms and continues.
 
-Mode: Regular proposes transforms from the profile and the framing, then checks
-importance before finalizing. Quick POC picks the most obviously useful
-transforms and moves on — see `ml-modeling` router for the keyword rule.
+The feature list is this step's decision. Each transform needs a reason
+in `01-data.md` or in the framing. Apply none by default.
+
+Steps:
+1. Run "Design docs changed?" in `../ml-modeling/SKILL.md`.
+2. Select transforms from the sections below.
+3. Run the selection script.
+4. Write `02-features.md`: the list, the reason for each transform, and
+   what was tried and dropped.
+5. Check.
 
 ## Numerical transforms
 
@@ -40,36 +57,27 @@ def engineer_numerical(df, col):
     })
 ```
 
-**Missing-value indicator flags**: for any numeric column with a
-non-trivial null rate, add a binary `{col}_missing` column alongside it -
-"was this invalid/absent" stays visible as a signal even after imputation
-happens later in the training pipeline.
-
-**Prefer quantile bins for skewed columns**: swap `pd.cut` (fixed-width)
-for `pd.qcut` (quantile-based) when the profile flags a column as skewed -
-fixed-width bins on a skewed column put almost every row into one bin.
+- **Missing flags.** For a numeric column with a real null rate, add a
+  binary `{col}_missing`. The signal stays after imputation.
+- **Skewed column.** Use `pd.qcut` (quantile bins), not `pd.cut`. Fixed
+  bins put almost all rows in one bin.
 
 ## Categorical encoding
 
-One-hot for low cardinality; target or frequency encoding for high-cardinality
-columns (e.g. `user_id`) — one-hot there would blow up dimensionality.
+- Low cardinality: one-hot.
+- High cardinality (for example `user_id`): target or frequency encoding.
+- Target encoding is smoothed:
+  `smoothed = (count * cat_mean + k * global_mean) / (count + k)`. A rare
+  category moves toward the global mean.
 
-**Smoothed/regularized target encoding**: shrink a category's target mean
-toward the global mean, weighted by that category's row count -
-`smoothed = (count * cat_mean + k * global_mean) / (count + k)` - so a
-rarely-seen category isn't treated as confidently as a common one. Cheap
-(one groupby), meaningfully more effective than naive mean encoding.
+## Aggregation features (leave-one-out)
 
-## Aggregation features (leave-one-out safe)
+Statistics for each entity of the population (user, item, session): the
+mean, count, or std of the target or of a numeric column. Often the
+strongest group, and cheap (one groupby).
 
-Per-entity historical stats - mean/count/std of the target, or of another
-numeric column, grouped by whatever categorical id represents the framing's
-population (a user, item, session, or similar entity). Often the highest-value
-feature group available and cheap to compute (one groupby), but only safe
-under one condition:
-
-**Leave-one-out is mandatory when the aggregate includes the row's own
-label.** Exclude the row's own value from its own group's statistic:
+**Leave-one-out is mandatory when the statistic uses the row's own
+label.** Without it, the label leaks into its own feature.
 
 ```python
 count = df.groupby(entity_col)[target_col].transform('count')
@@ -78,59 +86,36 @@ loo_rate = (total - df[target_col]) / (count - 1)
 loo_rate = loo_rate.fillna(df[target_col].mean())  # count == 1 groups
 ```
 
-Skipping this is direct target leakage - the label leaking into its own
-feature, not a subtler timing leak. Always keep the count/exposure alongside
-the rate: a rate from 2 rows and a rate from 2,000 aren't equally
-trustworthy, and a model benefits from knowing which.
+- Keep the count next to the rate. A rate from 2 rows is less reliable
+  than a rate from 2,000.
+- Save a lookup table (`<entity id> -> rate, count`). Train and evaluate
+  **left-join** it onto the test split. Test rows are not in the train
+  statistic, so a plain join does not leak.
+- **k-fold CV.** A column computed once before the split leaks across
+  the rows of a validation fold that share an entity. A boosted model uses
+  this leak more than a linear or bagged model, so the CV winner can be
+  wrong. Compute the column again in each fold (leave-one-out in the train
+  part, left-join onto the validation part). If you do not, mark the CV
+  ranking as provisional until `ml-modeling-evaluate`.
 
-Persist a small lookup table (`<entity id> -> rate, count`) so
-`ml-modeling-train`/`-evaluate` can **left-join** (not leave-one-out) the
-same stat onto the held-out test split - test rows were never part of the
-training aggregate, so a plain join is leakage-free there.
+## Embeddings
 
-**Warning, not a footnote: this column is not automatically safe under
-k-fold CV.** Row-level leave-one-out only excludes a row's own label from
-its own group statistic - it does not exclude every other row from the
-same CV validation fold. If this column is computed once, globally, before
-a k-fold split (rather than re-derived per fold from that fold's train
-portion only), rows in a validation fold still leak into each other's
-aggregate features whenever they share an entity. This is not a small,
-uniform effect: a gradient-boosted/iterative model can exploit that
-fold-crossing leak far more aggressively than a bagged or linear model can,
-so it can flip which candidate looks like the winner in exactly the
-scenario `ml-modeling-train`/`-multiagent` compare candidates for.
-Recompute this column per fold (same leave-one-out-within-the-fold,
-smoothed-mean-onto-the-validation-fold pattern as the test-split left-join
-above, just run once per fold) before trusting a CV ranking that includes
-it - or explicitly flag the ranking as provisional pending the real
-held-out evaluation in `ml-modeling-evaluate` if recomputing per fold isn't
-done.
+Not used, in both modes. A POC has no time to train or fine-tune them, and
+a generic pretrained embedding is not adapted to the task. A local
+embedding model is on hold (laptop resources). Use frequency or target
+encoding for categoricals and IDs. For free text, use "Cheap text
+signals".
 
-## Embeddings (not used in Quick POC)
+## Interaction and cross features
 
-Not used by default: training your own embeddings doesn't fit a POC's time
-budget, and a pretrained one can't be fine-tuned to the task in that time
-either, so it would stay a generic, unadapted representation rather than one
-that's learned anything about this problem. Self-hosting a pretrained
-embedding model is a future possibility, on hold for now - not effective on
-a personal laptop (resource-constrained for local model inference at any
-real scale). Default stays frequency/target encoding (above) for
-categoricals and IDs, regardless of mode - see "Cheap text signals" below
-for the efficient fallback on a free-text column.
+Combine 2 or 3 categorical columns, or take a ratio or product of 2
+related numeric columns. Do this only when the profile or the domain shows
+a joint effect. Do not generate all combinations.
 
-## Interaction / cross features
+## Cheap text signals
 
-Concatenate two or three categorical columns into one, or take a
-ratio/product of two related numeric columns - only when profile evidence or
-the framing's domain reasoning suggests a joint effect isn't captured by
-either column alone. Not a combinatorial auto-generate-everything pass:
-same "justified, not applied by default" rule as every other transform here.
-
-## Cheap text signals (no embeddings)
-
-For a free-text column not worth embedding (see above), cheap derived
-numerics still help: string length, word/token count, digit or punctuation
-presence/count. Near-zero cost, no model needed.
+For a free-text column: string length, token count, digit and punctuation
+counts. No model is necessary.
 
 ## Time-based, with cyclical encoding
 
@@ -146,32 +131,36 @@ def engineer_time(df, col):
     })
 ```
 
-Sin/cos pair matters for anything cyclical (hour, day-of-week, month) — raw
-integer encoding tells the model 23:00 and 00:00 are far apart when they're
-adjacent.
-
-**Rolling/trailing window aggregates** (e.g. a trailing-N-day mean via
-`groupby(...).rolling(...)`) for projects built from raw logs with real
-per-row timestamps - not every project has one, so this only applies when
-the data step's `build_dataset.py` had actual dates to work with.
-Vectorized, so still cheap even at scale.
+- Use the sin/cos pair for each cyclical value (hour, day of week, month).
+  A raw integer puts 23:00 far from 00:00.
+- Trailing-window aggregates (for example a trailing N-day mean with
+  `groupby(...).rolling(...)`): only when `build_dataset.py` had real row
+  timestamps.
 
 ## Selection
 
-Run `../ml-modeling/scripts/feature_selector.py --file <csv> --target <col>
---top <n>` with `<csv>` = `01-data.json` -> `dataset.train` (or your "Output
-table") and `<col>` = `dataset.label` — composite score across variance,
-correlation, cardinality, null rate. Use this to justify dropping features, not
-just to generate a top-N list.
+Run:
 
-Done when the feature set is a concrete list (not "relevant features"), each
-nontrivial transform - including aggregation and interaction features - is
-justified by something in `01-data.md` or the framing (not applied by
-default), the file records what was tried and dropped, not just what
-survived, and, if this step's feature list resolves a placeholder or
-contradicts an assumption in `spec/<topic>.md`, that spec line is updated to
-match (see `../ml-modeling/SKILL.md`, "Spec self-staleness").
+```
+python3 .agents/skills/personal/ml-modeling/scripts/feature_selector.py --file <csv> --target <col> --top <n>
+```
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
-improvement log.
+`<csv>` is `dataset.train` (or the "Output table"). `<col>` is
+`dataset.label`. The score combines variance, correlation, cardinality,
+and null rate. It is a rough screen: remove the id column first, and do
+not drop a feature on this score alone. Confirm a drop with model
+importance or a CV ablation.
+
+## Check
+
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Is the feature set a concrete list, not "relevant features"?
+2. Does each transform (aggregation and interaction included) have a
+   reason in `01-data.md` or in the framing?
+3. Is each feature available at prediction time? Does each aggregate that
+   uses the label use leave-one-out (and per fold for CV)?
+4. Does the file record what was tried and dropped?
+
+Done when the 4 answers are yes, `check_doc.py` prints `OK`, and a spec
+line that this feature list resolves or contradicts is updated (see
+"Closing the loop" in `../ml-modeling/SKILL.md`).

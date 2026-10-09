@@ -22,9 +22,9 @@ dispatch you, run it first.
    In a project folder, read `spec/`, `modeling/01`-`04`, and the PRD
    metrics. Use `01-data.json`'s `dataset` block for paths, label, and
    split.
-2. Use the problem type's playbook in
-   `../ml-playbooks.md`. Do its classic-mistakes check
-   first.
+2. Use the problem type's playbook in `../ml-playbooks.md`. Do its
+   classic-mistakes check first. For complexity findings, use Principle 1
+   in `../ml-design-principles.md` (the complexity gate, the cost table).
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections are in priority order: A to D (baseline, labels, split,
    leakage) hold most P1 findings. Brief mode: `[C]` items, plus any P1
@@ -37,20 +37,33 @@ dispatch you, run it first.
 
 ## Evidence
 
-- Brief mode: `file:line` or a number from existing output. Run no new
-  commands.
+- Brief mode: `file:line` or a number from existing output. You can read
+  any file (code, params, logs). Run no probes or new training.
 - Normal mode: command output for each P1 and P2 finding. Standard probes:
   - **Leakage:** train on the suspect feature only. A score near the full
     model shows a leak.
   - **Split:** count entities in both train and test. Compare date ranges.
   - **Baseline:** score the playbook baseline on the same test set.
-  - **Noise:** bootstrap the metric, or use
-    `../ml-modeling/scripts/hypothesis_tester.py`.
+  - **Noise:** bootstrap the metric, or run
+    `python3 .agents/skills/personal/ml-modeling/scripts/hypothesis_tester.py`.
   - **Threshold:** compute precision and recall at the action capacity.
 
 Run probes with `uv run`, and write them in the session scratchpad. Do not
 change the project's code or data.
 
-Done when each check in the mode's scope has a result, or a one-line reason
-why it does not apply, and each P1 and P2 finding has the evidence that the
-mode requires.
+## Check
+
+Before you return the critique, read it again against these questions. Fix each
+"no", then check again (maximum 2 loops). Return the open items and each skill
+issue (a gap or error in this lens or its catalog) with the critique. The core
+logs them.
+1. Does each check in the mode's scope have a result, or a one-line
+   reason why it does not apply?
+2. Does each P1 and P2 finding have the evidence that the mode requires
+   (Brief: `file:line` or existing output; Normal: probe output) and an
+   alternative?
+3. Did no probe change the project's code or data?
+4. Are the findings in priority order, upstream (catalog section order)
+   first? Does each question have an expected answer?
+
+Done when the 4 answers are yes.

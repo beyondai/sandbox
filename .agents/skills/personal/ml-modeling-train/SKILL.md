@@ -1,7 +1,7 @@
 ---
 name: ml-modeling-train
 description: >-
-  Use to select and train one ML model candidate, sequentially — the
+  Use to select and train one ML model candidate, sequentially - the
   algorithm-selection matrix, cross-validation, experiment logging. Step 3 of
   the ml-modeling-* chain (data → features → train → evaluate), the sequential
   alternative to ml-modeling-multiagent. Trigger on "train a model for this,"
@@ -11,98 +11,107 @@ description: >-
 
 # Train (sequential)
 
-Reads `<project-folder>/design/high-level.md`'s Phasing (the model class per
-phase: baseline, first real model, stretch), `modeling/01-data.md` (class
-balance), and `modeling/02-features.md`. The candidate, loss, and class
-weighting are this step's decisions, recorded in `03-train.md`. Writes
-`<project-folder>/modeling/03-train.md`. Project folder and output format: see `../ml-modeling/SKILL.md`,
-"Which project folder" and "Output docs". First, run the "Design docs
-changed?" check from `../ml-modeling/SKILL.md`.
+Contents: Algorithm selection | Quick POC time budget | Log each run | Check
 
-Train on `02-features.md`'s "Output table" if present, else `01-data.json`
--> `dataset.train`. Cross-validate inside that table only; `dataset.test` is
-never read here - it belongs to `ml-modeling-evaluate`.
+- **Reads:** the Phasing in `<project-folder>/design/high-level.md` (the
+  model class for each phase), `modeling/01-data.md` (class balance), and
+  `modeling/02-features.md`.
+- **Input table:** the "Output table" in `02-features.md`, or else
+  `01-data.json` -> `dataset.train`. Cross-validate inside this table.
+  Never read `dataset.test`: it belongs to `ml-modeling-evaluate`.
+- **Writes:** `modeling/03-train.md` and `modeling/model.joblib` (the
+  fitted model and its decision threshold; see "Handoff" in
+  `../ml-modeling/SKILL.md`).
+- **Rules:** `../ml-system-design/SKILL.md`, "Project folder", "Output
+  docs", "Check the output", "Skill improvement log".
+- **Mode:** Regular starts simple. It selects a more complex model only if
+  it passes the complexity gate (`../ml-design-principles.md`, Principle 1:
+  the gain is larger than the noise, and the value of the gain is larger
+  than the added running, maintenance, explainability, and risk cost).
+  Quick POC goes to the workhorse row (below), unless the Phasing says
+  otherwise.
 
-One candidate, chosen and trained in this single pass — see `ml-modeling` router
-if you want `ml-modeling-multiagent` instead (multiple candidates, concurrent,
-compared). Mode: Regular starts simple and upgrades only if the more complex model
-passes the complexity gate in `../ml-design-principles.md`, Principle 1
-(gain > noise, and value of the gain > added running, maintenance,
-explainability, and risk cost) - write the cost table in `03-train.md`; Quick POC goes straight to the workhorse row below unless
-high-level's Phasing says otherwise — see `ml-modeling` router for the keyword
-rule. Class imbalance: decide the handling here (class weights first, resampling
-only if weights underperform) from `01-data`'s class balance, and say why in
-`03-train.md`.
+This skill selects one model. It also trains the simplest option (a
+linear model or the playbook baseline) as the comparison, so the choice
+has evidence. For several candidates in parallel, use
+`ml-modeling-multiagent`.
+
+**Threshold.** For a metric at a threshold (F1, precision@k), choose the
+threshold on out-of-fold train predictions, never on test. Save it in
+`model.joblib`.
+
+Steps:
+1. Run "Design docs changed?" in `../ml-modeling/SKILL.md`.
+2. Select the candidate (matrix below). Decide the loss and the class
+   imbalance handling: class weights first; resampling only if weights do
+   worse. Say why in `03-train.md`.
+3. Check the CV for leaks (below).
+4. Train with CV. Log each run.
+5. Write `03-train.md`, with the cost table if the selected model is not
+   the simplest one tried.
+6. Check.
 
 ## Algorithm selection
 
 | Scenario | Start with | Upgrade to |
 |---|---|---|
-| Interpretability required | Logistic/Linear Regression | — (stay here for stakeholder-facing models) |
-| Small data (<10K rows) | Random Forest | XGBoost if accuracy insufficient |
-| Medium data, high accuracy needed | XGBoost/LightGBM | — (default workhorse for tabular data) |
-| Large data, complex patterns | Neural network | Only once tree methods plateau |
-| Unsupervised grouping | K-Means/DBSCAN | Validate `k` via silhouette score |
+| Interpretability required | Logistic/Linear Regression | none (stay for stakeholder-facing models) |
+| Small data (<10K rows) | Random Forest | XGBoost if accuracy is not sufficient |
+| Medium data, high accuracy needed | XGBoost/LightGBM | none (default workhorse for tabular data) |
+| Large data, complex patterns | Neural network | only after tree methods plateau |
+| Unsupervised grouping | K-Means/DBSCAN | validate `k` with the silhouette score |
 
-Use cross-validation, not a single train/test split, to pick between candidates.
-Folds are drawn inside the train table, never across the `dataset` split.
+Use cross-validation, not one train/test split, to compare candidates.
+Make the folds inside the train table, never across the `dataset` split.
 
-Before trusting a CV ranking, check whether any feature in the table was
-built from the target column without per-fold nesting (a leave-one-out or
-target-encoded aggregate computed once, globally - see
-`ml-modeling-features/SKILL.md`, "Aggregation features"). If so, either
-recompute it per fold or treat the ranking as provisional pending the real
-held-out evaluation in `ml-modeling-evaluate`, and say so explicitly in
-`03-train.md` - don't pick a winner off unverified CV numbers. The
-distortion this causes is not uniform across model classes: a
-gradient-boosted/iterative model can exploit it far more than a bagged or
-linear one, which is exactly the failure mode this check exists to catch.
+**CV leak check.** Is a feature built from the target once for the
+whole table, without per-fold computation (a leave-one-out or target
+encoding; see `../ml-modeling-features/SKILL.md`, "Aggregation features")?
+If yes, compute it again in each fold, or mark the CV ranking as
+provisional in `03-train.md` until `ml-modeling-evaluate`. A boosted model
+uses this leak more than a linear or bagged model, so the ranking can be
+wrong.
 
 ## Quick POC time budget
 
-Target roughly 3 minutes of wall-clock for the candidate, not left
-unbounded. Neither the mode line above nor the algorithm-selection matrix
-names a fold count or model size, so without an explicit default this
-step silently reaches for Regular-mode-grade rigor (5-fold CV, 200
-trees/iterations) even on a fast POC pass - real numbers from one project:
-Random Forest (`n_estimators=200`, `max_depth=12`) took 237.6s for 5-fold
-CV on a 480k-row table, HistGradientBoosting (`max_iter=200`) took 125.4s.
-Default Quick POC to (1) 3-fold CV instead of 5-fold - cuts wall-clock by
-~40% with only a small loss of estimate stability for a POC-grade
-decision, and (2) roughly half the Regular-mode default trees/iterations
-(e.g. `n_estimators=100` instead of 200 for Random Forest, `max_iter=100`
-instead of 200 for HistGradientBoosting/LightGBM/XGBoost) unless the user
-names a specific size. Applied to the numbers above, this would bring
-Random Forest to roughly 70s and HistGradientBoosting to roughly 40s -
-both comfortably under budget. Regular mode keeps the fuller defaults
-(5-fold, 200 trees/iterations) since it isn't optimizing for speed. State
-the reduced fold count and size explicitly in `03-train.md`'s params (not
-silently) so a later Regular-mode re-run knows what was traded away.
+Target about 3 minutes of wall-clock time for the candidate.
 
-## Log it
+| Setting | Quick POC | Regular |
+|---|---|---|
+| CV folds | 3 | 5 |
+| Trees or iterations | 100 (`n_estimators`, `max_iter`) | 200 |
+
+The user can name another size. Write the folds and the size in the
+params of `03-train.md`, so a Regular run knows what was reduced.
+(Measured on 480k rows, 5-fold, 200 trees: Random Forest 237.6s,
+HistGradientBoosting 125.4s. The POC settings bring them to about 70s and
+40s.)
+
+## Log each run
 
 ```
-python3 ../ml-modeling/scripts/experiment_tracker.py \
+python3 .agents/skills/personal/ml-modeling/scripts/experiment_tracker.py \
   --log-file <project-folder>/modeling/experiments.json \
   log --name "<model>_v1" --params '{"lr":0.1,"depth":6}' \
   --metrics '{"f1":0.87}'
 ```
 
-Every training run gets logged — this is what `ml-modeling-evaluate` and any
-later run compare against. Always pass `--log-file` with the project's path, and
-before the subcommand (`--log-file ... log ...`, not `log --log-file ...`, which
-argparse rejects): the script's default is `experiments.json` relative to
-whatever directory the agent happens to be in, which scatters logs across
-projects.
+- Always give `--log-file` with the project path. The default path is
+  relative to the current folder.
+- Put `--log-file` before the subcommand. `log --log-file ...` fails.
 
-Done when `03-train.md` names the chosen model, states why it beat the
-alternatives in the matrix above (not just "it's the default"), includes
-the cost table if the chosen model is not the simplest one tried, includes the
-training code actually run — not a template — and, if this step's choice of
-model/loss/class-weighting resolves a placeholder or contradicts an
-assumption in `spec/<topic>.md`, that spec line is updated to match (see
-`../ml-modeling/SKILL.md`, "Spec self-staleness").
+## Check
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
-improvement log.
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does `03-train.md` name the selected model and compare it with the
+   simplest option on the same CV (not "it is the default")?
+2. If the model is not the simplest one tried, does the cost table show
+   that it passes the complexity gate?
+3. Does `03-train.md` hold the training code that ran, not a template?
+4. Did no step read `dataset.test`? Is the threshold from out-of-fold
+   predictions, and is `model.joblib` saved? Is the CV free of the leak
+   above, or marked provisional?
+
+Done when the 4 answers are yes, `check_doc.py` prints `OK`, and a spec
+line that the model, loss, or class weights resolve or contradict is
+updated (see "Closing the loop" in `../ml-modeling/SKILL.md`).

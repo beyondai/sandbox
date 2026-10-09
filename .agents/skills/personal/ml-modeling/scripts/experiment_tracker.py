@@ -5,6 +5,13 @@ Maintains a structured experiment log file.  Each experiment records a name,
 parameters, metrics, tags, and timestamps.  Supports listing, comparing, and
 filtering experiments.
 
+Requires: python3 standard library only (no venv needed).
+
+"Best" in compare: the highest value, except for metrics whose name shows
+that lower is better (mae, mse, rmse, mape, wape, smape, loss, logloss,
+brier, error); for those, the lowest value. The gap between 2 runs can
+still be inside the noise: test it before you call a winner.
+
 Usage:
     python experiment_tracker.py log --name "xgb_v2" --params '{"lr":0.1,"depth":6}' --metrics '{"f1":0.87,"auc":0.92}'
     python experiment_tracker.py list
@@ -21,6 +28,20 @@ from datetime import datetime
 
 
 DEFAULT_LOG_FILE = "experiments.json"
+
+LOWER_IS_BETTER = ("mae", "mse", "rmse", "mape", "wape", "smape", "loss",
+                   "logloss", "brier", "error")
+
+
+def lower_is_better(metric: str) -> bool:
+    name = metric.lower()
+    return any(tok in name.replace("-", "_").split("_") or name.endswith(tok)
+               for tok in LOWER_IS_BETTER)
+
+
+def best_of(values, metric):
+    pick = min if lower_is_better(metric) else max
+    return pick(values, key=lambda x: x[1]) if values else None
 
 
 def _load_experiments(path: str) -> list:
@@ -142,8 +163,9 @@ def cmd_compare(args):
         for m in all_metrics:
             vals = [(e["id"], e["metrics"].get(m)) for e in selected if m in e.get("metrics", {})]
             if vals:
-                best = max(vals, key=lambda x: x[1])
-                bests[m] = {"experiment_id": best[0], "value": best[1]}
+                best = best_of(vals, m)
+                bests[m] = {"experiment_id": best[0], "value": best[1],
+                            "direction": "min" if lower_is_better(m) else "max"}
         comparison["best_per_metric"] = bests
         print(json.dumps(comparison, indent=2))
     else:
@@ -174,13 +196,14 @@ def cmd_compare(args):
                 for e in selected:
                     val = e.get("metrics", {}).get(m)
                     values.append(val)
-                best_val = max((v for v in values if v is not None), default=None)
+                present = [(None, v) for v in values if v is not None]
+                best_val = best_of(present, m)[1] if present else None
                 row = f"  {m:<18}"
                 for val in values:
                     marker = " *" if val is not None and val == best_val else ""
                     row += f" {str(val if val is not None else '-'):<18}{marker}"
                 print(row)
-            print("\n  * = best value")
+            print("\n  * = best value (lowest for error and loss metrics)")
 
 
 def main():

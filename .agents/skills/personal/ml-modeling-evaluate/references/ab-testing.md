@@ -1,7 +1,7 @@
 # A/B testing a shipped model
 
 Only relevant once a model is live and being compared against production traffic
-or a prior model — not part of the offline train/evaluate loop above.
+or a prior model, not part of the offline train/evaluate loop above.
 
 ## Sample size
 
@@ -35,7 +35,7 @@ def analyze_ab(control, treatment, alpha=0.05):
             "ci_95": ((p_t - p_c) - 1.96 * se, (p_t - p_c) + 1.96 * se)}
 ```
 
-Always report effect size alongside the p-value — a large sample makes tiny,
+Always report effect size alongside the p-value, a large sample makes tiny,
 practically meaningless differences statistically significant.
 
 ## Running it for real
@@ -50,6 +50,6 @@ python3 hypothesis_tester.py ttest --file data.csv \
   --col-a group_a --col-b group_b
 ```
 
-Uses only normal/t-distribution approximations (stdlib, no scipy) — fine for
+Uses only normal/t-distribution approximations (stdlib, no scipy), fine for
 fast directional reads; validate with `scipy.stats` before treating a result as
 publication-grade.

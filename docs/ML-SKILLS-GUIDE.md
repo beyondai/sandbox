@@ -1,5 +1,8 @@
 # ML Skills Guide
 
+Contents: How it works | The shape | Two speeds | Data | Project folder |
+Command reference | Key design decisions
+
 Orientation for the `ml-system-design-*` / `ml-modeling-*` skill family in
 `.agents/skills/personal/`: design an ML system, build and evaluate a model
 hands-on, or get a fast autonomous baseline. Everything is chained through
@@ -11,6 +14,8 @@ improvement log's mechanics) lives in `.agents/skills/personal/README.md`.
 To review a finished design or modeling report, see
 `docs/ML-CRITIQUE-GUIDE.md`.
 Design rationale lives in `.agents/skills/personal/adr/`.
+
+The skills are written for and tested on Claude Opus 5.5.
 
 ## How it works
 
@@ -166,9 +171,40 @@ run only by command, the rest also trigger from plain language.
 | `mm-autoresearch` cmd | Optional auto-improvement loop                |
 | `ml-critique`         | Critique a finished write-up (see critique guide) |
 
+### Every skill ends with a Check
+
+The last step of each skill reads the output again and checks it:
+
+1. **Intent:** 2-4 questions for that skill, each answered yes or no.
+2. **Format:** `check_doc.py` on each file that the skill wrote.
+3. **Fix:** fix and check again, at most 2 times. Open items are reported.
+4. **Reflect:** a gap in the skill goes to `SKILL-IMPROVEMENTS.md`.
+
+The multi-step skills also show a progress checklist that they tick.
+
+### Bundled scripts
+
+Paths are under `.agents/skills/personal/`. Run them from the sandbox
+root.
+
+- `ml-system-design/scripts/check_doc.py <files|dirs>`: checks the output
+  format (80 columns, wide tables, em dashes). Prints `OK` or
+  `file:line: reason`. Python stdlib.
+- `ml-modeling/scripts/spec_hash_check.sh <project>`: has the PRD or
+  high-level changed since the spec? Prints `MATCH` or `CHANGED`.
+  `--refresh prd|high-level` updates the hash. Bash and git.
+- `ml-modeling-data/scripts/launch_dashboard.sh <project>`: starts or
+  reuses the project dashboard on a free port and prints the URL.
+  `--stop` stops it. Bash, lsof, curl, uv.
+- `ml-modeling/scripts/experiment_tracker.py`, `feature_selector.py`,
+  `hypothesis_tester.py`: experiment log, feature ranking, significance
+  tests. Python stdlib.
+
+On a new clone, run `uv sync` at the sandbox root first.
+
 ### Parameters
 
-Free text after the command, no flags. Three kinds of words are recognized:
+Free text after the command, no flags. Four kinds of words are recognized:
 
 - **topic or project** - `churn prediction` starts a new folder;
   `labs/ml-riot-churn-2` continues an existing one.
@@ -222,6 +258,9 @@ Each has an ADR in `.agents/skills/personal/adr/`.
   priorities, convergence, and a decisions record (0009).
 - **One folder per project** - all generated files in `<parent>/<project>/`,
   never in `notes/` (0010).
+- **Every skill checks its own output** - intent questions, a format
+  script, a fix loop, and a skill-issue log; fragile steps are scripts
+  (0011).
 - **Cleaning lives inside the data step** - genuine errors get fixed and
   re-profiled there, not left to feature engineering or split into a
   separate step (0007).

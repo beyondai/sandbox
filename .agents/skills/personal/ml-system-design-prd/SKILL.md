@@ -10,64 +10,61 @@ disable-model-invocation: true
 
 # ML System Design PRD
 
-Call the Skill tool twice: `ml-system-design-definition` for the checklist,
-`grilling` for the interview mechanics.
+This skill is the interview. It creates the project folder and writes
+`prd/`. `ml-system-design-definition` owns the checklist. Use its
+checklist, and keep no copy here.
 
-Seed `grilling`'s design tree from the Definition checklist bullets — Problem,
-Requirements (scope, non-functional), Metrics (offline, online), Team
-(stakeholders, reuse) — each scoped to the topic in `$ARGUMENTS`. Every bullet
-is a branch; run the rounds until the frontier is empty, same as `grilling`
-always does. Don't skip Requirements — scope's out-of-scope list or the
-offline/online metric split just because the topic feels obvious — grilling
-exists precisely to stop those from being silently assumed.
+Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+"Check the output", "Skill improvement log".
 
-## Answers can arrive in a notes file
+## Steps
 
-The user may answer a round by pointing at a notes file (`@notes/<topic>.md`)
-instead of typing in chat, and will mix the two: long answers in the file,
-short ones inline. The file is one long-lived document per session with the
-user's own section labels (e.g. `#to-prd`), not a fixed schema. When a round's
-answer is such a reference: read the file, match its content to the open
-questions by the user's labels, and treat only content added since the last
-time this session read the file as new input - never re-process the whole
-file. Say which questions the new content answered and which are still open.
+1. **Project folder.** Use the user's project name, or propose
+   `ml-<topic-slug>`. The parent is `labs/` unless the user names another.
+   If the folder exists, ask: continue it, or start a new attempt
+   (`-<n>`)?
+2. **Load.** Call the Skill tool 2 times: `ml-system-design-definition`
+   (the checklist) and `grilling` (the interview mechanics).
+3. **Seed the tree.** Each Definition bullet is a branch, for the topic in
+   `$ARGUMENTS`: Problem, Requirements (scope, non-functional), Baseline,
+   Metrics (offline, online), Team (stakeholders, reuse). Include all
+   branches, also when the topic seems obvious: the interview exists to
+   stop silent assumptions.
+4. **Grill** in rounds until the frontier is empty.
+   - Regular: push for precise answers.
+   - Quick POC: the same coverage, a faster pace. Make the one-pass POC draft of
+     `ml-system-design-definition`. Show it as numbered questions, with the
+     draft answer as the recommendation. Maximum 6 questions in each round (a
+     bullet with sub-parts is one question). Accept the first reasonable answer.
+   - End each round with: "Anything else to add or change before I move
+     on?"
+5. **Write** `<project-folder>/prd/<topic-slug>.md`: one heading for each
+   checklist bullet, in the user's words and numbers, not draft
+   assumptions: later steps treat the PRD as confirmed. Do not write
+   `design/definition.md`. If the slug is ambiguous, confirm it.
+6. **Check.**
 
-Regular vs. Quick POC (keyword-selected, see
-`../adr/0001-ml-modeling-family-and-continuity.md`) changes the grill's pace,
-not its coverage: Quick POC still touches every bullet, but batches them into
-fewer, larger rounds and accepts the first reasonable answer instead of pushing
-for precision — grilling's exhaustiveness is the one thing POC mode doesn't get
-to skip here, since a PRD missing a branch entirely defeats the point of using
-this skill at all.
+## Answers in a notes file
 
-Quick POC round shape: produce `ml-system-design-definition`'s one-pass POC
-draft (every checklist item with its most likely answer) and present it as
-grilling rounds, each item a numbered question with the draft answer as the
-recommendation. Cap each round at 6 questions: if the checklist has more than
-6 open items, split the draft into consecutive rounds of at most 6 each
-instead of one large round. End every round with an explicit invitation for
-free-form input — e.g. "anything else to add or change before I move on?" —
-so the user isn't limited to reacting item by item. The user's confirmations,
-overrides, and free-form additions become the PRD; the draft itself is never
-written to `design/definition.md` by this skill. The split between the two
-skills: this one is the interview (hand-run, creates the folder, writes
-`prd/`); `-definition` owns the checklist and the drafted section, and this
-skill reuses its checklist rather than keeping a copy.
+The user can answer in a notes file (`@notes/<topic>.md`), and mix it
+with chat answers. The file has the user's own section labels (for
+example `#to-prd`).
+1. Read the file. Match its content to the open questions by the labels.
+2. Use only the content that was added since this session last read the
+   file.
+3. Say which questions the new content answered, and which are still
+   open.
 
-This skill creates the project folder. Use the name and parent rules in
-`../ml-system-design/SKILL.md`, "Project folder": the user's project name
-(or a proposed `ml-<topic-slug>`), under `labs/` unless the user names
-another parent. If a folder with that name exists, ask whether this
-continues it or starts a new attempt (`-<n>`).
+## Check
 
-When the frontier empties, write the settled answers to
-`<project-folder>/prd/<topic-slug>.md`, one heading per checklist bullet, in the
-user's own words and numbers — never the placeholder-style assumptions a draft
-pass would use. Output format: `../ml-system-design/SKILL.md`, "Output docs". Confirm the slug with the user if the topic name is ambiguous.
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does each checklist bullet have a concrete answer that the user
+   confirmed?
+2. Does the problem name the decision that the model controls, and who
+   acts on it?
+3. Is there one primary offline metric, and does each metric have a
+   threshold?
+4. Is the out-of-scope list real and specific? Is the baseline named?
 
-Done when the PRD file exists and every checklist bullet has a concrete,
-user-confirmed answer under its heading.
-
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+Done when the PRD file exists, the 4 answers are yes, and `check_doc.py`
+prints `OK`.

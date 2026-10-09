@@ -11,61 +11,67 @@ description: >-
 
 # ML System Design
 
-Five sections, each its own skill, invoked in order for a full doc:
+Contents: Steps | Project folder | Output docs | Check the output | Hand edits
+between steps | Regular and Quick-POC mode | The fork: paper or hands-on |
+Related skills and docs | Skill improvement log
 
-1. `ml-system-design-definition` — problem, requirements, metrics, team.
-2. `ml-system-design-high-level` — ML framing, architecture, phasing.
-3. `ml-system-design-deep-dive` — data, features, models, training.
-4. `ml-system-design-delivery` — execution, deployment, eval, monitoring,
-   fallback.
-5. `ml-system-design-post-delivery` — analysis, explainability, iteration,
-   democratize.
+A full design doc has 5 sections. Each section is its own skill:
 
-For a full doc, invoke each in order. If `<project-folder>/prd/<topic>.md`
-exists, it is the Definition section: start the full doc at
-`ml-system-design-high-level`, and reserve `ml-system-design-definition` for a
-project without a PRD or for reviewing an existing Definition section. For a
-single-section ask, invoke that skill directly and skip this one next time. For interview prep, narrate through
-the five in order, using each skill's bullets as the follow-ups an interviewer
-would ask.
+1. `ml-system-design-definition`: problem, requirements, metrics, team.
+2. `ml-system-design-high-level`: ML framing, architecture, phasing.
+3. `ml-system-design-deep-dive`: data, features, models, training.
+4. `ml-system-design-delivery`: execution, deployment, evaluation,
+   monitoring, fallback.
+5. `ml-system-design-post-delivery`: analysis, explainability, iteration.
 
-Scale depth to system size: a small internal model doesn't need
-10M-req/min-grade detail in every subsection. The subsections most often
-skipped and most often flagged in review are out-of-scope and the baseline
-(`ml-system-design-definition`) and fallback (`ml-system-design-delivery`) —
-never skip those three regardless of doc size.
+```
+prd (= definition) -> high-level -> [ deep-dive (paper)          ] -> delivery -> post-delivery
+                                    [ ml-modeling-* (hands-on)   ]
+```
 
-Starting a new project: before invoking any section skill, ask two things in
-one message - (a) run `/ml-system-design-monkey-mode <topic>` in parallel as a
-background baseline? (b) scope with `/ml-system-design-prd <topic>` first? Both
-are hand-run commands, so the user has to type them; your job is to make sure
-they're offered rather than discovered later. Default recommendation: yes to
-both. Only skip the questions when the user names a specific section to work
-on. `/ml-system-design-prd` grills the user round-by-round on the Definition
-checklist and writes the resolved answers into a project folder before any
-drafting starts.
+## Steps
 
-Monkey-mode runs concurrently with PRD/design work on the same project
-folder by design (see the track below) — when dispatching it, describe the
-project folder as shared, in-progress state, not an empty one to set up from
-scratch, even on a brand-new project. A background agent told a shared path
-"does not exist yet" has previously reset the whole folder instead of only
-creating its own `monkey-mode/` subdirectory, destroying a PRD the foreground
-session had just written.
+Progress (copy into your reply, tick each line):
 
-Every artifact for a project lives in its project folder (see "Project
-folder" below), not scattered into repo-wide `docs/` or `notes/`. Write ADRs for a project's architectural
-decisions into `<project-folder>/adr/`, following the numbering and
-when-to-write rules in the `domain-modeling` skill's ADR format — only the
-location is project-scoped, the format itself is unchanged. ADRs stay
-one-per-decision even as a project accumulates several - never a single running
-project-decisions log, and never the home for a whole design section (each
-section has its own file under `design/`).
+```
+[ ] 1 Offer monkey-mode and the PRD (new project only)
+[ ] 2 Definition, or the PRD
+[ ] 3 High-level
+[ ] 4 Deep dive, or the ml-modeling chain
+[ ] 5 Delivery
+[ ] 6 Post-delivery
+[ ] 7 Check each file (see "Check the output")
+```
+
+1. **New project.** Before any section skill, ask 2 questions in one
+   message. The recommended answer to each is yes:
+   - Run `/ml-system-design-monkey-mode <topic>` in the background as a
+     baseline?
+   - Scope with `/ml-system-design-prd <topic>` first?
+
+   The user types these commands. Skip the questions only when the user
+   names one section.
+2. **Order.** Run the section skills in order. If
+   `<project-folder>/prd/<topic>.md` exists, it is the Definition: start at
+   `ml-system-design-high-level`. For one section, run that skill only.
+3. **Interview prep.** Go through the 5 sections in order. Use each skill's
+   bullets as the interviewer's follow-up questions.
+4. **Depth.** Scale the depth to the system size. Never skip these 3
+   items: out-of-scope and the baseline (definition), and the fallback
+   (delivery). Docs skip them most often, and reviews flag them most.
+5. **Monkey-mode in the background.** Tell the agent that the project
+   folder is shared and in progress, also for a new project. It creates
+   only its own `monkey-mode/` subfolder. (A background agent told that the
+   folder "does not exist yet" once reset the folder and deleted a PRD.)
+6. **ADRs.** Write each architectural decision as one ADR in
+   `<project-folder>/adr/`. Use the numbering and the rules of the
+   `domain-modeling` skill's ADR format. One ADR for each decision. A
+   design section goes in `design/`, never in an ADR.
 
 ## Project folder
 
 This section is the single source of truth for where all `ml-*` and
-`ml-critique*` skills save local docs and designs.
+`ml-critique*` skills save files.
 
 ```
 <parent>/                  default: labs/ (the user can name another)
@@ -80,12 +86,12 @@ This section is the single source of truth for where all `ml-*` and
   project that already exists: ask "continue the existing project, or
   start a new attempt?" first.
 - **Parent folder.** The default is `labs/`. The user can name another
-  parent in the request (for example "put proj1 in ~/work/designs"). Use
-  that parent for the project. Later requests name the project by its path.
+  parent in the request (for example "put proj1 in ~/work/designs"). Later
+  requests name the project by its path.
 - **Subfolders.** A skill creates its subfolder the first time that it
-  writes there. Every other file generated for the project (research,
-  notes for the project, test records) goes in a subfolder of the project
-  folder. Never in `notes/`: it holds only what the user typed or pasted.
+  writes there. Every other file for the project (research, test records)
+  goes in a subfolder of the project folder. `notes/` holds only what the
+  user typed or pasted: read it, and create no files there.
 
 ### Which project folder
 
@@ -98,124 +104,130 @@ Use the first rule that applies:
    the subfolders above.
 4. Ask the user.
 
-Only `/ml-system-design-prd` and the monkey tracks create a new project
+Only `/ml-system-design-prd` and the monkey tracks create a project
 folder. Section and step skills never create one.
 
 ## Output docs
 
-Every file that a skill in this family creates goes in the project folder.
-`notes/` holds only content that the user typed or pasted: read it, but do
-not create files there.
+Every file under the project folder follows these rules:
+- Wrap prose at 80 columns. Use hard line breaks in paragraphs and list
+  items. Indent continuation lines under their bullet. Fenced code blocks
+  are the exception.
+- If a table row is longer than 80 columns, write a list of headed
+  paragraphs instead. The reader uses a terminal.
+- Write in about 80% ASD-STE100: short sentences (20 words or fewer for
+  instructions, 25 for descriptions), one instruction in each sentence,
+  active voice, one word for one meaning, lists over long paragraphs. Keep
+  technical names as they are.
+- Add a fenced ASCII diagram next to the text when structure, data flow,
+  sequence, or a timeline is easier to see. The text stays complete
+  without the diagram.
+- No em dashes.
 
-Every file written under the project folder (`prd/`, `design/`, `adr/`,
-`spec/`, `modeling/`, `monkey-mode/`, `critique/`) wraps prose at 80
-columns: hard line breaks inside paragraphs and list items, continuation
-lines indented under their bullet. Fenced code blocks are the exception. A
-table whose row would run past 80 columns becomes a list of headed
-paragraphs instead - the reader is a human in a terminal, not a renderer.
+## Check the output
 
-Write the prose in approximately 80% of ASD-STE100: short sentences (20
-words or fewer for instructions, 25 for descriptions), one instruction in
-each sentence, active voice, one word for one meaning, and lists instead of
-long paragraphs. Keep technical names as they are. Add an ASCII diagram
-(fenced) next to the text when structure, data flow, sequence, or a timeline
-is easier to see than to read. The diagram is an addition: the text stays
-complete without it.
+Every `ml-*` and `ml-critique*` skill ends with this step. The skill's own
+"Check" step gives its intent questions.
+
+1. **Intent.** Read the output again. Compare it with the skill's purpose,
+   the user's request, and the skill's intent questions. Answer each
+   question with yes or no and a line reference, in your reply.
+2. **Format.** Run this on each `.md` file that the skill wrote. If the
+   skill names required headings, add `--sections "<A>,<B>"`. It prints
+   `OK` or `file:line: reason`.
+
+   ```
+   python3 .agents/skills/personal/ml-system-design/scripts/check_doc.py <files>
+   ```
+3. **Fix.** For each "no" and each failure, fix the output. Then do steps 1
+   and 2 again. Stop after 2 loops, and tell the user what is still open.
+4. **Reflect.** Did a gap or an error in the skill cause a problem? Did the
+   user correct how the skill works? If yes, add an entry to the skill
+   improvement log (below).
 
 ## Hand edits between steps
 
-Every file under the project folder is the user's to edit by hand between
-steps. When the user says a file changed, or a re-read shows it did: re-read
-it, then re-run each downstream step whose file cites the changed content,
-updating those files in place. Downstream order: `prd/` feeds
-`design/high-level.md`, which feeds `design/deep-dive.md` or `spec/` +
-`modeling/`, which feed `delivery` and `post-delivery`. Each touched file
-gets one line under a `## Change log` heading at its end saying what moved
-and why. On the hands-on route the hash check in `../ml-modeling/SKILL.md`,
-"Design docs changed?", catches the same edits without being told.
+The user can edit any file in the project folder between steps. When a
+file changed:
+1. Read it again.
+2. Run again each downstream step whose file uses the changed content.
+   Update those files in place. The downstream order: `prd/` ->
+   `design/high-level.md` -> `design/deep-dive.md` or `spec/` + `modeling/`
+   -> delivery -> post-delivery.
+3. Add one line to a `## Change log` heading at the end of each changed
+   file: what changed, and why.
 
-## Regular vs. Quick-POC mode
+On the hands-on route, `spec_hash_check.sh` finds the same edits (see
+`../ml-modeling/SKILL.md`, "Design docs changed?").
 
-Every section above supports both. Regular: full rigor, ask when unknown. Quick
-POC: a one-hour MVP, not lower quality — `ml-system-design-deep-dive` in
-particular answers all four of its items in one batched pass instead of asking
-round by round. Mode is chosen by keyword in the request
-("poc"/"quick"/"mvp"/"prototype"/"fast"/"one hour" → Quick POC;
-"regular"/"full"/nothing → Regular), not a flag — this skill family has no
-structured argument syntax. Full detail in
-`adr/0001-ml-modeling-family-and-continuity.md`.
+## Regular and Quick-POC mode
 
-## Forking into execution: the `ml-modeling` family
+Each section skill has the 2 modes. The keyword in the request selects
+the mode. There are no flags.
+- Quick POC: "poc", "quick", "mvp", "prototype", "fast", "one hour",
+  "1 hour". A
+  one-hour MVP, at the same quality. Section skills answer in one pass
+  and mark each guess as an assumption. The PRD and the deep dive ask
+  their essential questions in batched rounds. This is the one keyword
+  list for all `ml-*` skills.
+- Regular: "regular", "full", or no keyword. Full rigor. Ask when a fact
+  is unknown.
 
-`ml-system-design-*` stops at decisions on paper. `ml-modeling` (a separate
-skill family: data → features → train → evaluate) is the hands-on version of
-the deep dive. The fork sits right after `design/high-level.md`:
+Reason: `../adr/0001-ml-modeling-family-and-continuity.md`.
 
-```
-prd (= definition) -> high-level -> [ -deep-dive (paper) | ml-modeling-* (hands-on) ] -> -delivery -> -post-delivery
-```
+## The fork: paper or hands-on
 
-Pick one. Both answer the same questions (data, features, models, training);
-the paper one writes `design/deep-dive.md`, the hands-on one writes
-`modeling/01`-`04` and does not read `design/deep-dive.md`. `-delivery` cites
-whichever exists (real `04-evaluate.md` numbers when modeling ran). The first
-`ml-modeling-*` call synthesizes `spec/<topic>.md` from PRD + ADRs +
-high-level and pins their hashes; execution that contradicts the framing is
-flagged back to `design/high-level.md`, not silently absorbed. See
-`ml-modeling` for the chain, `adr/0006-fork-after-high-level.md` for why the
-fork moved here, and `adr/0001-ml-modeling-family-and-continuity.md` for the
-family's origin.
+After `design/high-level.md`, select one route:
+- **Paper:** `ml-system-design-deep-dive` writes `design/deep-dive.md`.
+- **Hands-on:** the `ml-modeling` chain (data -> features -> train ->
+  evaluate) writes `spec/<topic>.md` and `modeling/01`-`04`. It does not
+  read `design/deep-dive.md`.
 
-## Design principles
+Delivery uses the file that exists. If both exist, it uses the newer one
+(with modeling, the real numbers from `04-evaluate.md`). When execution
+contradicts the framing, send the change back to `design/high-level.md`.
+Reason:
+`../adr/0006-fork-after-high-level.md`.
 
-`../ml-design-principles.md` holds the principles that every section and
-step skill applies, and that `ml-critique` reviews against. Principle 1:
-simple by default, complex only with evidence.
+## Related skills and docs
 
-## Critique a finished write-up: `ml-critique`
-
-The Review mode of each section skill examines coverage. To judge the
-quality of the decisions in a finished design, and to settle each finding
-with the user, use `ml-critique`. It writes `<project-folder>/critique/`.
-
-## A third, independent track: `ml-system-design-monkey-mode`
-
-Not a step in either path above — a fully autonomous fast-baseline track that
-shares only the project-folder root, nothing else (no `design/` or `prd/`
-dependency, no `modeling/` writes). Run it by hand,
-`/ml-system-design-monkey-mode <topic>`, alongside either path when you want a
-real runnable baseline in the background while you keep working on the actual
-design.
+- `../ml-design-principles.md`: the principles that each skill applies and
+  that `ml-critique` uses. Principle 1: simple by default, complex only
+  with evidence.
+- `ml-critique`: judges the quality of a finished write-up, and settles
+  each finding with the user. It writes `<project-folder>/critique/`. A
+  section skill's Review mode checks only coverage.
+- `ml-system-design-monkey-mode`: an autonomous fast baseline. It shares
+  only the project folder. It does not read `prd/` or `design/`, and it
+  does not write `modeling/`. The user runs it by hand.
 
 ## Skill improvement log
 
-Any `ml-system-design-*` skill, while it runs, may turn up something about the
-*skill itself* worth fixing — not the design doc it's writing. Two triggers:
+This section is the single source of truth for all `ml-*` and
+`ml-critique*` skills.
 
-1. **Agent-found**: a bug in this skill's own instructions, or a genuinely
-   better way to do the section than what's written.
-2. **User-requested**: you ask to change how the skill behaves — as opposed to a
-   one-off request specific to this project's design.
+Log an entry when one of these occurs during a run:
+1. **Agent-found:** a bug in the skill's instructions, or a better method
+   than the one written.
+2. **User-requested:** the user asks to change how the skill works (not a
+   one-time request for this project).
 
-Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry,
-appended to after) rather than editing the actual `SKILL.md` on the spot — keeps
-the skill files stable mid-run and gives you a batch to review later instead of
-drive-by edits:
+Add the entry to `<project-folder>/SKILL-IMPROVEMENTS.md`. Create the file
+at the first entry. Do not edit the `SKILL.md` during the run, unless the
+user asks: a skill file serves every future project, so a drive-by edit
+from one run changes behavior everywhere. The log gives a batch to review.
 
 ```markdown
-## <date> — <skill-name>
+## <date> - <skill-name>
 - **Source**: agent-found bug | agent-found better design | user-requested
 - **Status**: proposed
-- **Finding**: <what's wrong or what could be better, concretely>
-- **Suggested change**: <the actual edit, concrete enough to apply as-is>
+- **Finding**: <what is wrong or what can be better>
+- **Suggested change**: <the edit, ready to apply>
 ```
 
-**Review**: any skill in the family, at the end of a run (after doing the task
-actually asked for, never blocking it), checks this file for entries still
-marked `proposed`. If any exist, say so and offer to review them now. Per entry:
-ask adopt or decline; an adopted entry gets applied as a real edit to the
-corresponding skill file under `.agents/skills/personal/<skill>/SKILL.md`, then
-the entry's `Status` flips to `adopted` or `declined`. Never delete an entry —
-`SKILL-IMPROVEMENTS.md` stays a durable per-project record of what was proposed
-and decided. Same convention on the `ml-modeling-*` side; full rationale in
-`adr/0004-skill-improvement-log.md`.
+**Review.** At the end of each run, after the task, look for entries with
+`Status: proposed`. If there are any, say so and offer to review them. For
+each entry, ask: adopt or decline? Apply an adopted entry to
+`.agents/skills/personal/<skill>/SKILL.md`. Then set `Status` to `adopted`
+or `declined`. Never delete an entry. Reason:
+`../adr/0004-skill-improvement-log.md`.

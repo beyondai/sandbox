@@ -107,6 +107,10 @@ tb_logs/
 # Logs (run logs, dashboards, browser consoles)
 *.log
 
+# Dashboard runtime state (port and PID of a running process)
+**/dashboard/.pid
+**/dashboard/.port
+
 # Hugging Face / caches
 .cache/
 .huggingface/

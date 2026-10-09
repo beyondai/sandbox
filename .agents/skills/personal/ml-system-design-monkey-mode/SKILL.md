@@ -1,9 +1,9 @@
 ---
 name: ml-system-design-monkey-mode
 description: >-
-  One-shot, fully autonomous ML baseline builder — ask up to 3 quick questions,
+  One-shot, fully autonomous ML baseline builder - ask up to 3 quick questions,
   then build and evaluate a fast (5-10 min) baseline in the background while you
-  keep working. Never blocks — proceeds with self-inferred assumptions if you
+  keep working. Never blocks - proceeds with self-inferred assumptions if you
   don't answer. A third, independent track alongside the whole-design path and
   the ml-modeling-* path. Run by hand only, e.g. /ml-system-design-monkey-mode
   churn prediction for a subscription app.
@@ -12,162 +12,164 @@ disable-model-invocation: true
 
 # Monkey Mode
 
-A third, independent track alongside `ml-system-design-*` (the whole design doc)
-and `ml-modeling-*` (the deliberate data→features→train→evaluate chain) — shares
-only the project-folder root with both, nothing else. Doesn't read
-`design/` or `prd/`, doesn't write into `modeling/`, doesn't require either
-path to have run first. The point: one line in, a runnable baseline out, in the
-background, while you keep working on the real design.
+Contents: Steps | The 3 questions (never blocking) | Fast defaults (build with
+these; do not ask) | Saved outputs: eval runs again without modeling |
+Deliverable | Check
 
-For tasks with high-cardinality identity columns (user/item ids,
-recommendation-shaped problems), see the sibling
-`ml-system-design-monkey-mlp` — same contract, an embedding-MLP instead of
-this skill's tree/linear default, writes to a disjoint `monkey-mlp/` folder
-so both can run on the same project.
+One line in, a runnable baseline out, in the background, while the user
+works on the real design.
 
-## Process
+- An independent track. It shares only the project folder with
+  `ml-system-design-*` and `ml-modeling-*`. It does not read `design/` or
+  `prd/`, and it writes only `monkey-mode/`. Nothing must run first.
+- For high-cardinality id columns (user or item ids, recommendation
+  problems), use `ml-system-design-monkey-mlp`. It has the same contract
+  and writes `monkey-mlp/`, so both can run on one project.
+- Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
+  "Check the output", "Skill improvement log".
 
-1. Resolve the project folder with `../ml-system-design/SKILL.md`, "Project
-   folder" (name, parent, and new-attempt rules, same as
-   `ml-system-design-prd`).
-2. Fire the 3 questions below via AskUserQuestion, each with a recommended
-   default. **Never block**: whether answered, partially answered, or skipped,
-   proceed immediately — an unanswered item falls back to its self-inferred
-   default, not a re-ask.
-3. Dispatch a background `general-purpose` agent (no worktree needed — same
-   reasoning as `ml-modeling-multiagent`: this is one self-contained script, not
-   concurrent edits) with everything it needs to run unattended: the resolved
-   task/data/metric/success-bar (each marked answered-by-user or self-inferred),
-   the fast defaults below, the deliverable list, and the output path. Tell the
-   user it's running in the background and they can keep working on the regular
-   flow.
+## Steps
 
-   The project folder may be populated concurrently by other in-progress work
-   (PRD/design running in the foreground session) and must be treated as
-   shared, not owned: instruct the agent to never delete or reset the
-   project-folder root or any sibling directory (`prd/`, `design/`, `adr/`,
-   `spec/`, `modeling/`) — only ever create `monkey-mode/` additively with
-   `mkdir -p` and write inside it. A prompt phrase like "the project folder
-   does not exist yet" describes the folder's state before this run, not
-   permission to reset it if it appears mid-run.
+Progress (copy into your reply, tick each line):
 
-   Instruct the agent to verify `pandas`/`scikit-learn`/`numpy` import via
-   `uv run python3 -c "import pandas, numpy, sklearn"` run from inside the
-   project folder — this resolves the sandbox root's shared `pyproject.toml`/
-   `.venv` (confirmed already stocked with pandas, numpy, scikit-learn,
-   matplotlib, plotly, streamlit, and more), not the bare ambient `python3`.
-   Only if that genuinely fails (a package truly isn't in the shared env) run
-   `uv add <pkg>` from the sandbox root (not the project folder) so the fix
-   lands in the shared `pyproject.toml`/`uv.lock` and benefits every future
-   project — never bootstrap a project-local `.venv` as the first move; that
-   duplicates work and silently diverges from the shared environment. Note
-   any such addition in the report's Learnings.
-4. When it reports back, surface the results.
+```
+[ ] 1 Resolve the project folder
+[ ] 2 Ask the 3 questions (never block)
+[ ] 3 Dispatch the background agent
+[ ] 4 Report the results, the Check result, and the skill issues
+```
 
-## The 3 questions — never blocking
+1. **Project folder.** Resolve it with `../ml-system-design/SKILL.md`,
+   "Project folder" (name, parent, new attempt).
+2. **Ask the 3 questions** (below) with AskUserQuestion, each with a
+   recommended default. Never block: the baseline runs while the user
+   works on other things. For each item without an answer, use the
+   self-inferred default. Do not ask again.
+3. **Dispatch** a background `general-purpose` agent. No worktree is
+   necessary: it is one script. Give it:
+   - the task, data, metric, and success bar, each marked
+     "answered by user" or "self-inferred";
+   - the fast defaults, the saved-output rules, the deliverable, the
+     Check, and the output path.
 
-1. **Task + data**: what's being predicted, and where's the data?
-   Self-inferred fallback: read the task type
-   (classification/regression/ranking) straight out of the prompt's own wording.
-   If no data is referenced, generate a small, reasonable synthetic dataset
-   shaped like the described problem.
-2. **Primary metric**: what should the baseline be scored on?
-   Self-inferred fallback: the standard metric for the inferred task — F1 for
-   imbalanced-looking binary classification, RMSE for regression, nDCG for
-   ranking.
-3. **Success bar**: what counts as "good enough" for a first baseline? Offer
-   three ways to answer: a number the user already has; "look one up" — a
-   quick web search for a domain benchmark (typical model performance for
-   this kind of task, cited), translated into the chosen metric and stated as
-   a soft target; or leave it to the fallback. Time-box the "look one up"
-   search to 2 minutes — take the best citation found in that window rather
-   than continuing to search for a perfect match. Watch for benchmarks that
-   measure a different population than the task (e.g. new-install churn vs.
-   retained-player lapse) and say so rather than adopting the number.
-   Self-inferred fallback: an actual assumed target number based on the problem
-   and data in hand (e.g. "F1 ~0.65-0.75 for a roughly balanced synthetic binary
-   classification") — not just "beat random." Runnable is the floor: something
-   that actually executes and reports a real number always outranks a good
-   number.
+   Tell the agent that the project folder is shared and in progress.
+   Other work (the PRD, the design) can write there at the same time:
+   - Never delete or reset the project folder or a sibling folder
+     (`prd/`, `design/`, `adr/`, `spec/`, `modeling/`).
+   - Create only `monkey-mode/` with `mkdir -p`, and write only there.
+   - "The folder does not exist yet" describes the state before the run.
+     It does not permit a reset.
 
-Everything else (cleaning, transforms, model pick, eval split, sample size) is a
-stated assumption, never a 4th question — in both the answered and self-inferred
-paths.
+   Tell the agent to run `uv run python3 -c "import pandas, numpy, sklearn"`
+   from the project folder (the shared sandbox venv). Only if this fails,
+   run `uv add <pkg>` at the sandbox root, and record it in Learnings. Do
+   not make a project venv: it duplicates work and drifts from the shared
+   environment.
 
-## Fast defaults — build with these, don't ask
+   Tell the user that it runs in the background.
+4. **Report** the results when the agent finishes. Add each skill issue
+   that the agent reports to the skill improvement log.
 
-- **Cleaning**: drop or median-impute nulls, nothing fancier.
-- **Features**: standard-scale numerics, one-hot low-cardinality categoricals.
-  No embeddings, no elaborate engineering.
-- **Model**: one fast, decent pick — see `ml-modeling-train`'s
-  algorithm-selection matrix, "start simple" row (logistic/linear regression, or
-  a single small tree ensemble for tabular data). Not a comparison — one model,
-  trained once.
-- **Eval**: a held-out split (or a small sampled subset if the dataset is
-  large), scored on the resolved primary metric. If a sample was taken,
-  state its size **as an explicit, bolded percentage of the full source**
-  in `report.md`'s Requirements/Input sections - not just the raw row
-  count buried in a Suggested Next Steps aside (e.g. "**a 600,000-row
-  sample, ~8.1% of the full 7,377,419-row `train.csv`**"). This has gone
-  unnoticed before when only the raw count was given up front, and it
-  matters for judging results later.
+## The 3 questions (never blocking)
 
-## Saved outputs: eval re-runs without modeling
+1. **Task and data:** what is predicted, and where is the data?
+   - Default: take the task type (classification, regression, ranking)
+     from the request. With no data, generate a small synthetic dataset
+     shaped like the problem.
+2. **Primary metric:** what is the baseline scored on?
+   - Default: F1 for imbalanced binary classification, RMSE for
+     regression, nDCG for ranking.
+3. **Success bar:** what is "good enough" for a first baseline? 3 ways to
+   answer:
+   - a number that the user has;
+   - "look one up": a web search for a domain benchmark, at most 2
+     minutes. Take the best citation in that time. Convert it to the
+     metric, as a soft target. If the benchmark measures a different
+     population (for example new-install churn against retained-player
+     lapse), say so, and do not adopt the number;
+   - the default: an assumed number for this problem and data (for
+     example "F1 ~0.65-0.75 for a roughly balanced synthetic binary
+     classification"), not only "beat random".
 
-A metric or cutoff change (e.g. @10 to @5) must re-run eval only, never data
-prep or training. So the run saves its intermediate results, and the code has
-two entry points:
+A runnable result with a real number is more important than a good
+number. Each other choice (cleaning, transforms, model, split, sample) is
+a stated assumption, never a 4th question.
+
+## Fast defaults (build with these; do not ask)
+
+- **Cleaning:** drop the nulls, or impute the median.
+- **Features:** standard-scale numerics. One-hot low-cardinality
+  categoricals. No embeddings.
+- **Model:** one fast model, trained once: the "start simple" row in
+  the matrix of `../ml-modeling-train/SKILL.md` (logistic or linear
+  regression, or one small tree ensemble). No comparison.
+- **Eval:** a held-out split, or a sample for a large dataset, scored on
+  the primary metric. For a sample, state its size in the Requirements
+  and Input sections as a bold percentage of the full source. Example:
+  "**a 600,000-row sample, ~8.1% of the full 7,377,419-row
+  `train.csv`**". Not only a raw row count in Next Steps: readers compare
+  the result with benchmarks on the full data.
+
+## Saved outputs: eval runs again without modeling
+
+A change of metric or cutoff (for example @10 to @5) runs the eval
+again, never data prep or training. The code has 2 entry points:
 
 ```
 train:  prepare data -> split -> fit -> score -> save   (slow, run once)
 eval:   read saved outputs -> metrics at any K -> metrics file   (fast)
 ```
 
-- Save, as parquet:
+- Save as parquet:
   - the prepared and split data (with the split column);
   - the ground truth for the eval rows or queries;
-  - the candidate sets, for ranking tasks;
-  - each model's scores. For ranking, save the top 50 items per query, not
-    only the top K. For classification or regression, save every eval row.
-- Save them under the sandbox-root `data/<dataset>/monkey-mode/`. Never save
-  them inside the project folder.
-- Generated data never goes into git. Before the run ends, check each saved
-  path with `git check-ignore -v <path>`. If a path is not ignored, move it
-  under `data/`. Do not edit `.gitignore` without asking the user.
-- The project folder keeps only small, readable files: the code, the
-  metrics file, the run log and `report.md`.
-- Name the saved paths and the `eval` command in the report's Implementation
-  section.
+  - the candidate sets, for ranking;
+  - each model's scores: the top 50 items for each query (ranking), or
+    each eval row (classification, regression).
+- Save them in the sandbox-root `data/<dataset>/monkey-mode/`, never in
+  the project folder.
+- Before the run ends, run `git check-ignore -v <path>` for each saved
+  path. If a path is not
+  ignored, move it under `data/`. Do not edit `.gitignore` without the
+  user's approval.
+- The project folder keeps only small files: code, the metrics file, the
+  run log, `report.md`.
+- Name the saved paths and the `eval` command in Implementation.
 
 ## Deliverable
 
-Write `<project-folder>/monkey-mode/report.md` (format:
-`../ml-system-design/SKILL.md`, "Output docs") with exactly these sections:
+`<project-folder>/monkey-mode/report.md`, with these 7 sections:
 
-- **Requirements** — the simple/assumed version, from the 3 answers or their
-  inferred fallbacks
-- **Input** — data source (real path, or synthetic-generation description +
-  seed)
-- **Design** — the approach taken and why (the fast defaults above, applied to
-  this problem)
-- **Implementation** — the actual code that ran, not a template
-- **Results** — real metrics from the eval step, against the stated success bar
-- **Learnings** — what the baseline reveals (is the target learnable, any data
-  issue found, anything surprising)
-- **Suggested Next Steps** — what this implies for the regular flow, either path
-  (e.g. "this suggests the V1 model class in `design/high-level.md`'s Phasing
-  is a reasonable bet") — without monkey-mode itself ever reading from or writing into
-  `design/`, `modeling/`, `prd/`, `adr/`, or `spec/`
+- **Requirements:** from the 3 answers or their defaults. Mark each item
+  "answered by user" or "self-inferred".
+- **Input:** the data path, or the synthetic generator and its seed.
+- **Design:** the approach and why (the fast defaults for this problem).
+- **Implementation:** the code that ran, not a template.
+- **Results:** real metrics against the success bar.
+- **Learnings:** what the baseline shows (is the target learnable, data
+  issues, surprises).
+- **Suggested Next Steps:** what this means for the regular flow (for
+  example "the V1 model class in the Phasing of `design/high-level.md` is
+  a reasonable bet"). Monkey-mode never reads or writes `design/`,
+  `modeling/`, `prd/`, `adr/`, or `spec/`.
 
-Mark, per item in Requirements, whether it came from the user's answer or
-self-inference — the one place this doc must not blur "you told me" with "I
-assumed."
+## Check
 
-Done when `report.md` exists with all six sections populated by a real run (real
-code, real numbers) — not placeholders.
-The saved outputs (see "Saved outputs") exist, are git-ignored, and the
-`eval` entry point reproduces the metrics file from them.
+The background agent does "Check the output" in
+`../ml-system-design/SKILL.md`. It does not ask the user, and it reports
+each skill issue in its final message (not in a file). Intent questions:
+1. Do all 7 sections hold results of a real run (real code, real
+   numbers)?
+2. Is each Requirements item marked "answered by user" or
+   "self-inferred"?
+3. Is the result compared with the success bar, and is a sample stated as
+   a percentage?
+4. Do the saved outputs exist and are they git-ignored? Does the `eval`
+   entry point make the same metrics file again?
 
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-system-design/SKILL.md`'s Skill
-improvement log.
+Done when the 4 answers are yes and `check_doc.py` prints `OK` for
+`report.md` with:
+
+```
+--sections "Requirements,Input,Design,Implementation,Results,Learnings,Suggested Next Steps"
+```

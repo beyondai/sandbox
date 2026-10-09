@@ -1,8 +1,8 @@
 # Problem-type playbooks
 
 The reviewer's experience, one playbook for each problem type. Shared by
-`ml-critique*` and by `ml-system-design-definition` (the Baseline item). Each playbook
-has the same 8 parts:
+`ml-critique*` and by `ml-system-design-definition` (the Baseline item).
+Each playbook has the same 8 parts:
 
 1. **Framing**: the standard ML task and label.
 2. **Architecture**: the standard system shape.

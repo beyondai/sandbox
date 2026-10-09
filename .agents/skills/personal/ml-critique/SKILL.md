@@ -11,6 +11,9 @@ description: >-
 
 # ML Critique
 
+Contents: Purpose | Reviewer | Priority | Steps | Reference design (optional) |
+Modes | Done when
+
 ## Purpose
 
 - **Problem.** A complete ML write-up can still be vague or wrong. Review
@@ -50,8 +53,9 @@ change the result most.
    complex only when it passes the complexity gate (gain > noise, and value
    of the gain > added running, maintenance, explainability, and risk
    cost).
-5. Write in approximately 80% of ASD-STE100. Add a diagram next to the text
-   when it helps. The text stays complete.
+5. Write in approximately 80% of ASD-STE100, also in chat (the critique and
+   the questions). Add a diagram next to the text when it helps. The text
+   stays complete.
 
 ## Priority
 
@@ -65,7 +69,7 @@ Give each finding a priority. Always present findings in priority order.
 
 Order rules:
 1. Upstream before downstream. An error in the problem or the label makes
-   all later work wrong. Thus, a vague goal comes before a weak feature.
+   all later work wrong, so a vague goal comes before a weak feature.
    The upstream order is the lens catalog's section order (A first).
 2. Inside one priority, put the larger effect first. If 2 findings have
    the same effect, put the finding you are more sure of first.
@@ -74,6 +78,16 @@ Order rules:
    item.
 
 ## Steps
+
+Progress (copy into your reply, tick each line):
+
+```
+[ ] 1 Select: mode, lens, problem type; ask about a reference design
+[ ] 2 Critique: lens subagents, merge, top 3
+[ ] 3 Converge: rounds until no item is open (or Deferred)
+[ ] 4 Document: critique/<date>-<lens>.md
+[ ] 5 Check
+```
 
 ### 1. Select the mode and the lens
 
@@ -92,8 +106,10 @@ Order rules:
 
 1. Dispatch each lens as a new subagent with: the lens `SKILL.md` path, the
    playbooks path, the write-up, the mode, the problem type, and the
-   Priority section above. The subagent has no session history. Thus, it
-   reads the text, not the author's intent.
+   Priority section above. The subagent has no session history, so it
+   reads the text, not the author's intent. With no subagent tool, run
+   each lens inline, right after Select, before you read notes or other
+   critiques.
 2. Each lens returns 4 parts. Each part is in priority order:
    1. **Done well.** Specific strengths, with reasons. These tell the author
       what to keep.
@@ -107,7 +123,8 @@ Order rules:
       each question, from experience.
 3. Merge the critiques if 2 lenses ran. Join the items that are the same
    problem. Remove findings with no evidence. Apply the Brief limits to the
-   merged result.
+   merged result. Add each skill issue that a lens reports to the skill
+   improvement log.
 4. Show the top 3 changes, then the 4 parts.
 
 ### 3. Converge
@@ -117,12 +134,13 @@ your recommended answer. Ask in priority order, P1 first.
 
 The user resolves each item: **accept**, **modify**, **reject** (with a
 reason), or **defer** (with an owner and the condition that unblocks it).
-The user can answer in chat or in a notes file (see "Answers can arrive in
-a notes file" in `../ml-system-design-prd/SKILL.md`).
+The user can answer in chat or in a notes file (see "Answers in a notes file"
+in `../ml-system-design-prd/SKILL.md`).
 
 ### 4. Document
 
-1. Write `<project-folder>/critique/<YYYY-MM-DD>-<lens>.md`. With no
+1. Write `<project-folder>/critique/<YYYY-MM-DD>-<lens>.md`, where
+   `<lens>` is `system`, `modeling`, or `both`. With no
    project folder, write `critique/<YYYY-MM-DD>-<slug>.md` in the folder
    of the write-up. For pasted text, ask the user where to write it. Never
    write in `notes/`: it holds only what the user typed or pasted. Use
@@ -134,11 +152,27 @@ a notes file" in `../ml-system-design-prd/SKILL.md`).
    - **Deferred entry:** the item, the reason, the owner, the unblock
      condition, and the risk.
    - **Conclusion:** `ready`, `ready with changes`, or `needs rework`, and
-     the most important changes.
-3. Do not edit the write-up.
+     the top 3 changes from the Summary, in the same order (updated only
+     if a decision changed one).
+3. Do not edit the write-up. In the Check, run `check_doc.py` with:
+
+   ```
+   --sections "Summary,Done well,Change or fix,Missing,Questions,Decisions and trade-offs,Deferred,Conclusion"
+   ```
+
 4. Offer an ADR for each decision that is difficult to reverse. If the
    write-up came from the `ml-*` chain, offer to send each accepted fix to
    the skill that owns it.
+
+### 5. Check
+
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does each P1 and P2 item have evidence and an alternative?
+2. Are the top 3 changes single changes, in priority order, with upstream
+   items first?
+3. Does each item have a resolution or a Deferred entry with its reason,
+   owner, unblock condition, and risk?
+4. Does the verdict follow from the decisions? Is the write-up unchanged?
 
 ## Reference design (optional)
 
@@ -178,7 +212,7 @@ The Summary names the reference design, or says "none (fresh view)".
 | Checks | Playbook classic mistakes and `[C]` catalog items. Also keep a P1 or P2 found while reading. | Full catalog |
 | Findings | P1 and P2 only. Maximum 5 each in parts 2, 3, 4, and 3 strengths. A limit never removes a P1. List the P2 items that a limit removes in one line under their part. | All, P1 to P3 |
 | Modeling evidence | `file:line` or existing output | Command output for P1 and P2 |
-| Converge | Maximum 2 rounds of 6 questions. P3 items not shown. | Rounds until no items stay open |
+| Converge | Maximum 2 rounds of 6 questions, P1 first, then P2. Items that do not fit go to Deferred ("no time"). P3 items not shown. | Rounds until no items stay open |
 | Checkpoints | None | After each phase and each round |
 | Time | Critique 10, Converge 25, Document 10 | No limit |
 
@@ -193,7 +227,6 @@ step".
 2. Each decision has its trade-off. Each deferred item has its reason,
    owner, unblock condition, and risk.
 3. The conclusion gives a verdict and the top changes.
-4. The user confirms.
-
-Log bugs in this skill, or changes the user asks for, with "Skill
-improvement log" in `../ml-system-design/SKILL.md`.
+4. The Check passed (4 yes answers, `check_doc.py` prints `OK`), or the
+   open items are reported.
+5. The user confirms.

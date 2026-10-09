@@ -1,5 +1,7 @@
 # Test: ml-critique skill series
 
+Contents: Setup | Tests | Results
+
 Date: 2026-10-08. Skills under test: `ml-critique`, `ml-critique-system`,
 `ml-critique-modeling`, and Principle 1 in `ml-design-principles.md`.
 

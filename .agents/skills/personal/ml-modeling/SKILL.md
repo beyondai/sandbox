@@ -2,7 +2,7 @@
 name: ml-modeling
 description: >-
   Use when executing the hands-on ML modeling workflow for a project that
-  already has a PRD and a fork-grade `design/high-level.md` — building the
+  already has a PRD and a fork-grade `design/high-level.md` - building the
   labeled table, profiling data, engineering features, training a model, and
   evaluating it. The hands-on alternative to ml-system-design-deep-dive.
   Entry point for the whole data-to-evaluated-model chain; for one step only,
@@ -13,87 +13,92 @@ description: >-
 
 # ML Modeling
 
-Four sequential steps, each its own skill, chained by files under
-`<project-folder>/modeling/` — not conversation memory, so any step can be invoked
-standalone in a fresh session:
+Contents: Steps | Required upstream | Modes | Dashboard | Bundled tools | After
+step 4 | Check
 
-1. `ml-modeling-data` — build or register the labeled table, record it in
-   `01-data.json`'s `dataset` block, profile, and clean →
-   `modeling/01-data.md`
-2. `ml-modeling-features` — engineer features → `modeling/02-features.md`
-3. `ml-modeling-train` (sequential) **or** `ml-modeling-multiagent` (parallel,
-   see below) — train → `modeling/03-train.md`
-4. `ml-modeling-evaluate` — evaluate → `modeling/04-evaluate.md`
+4 steps. Each step is its own skill. Files in `<project-folder>/modeling/`
+connect the steps, not the conversation, so each step can run alone in a
+new session.
 
-`dataset` is the data contract: later steps read table paths, label, and
-split roles from it, never from prose. One model per project folder.
-
-`/ml-modeling <topic>` is the entry point for the step-by-step path by
-default: invoke step 1, report its result, and stop for user confirmation
-before invoking step 2 — same checkpointed pattern as
-`ml-system-design-prd` and `ml-system-design-high-level` — and so on through
-step 4. Only run the whole chain in one uninterrupted pass when the request
-says so explicitly (e.g. "full chain," "run all four steps," "don't stop
-between steps"). For a single-step ask ("engineer features for this
-dataset"), invoke that skill directly — it reads whatever the previous step
-already wrote and continues from there.
-
-## Which project folder
-
-Use `../ml-system-design/SKILL.md`, "Project folder": the name, the parent
-folder (default `labs/`), the subfolders, and how to find the folder.
-
-## Output docs
-
-Every `.md` this family writes follows `../ml-system-design/SKILL.md`,
-"Output docs": prose wrapped at 80 columns, code blocks exempt, wide tables
-turned into headed paragraphs.
-
-## Required upstream: PRD + fork-grade high-level design
-
-Every step here reads `<project-folder>/prd/<topic>.md` and
-`<project-folder>/design/high-level.md`, in both Regular and Quick-POC mode.
-If either is missing, don't invent a substitute: run `/ml-system-design-prd`
-and `/ml-system-design-high-level` first (POC mode if speed matters), then
-come back. High-level's ML framing must be fork-grade — per model: prediction
-target, label definition and horizon, scoring population and cadence, unit of
-prediction, known exclusions — and its Architecture diagram must name the
-concrete source tables. That framing is what grounds every step below.
-
-**Where the fork sits.** After high-level, a project takes one of two routes
-to the same place:
-
-```
-prd -> high-level -> [ ml-system-design-deep-dive (paper) | ml-modeling-* (hands-on) ] -> delivery
-```
-
-`ml-modeling-*` is the hands-on, more detailed version of the deep dive: the
-same questions (data, features, models, training) answered by doing the work
-and recording it in `modeling/01`-`04`. It does not read
-`design/deep-dive.md`. If a project has both, whichever was written last is
-the record `ml-system-design-delivery` cites. Rationale in
-`../adr/0006-fork-after-high-level.md`.
-
-**Where each step gets its grounding** (replaces reading deep-dive sections):
-
-| Step | Reads | Decides and records itself |
+| Step | Skill | Writes |
 |---|---|---|
-| `ml-modeling-data` | framing (target, label, horizon, population, exclusions); Architecture's source tables; PRD scope | the train/test split and cutoffs, and which quality flags to clean vs. leave flagged -> `dataset` block in `01-data.json`, reasoning in `01-data.md` |
-| `ml-modeling-features` | framing (population, unit); `01-data.md` | the feature list -> `02-features.md` |
-| `ml-modeling-train` / `-multiagent` | Phasing (model class per phase); algorithm-selection matrix; `01-data` class balance | candidates, loss, class weighting -> `03-train.md` |
-| `ml-modeling-evaluate` | PRD Metrics — offline (primary, secondary, guardrails); `dataset.split` | -> `04-evaluate.md` / `.json` |
+| 1 | `ml-modeling-data`: build or register the labeled table, profile, clean | `01-data.md`, `01-data.json` |
+| 2 | `ml-modeling-features` | `02-features.md` |
+| 3 | `ml-modeling-train` (sequential) or `ml-modeling-multiagent` (parallel) | `03-train.md` |
+| 4 | `ml-modeling-evaluate` | `04-evaluate.md`, `04-evaluate.json` |
 
-**`spec/<topic>.md`**: the first time any `ml-modeling-*` step runs against a
-project that has both upstream files but no `spec/<topic>.md` yet, synthesize
-one — `prd/` + `adr/` + `design/high-level.md` distilled into an
-implementation-ready doc: Problem Statement, Solution, Implementation Decisions,
-Testing Decisions, Out of Scope. Its first two lines are `prd-hash: <sha>` and
-`high-level-hash: <sha>`, each from `git hash-object -w <file>` (the `-w` stores
-the blob so it stays diffable even if that version was never committed). Full
-rationale in `../adr/0001-ml-modeling-family-and-continuity.md` and
-`../adr/0006-fork-after-high-level.md`.
+- The `dataset` block in `01-data.json` is the data contract. Later steps
+  read table paths, the label, and the split roles from it, never from
+  prose.
+- One model for each project folder.
 
-Spec template - each section is a distillation, not a copy:
+## Steps
+
+Progress (copy into your reply, tick each line):
+
+```
+[ ] 0 PRD and high-level exist; spec exists or is synthesized
+[ ] 1 data       [ ] 2 features      [ ] 3 train      [ ] 4 evaluate
+[ ] Check each step's output (see the Check step in each skill)
+```
+
+1. `/ml-modeling <topic>` runs step 1, reports the result, and stops for
+   the user's confirmation. Then step 2, and so on.
+2. Run all 4 steps without stops only when the user says so ("full
+   chain", "run all four steps", "don't stop between steps").
+3. For one step, run that skill. It continues from the files that exist.
+
+Project folder, output format, the Check procedure, and the skill
+improvement log: `../ml-system-design/SKILL.md`, sections "Project
+folder", "Output docs", "Check the output", and "Skill improvement log".
+
+## Required upstream
+
+Each step reads `<project-folder>/prd/<topic>.md` and
+`<project-folder>/design/high-level.md`, in both modes. If one is missing,
+do not make a substitute. Run `/ml-system-design-prd` and
+`/ml-system-design-high-level` first (POC mode for speed).
+
+The ML framing in high-level must be fork-grade. For each model it gives:
+the prediction target, the label definition and horizon, the scoring
+population and cadence, the unit of prediction, and the known exclusions.
+Its Architecture diagram names the source tables.
+
+`ml-modeling-*` is the hands-on version of the deep dive. It does not read
+`design/deep-dive.md`. If a project has both, delivery uses the newer one.
+Reason: `../adr/0006-fork-after-high-level.md`.
+
+What each step reads, and what it decides:
+
+- **`ml-modeling-data`.** Reads the framing, the Architecture source
+  tables, and the PRD scope. Decides the split, the cutoffs, and which
+  quality flags to clean. Records them in the `dataset` block of
+  `01-data.json`, with the reasons in `01-data.md`.
+- **`ml-modeling-features`.** Reads the framing (population, unit) and
+  `01-data.md`. Decides the feature list (`02-features.md`).
+- **`ml-modeling-train` / `-multiagent`.** Reads the Phasing (model class
+  for each phase), the algorithm-selection matrix, and the class balance
+  in `01-data`. Decides the candidates, the loss, and the class weights
+  (`03-train.md`).
+- **`ml-modeling-evaluate`.** Reads the PRD offline metrics (primary,
+  secondary, guardrails) and `dataset.split`. Writes `04-evaluate.md` and
+  `.json`.
+
+Handoff between steps 2, 3, and 4 (so evaluate never refits on test):
+- Features writes `modeling/features.py` with `transform(df)`, fit on
+  train only. The same function transforms train and test.
+- Train saves `modeling/model.joblib`: the fitted model and its decision
+  threshold.
+- Evaluate loads both, scores `dataset.test` once, and saves the per-row
+  scores to `modeling/test_scores.csv`. A metric change then reruns only
+  the metric code.
+
+### The spec
+
+The first step that runs without `spec/<topic>.md` synthesizes it from
+`prd/`, `adr/`, and `design/high-level.md`. Each section is a summary, not
+a copy. The first 2 lines hold the hashes from `git hash-object -w <file>`.
+The `-w` stores the blob, so `git diff` works for an uncommitted version.
 
 ```
 prd-hash: <sha>
@@ -113,195 +118,131 @@ high-level-hash: <sha>
 ## Out of Scope           <- PRD Requirements - scope, out-of-scope list
 ```
 
-## Regular vs. Quick-POC mode
+Reasons: `../adr/0001-ml-modeling-family-and-continuity.md`,
+`../adr/0006-fork-after-high-level.md`.
 
-- **Regular**: full rigor at every step, ask when unknown.
-- **Quick POC**: a one-hour MVP, not lower documentation quality — favor speed
-  once past the required PRD and high-level (both have their own POC modes):
-  fewer clarifying questions, first-reasonable-choice over exhaustive
-  comparison.
+### Design docs changed?
 
-Mode is chosen by keyword, not a flag, since this skill family has no structured
-argument syntax:
+Each step runs this check first, in both modes:
+
+1. Run the script:
+
+   ```
+   bash .agents/skills/personal/ml-modeling/scripts/spec_hash_check.sh <project-folder>
+   ```
+
+2. `MATCH`: continue, and say nothing. Exit 2 with "no spec/":
+   synthesize the spec first (below), then run the script again.
+   `NOHASH` or `MISSING`: stop and ask the user.
+3. `CHANGED <file>`: the script prints `OLD <sha> NEW <sha>`. Run `git
+   -C <project-folder> diff <old> <new>`, and summarize which sections
+   changed. Then ask 2
+   questions before the step:
+   - Synthesize `spec/<topic>.md` again now, or keep the current spec?
+   - Apply the changed decisions in this step and later, or continue with
+     the earlier decisions?
+4. Record the answer as one line in the step's output `.md`. Example:
+   `high-level changed since spec (ML framing); user chose: apply going
+   forward, spec kept`.
+5. If the spec was synthesized again, or the user chose "apply", run the
+   script with `--refresh prd` or `--refresh high-level`. If the user
+   chose the earlier decisions, do not refresh: the next step asks again.
+
+`ml-modeling-autoresearch` runs unattended, so it does not ask. On
+`CHANGED`, it records the change in `round-summary.md` and continues. The
+next interactive step asks the user.
+
+A hand edit to a step's own output (`modeling/0N-*.md`, `01-data.json`)
+needs no hash check. Run again from the next step (see "Hand edits between
+steps" in `../ml-system-design/SKILL.md`).
+
+### Closing the loop
+
+- **Upstream.** If a step finds that an upstream decision must change (for
+  example, the label horizon does not work, or a source table does not
+  exist), tell the user. Offer to update `design/high-level.md` or
+  `prd/<topic>.md`. After the update, run `spec_hash_check.sh <project-folder>
+  --refresh prd` (or `high-level`).
+- **Spec.** After a step records its decision in `0N-*.md`, read the
+  Implementation Decisions and Testing Decisions of `spec/<topic>.md`. If
+  a line defers this decision to this step ("split rule: to be set by
+  `ml-modeling-data`"), or states an assumption that the decision
+  contradicts, replace the line with the decision and a pointer to the
+  step's file. No hash refresh is necessary.
+- **Step decisions** (the features chosen, the model, the split) go in
+  that step's own `0N-*.md`. On the hands-on route, these files are the
+  deep-dive record.
+
+## Modes
+
+The keyword in the request selects the mode. There are no flags.
 
 | Words in the request | Mode |
 |---|---|
-| "poc", "quick", "mvp", "prototype", "fast", "one hour"/"1 hour" | Quick POC |
-| "regular", "full", or no mode word | Regular (default) |
+| Quick-POC keywords ("Regular and Quick-POC mode" in `../ml-system-design/SKILL.md`) | Quick POC: fewer questions, the first reasonable choice. Same doc quality. |
+| "regular", "full", or no mode word | Regular (default): full rigor, ask when a fact is unknown. |
 
-## Sequential vs. parallel training
-
-Step 3 has two producers for the same `modeling/03-train.md` slot — pick one per
-run, same keyword mechanism:
+Step 3 has 2 skills for the same `03-train.md`:
 
 | Words in the request | Skill |
 |---|---|
 | "parallel", "multiagent", "concurrent" | `ml-modeling-multiagent` |
-| "sequential", or no preference stated | `ml-modeling-train` (default) |
+| "sequential", or no preference | `ml-modeling-train` (default) |
 
-`ml-modeling-multiagent` trains every candidate model type high-level's Phasing
-names (plus the algorithm-selection matrix's short-list, if Phasing names only
-one) concurrently, each in its own `modeling/train-candidates/<model-type>/`,
-then compares and writes the winner to `03-train.md`. Full rationale for why
-this is safe without git worktrees (unlike mattpocock's `implement-spec`, which
-this pattern is adapted from) is in the ADR.
+## Dashboard
 
-## Dashboard — deliberately narrow, Regular/Quick-POC only
+Regular and Quick-POC only. Never in monkey-mode.
+- `ml-modeling-data` creates `dashboard/eda.ipynb` and `dashboard/app.py`,
+  and starts the app.
+- The app has 2 sections: EDA (`01-data.json`) and Final Results
+  (`04-evaluate.json`). It adds a model comparison if
+  `train-candidates/*/metrics.json` exists.
+- Features and train write nothing for the dashboard. No later step edits
+  `app.py`.
 
-`ml-modeling-data` creates `dashboard/eda.ipynb` (real executed EDA) and
-bootstraps `dashboard/app.py` (Streamlit), launched as a background process.
-Only two sections: EDA (from `01-data.json`) and Final Results (from
-`04-evaluate.json`, written by `ml-modeling-evaluate`), plus an optional
-model-comparison section that reads `train-candidates/*/metrics.json` if
-`ml-modeling-multiagent` ran. `ml-modeling-features` and
-`ml-modeling-train`/`-multiagent` write nothing for the dashboard and are
-untouched by it — feature-engineering and training detail stay in their `.md`
-files, not duplicated onto a chart. `app.py` itself is written once and never
-edited by a later step; it just reads whatever JSON exists. Full rationale (why
-this scope and not a full per-step mirror) in
-`../adr/0002-modeling-dashboard.md`.
-
-Never runs in monkey-mode — that family shares only the project-folder root and
-stays fully separate (see `ml-system-design-monkey-mode`).
-
-## Optional follow-up: `ml-modeling-autoresearch`
-
-Once `modeling/04-evaluate.json` exists, `ml-modeling-autoresearch`
-(user-invoked only) becomes available — not a step in the chain above, an opt-in
-extra. A round: a couple of parallel candidates each try one change, the winner
-is kept if it beats the current best, promoted results flow straight into
-`04-evaluate.json` (the dashboard picks it up with zero code changes). Three
-modes, self-contained — no external scheduling: `/ml-modeling-autoresearch
-<project>` (one round), `... until plateau` (keeps going until a non-improvement
-streak or the round ceiling), `... for 20 minutes` (also bounded by a duration,
-stopping early on plateau). Works in Regular and Quick-POC mode; never in
-monkey-mode. Full usage and design rationale in
-`ml-modeling-autoresearch/SKILL.md`, `../adr/0003-autoresearch.md`, and
-`../adr/0005-autoresearch-self-contained-looping.md`.
+Reason: `../adr/0002-modeling-dashboard.md`.
 
 ## Bundled tools
 
-`scripts/experiment_tracker.py`, `scripts/feature_selector.py`,
-`scripts/hypothesis_tester.py` — stdlib-only, run with plain `python3`, no
-project venv needed. Referenced from the relevant step skills; shared here since
-`experiment_tracker.py` spans both train and evaluate.
+| Script | Requires | Used by |
+|---|---|---|
+| `scripts/experiment_tracker.py` | python3 stdlib | train, multiagent, evaluate, autoresearch |
+| `scripts/feature_selector.py` | python3 stdlib | features |
+| `scripts/hypothesis_tester.py` | python3 stdlib | evaluate, critique |
+| `scripts/spec_hash_check.sh` | bash, git | each step |
+| `../ml-modeling-data/scripts/launch_dashboard.sh` | bash, lsof, curl, uv | data, evaluate |
 
-## Closing the loop
+The stdlib scripts run with plain `python3`. The step code runs with `uv
+run` in the shared sandbox venv. On a new clone, run `uv sync` at the
+sandbox root first.
 
-If executing a step reveals something that should change an upstream decision
-— the framing, a source table, the phasing (e.g. the label horizon turns out
-unworkable, or a named source doesn't exist) — flag it and offer to update
-`design/high-level.md` or `prd/<topic>.md`; don't silently drift from the
-recorded decisions. After such an update, rewrite that file's hash line in
-the spec with the new `git hash-object -w <file>` so the check below doesn't
-re-ask about a change this chain made itself. Decisions that belong to the
-step itself (features chosen, model picked, split used) are recorded in that
-step's own `.md` — that is the hands-on deep dive's record.
+## After step 4
 
-### Design docs changed?
+- Iterate: run step 2 or 3 again.
+- `ml-modeling-autoresearch` (user-run only): automatic improvement
+  rounds. It writes the winners to `04-evaluate.json`. Modes: one round,
+  `until plateau`, `for 20 minutes`. Not in monkey-mode. Reasons:
+  `../adr/0003-autoresearch.md`,
+  `../adr/0005-autoresearch-self-contained-looping.md`.
+- `ml-critique`: judge the quality of the modeling report (leakage, split,
+  baseline, metric).
+- To ship: give `modeling/04-evaluate.md` to the `implement` skill.
+- A Quick POC that becomes a real project: run `ml-system-design-prd` and
+  `ml-system-design-high-level` again in Regular mode, and add `adr/`.
 
-The design session can keep editing `prd/<topic>.md` or
-`design/high-level.md` while modeling runs. Every step skill runs this check
-first, before its own work, in both Regular and Quick-POC mode:
+Usage paths: `../adr/0001-ml-modeling-family-and-continuity.md`.
+Principles: `../ml-design-principles.md` (Principle 1: start simple; a
+more complex model must pass the complexity gate).
 
-1. `git hash-object <file>` vs. the spec's `prd-hash:` and `high-level-hash:`
-   lines. Both equal: proceed, say nothing.
-2. Different: show what changed — `git diff <recorded-hash> -- <file>`,
-   summarized to which sections moved and how — then ask two questions before
-   doing the step:
-   - Re-synthesize `spec/<topic>.md` from the current design docs now, or
-     keep the current spec?
-   - Apply the changed decisions in this step and later ones, or proceed on the
-     previous decisions?
-3. Record the answer as one line in the step's output `.md` (e.g. `high-level
-   changed since spec (ML framing); user chose: apply going forward, spec
-   kept`) so a later session sees the choice. If the spec was re-synthesized, or
-   the user chose to apply the change going forward, refresh that hash line
-   with `git hash-object -w` so the same change isn't asked about again. If the
-   user chose to proceed on the previous decisions, leave the hash alone — the
-   next step asks again, which is intended: each step is a fresh chance to pick
-   the change up.
+## Check
 
-`ml-modeling-autoresearch` is autonomous and does not ask; on a mismatch it
-notes the change in `round-summary.md` and keeps running against the current
-file. The next interactive step surfaces the question.
+The router's own output is the spec and the step reports. Each step runs
+its own Check. When this skill synthesizes `spec/<topic>.md`, do "Check
+the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Does each spec section summarize its source (PRD, ADRs, high-level),
+   with no new decisions?
+2. Are both hash lines present and equal to `spec_hash_check.sh` output
+   (`MATCH`)?
+3. Does the Solution name the one model that this folder builds?
 
-Hand edits to a step's own output (`modeling/0N-*.md`, `01-data.json`) need
-no hash check: the next step reads the file as it stands. When the user says
-one changed, re-run from the step after it; see `../ml-system-design/SKILL.md`,
-"Hand edits between steps".
-
-### Spec self-staleness
-
-A second, separate reconciliation path from the hash check above — that one
-catches `prd/`/`high-level.md` drift; this one catches `spec/<topic>.md`
-going stale relative to a *step's own* resolved decision. `spec/` is
-synthesized once, before most steps run, so its Implementation Decisions and
-Testing Decisions sections can contain a placeholder deferring a decision to
-a specific step ("split rule: to be set by `ml-modeling-data`") or a stated
-assumption a step's real decision later contradicts. Nothing else in this
-chain notices when that happens — it sat wrong until caught by hand in one
-project.
-
-After a step writes its own decision to its `0N-*.md`, scan
-`spec/<topic>.md`'s Implementation Decisions and Testing Decisions sections
-for (a) a placeholder explicitly deferring that decision to this step, or
-(b) a stated assumption the fresh decision now contradicts. If either
-matches, update that spec line in place with the actual decision plus a
-one-line pointer to the step's own file for full reasoning — no hash refresh
-needed, since this isn't upstream-doc drift, just spec catching up to its
-own deferred or assumed content. Do this as an explicit item in the step's
-own "Done when" checklist so it isn't skipped.
-
-## Skill improvement log
-
-Any `ml-modeling-*` skill, while it runs, may turn up something about the *skill
-itself* worth fixing — not the project it's working on. Two triggers:
-
-1. **Agent-found**: a bug in this skill's own instructions, or a genuinely
-   better way to do the step than what's written.
-2. **User-requested**: you ask to change how the skill behaves — as opposed to a
-   one-off request specific to this project's data or model.
-
-Log it to `<project-folder>/SKILL-IMPROVEMENTS.md` (created on first entry,
-appended to after) rather than editing the actual `SKILL.md` on the spot — keeps
-the skill files stable mid-run and gives you a batch to review later instead of
-drive-by edits:
-
-```markdown
-## <date> — <skill-name>
-- **Source**: agent-found bug | agent-found better design | user-requested
-- **Status**: proposed
-- **Finding**: <what's wrong or what could be better, concretely>
-- **Suggested change**: <the actual edit, concrete enough to apply as-is>
-```
-
-**Review**: any skill in the family, at the end of a run (after doing the task
-actually asked for, never blocking it), checks this file for entries still
-marked `proposed`. If any exist, say so and offer to review them now. Per entry:
-ask adopt or decline; an adopted entry gets applied as a real edit to the
-corresponding skill file under `.agents/skills/personal/<skill>/SKILL.md`, then
-the entry's `Status` flips to `adopted` or `declined`. Never delete an entry —
-`SKILL-IMPROVEMENTS.md` stays a durable per-project record of what was proposed
-and decided. Same convention on the `ml-system-design-*` side; full rationale in
-`../adr/0004-skill-improvement-log.md`.
-
-## Design principles
-
-Every step applies `../ml-design-principles.md`. Principle 1: start simple,
-and select a more complex model only when it passes the complexity gate.
-
-## Where this leads
-
-To judge the quality of a finished modeling report (leakage, split,
-baseline, metric choice), use `ml-critique`. It runs the modeling lens and
-settles each finding with the user.
-
-After step 4: iterate (rerun step 2 or 3), reach for `ml-modeling-autoresearch`
-to keep improving the model automatically while you do other analysis, hand
-`modeling/04-evaluate.md` to mattpocock's `implement` skill by hand to
-productionize, or — if this graduated from a Path A quick POC into a real
-project — backfill `prd/` and a full `adr/` via `ml-system-design-prd` /
-`ml-system-design-high-level`. Full usage-path tables (both the modeling-focused
-path and the whole-design path that forks into this one) are in
-`../adr/0001-ml-modeling-family-and-continuity.md`.
+Done when the 3 answers are yes and `check_doc.py` prints `OK`.

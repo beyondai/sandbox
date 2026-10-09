@@ -1,7 +1,7 @@
 ---
 name: ml-modeling-evaluate
 description: >-
-  Use to evaluate a trained model rigorously — classification/regression
+  Use to evaluate a trained model rigorously - classification/regression
   metrics, baseline comparison, overfitting check. Also writes the project
   dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain
   (data → features → train → evaluate). Trigger on "evaluate this model,"
@@ -11,24 +11,37 @@ description: >-
 
 # Evaluate
 
-Reads `<project-folder>/prd/<topic>.md`'s Metrics — offline section (the primary
-metric, secondary metrics, guardrails — this is where "good enough" is defined)
-and `modeling/03-train.md` — written by either `ml-modeling-train` or
-`ml-modeling-multiagent`, doesn't matter which. Writes
-`<project-folder>/modeling/04-evaluate.md` and `modeling/04-evaluate.json`. This
-is the last step in the chain — see `ml-modeling` router for what comes after.
-Project folder and output format: see `../ml-modeling/SKILL.md`,
-"Which project folder" and "Output docs". First,
-run the "Design docs changed?" check from `../ml-modeling/SKILL.md`.
+Contents: Classification | Regression | Required checks | A/B test of a shipped
+model | Dashboard results | Check | After this step
 
-Score on `01-data.json` -> `dataset.test`. The train-side number for the
-overfit gap comes from the table the model was fit on (see `03-train.md`).
-If `dataset.split.type` is `cutoff`, say so in `04-evaluate.md`: this is a
-backtest at a later cutoff, not a random hold-out.
+- **Reads:** the offline metrics in `<project-folder>/prd/<topic>.md`
+  (primary, secondary, guardrails: they define "good enough") and
+  `modeling/03-train.md` (from `ml-modeling-train` or
+  `ml-modeling-multiagent`). If the PRD has no primary metric or no
+  numeric bar, say so and state the bar you use as an assumption.
+- **Loads:** `modeling/model.joblib` and `transform()` from
+  `modeling/features.py`. Do not refit on test (see "Handoff" in
+  `../ml-modeling/SKILL.md`).
+- **Scores on:** `01-data.json` -> `dataset.test`. The train number for the
+  overfit gap comes from the table that the model was fit on.
+- **Writes:** `modeling/04-evaluate.md`, `modeling/04-evaluate.json`, and
+  the per-row scores in `modeling/test_scores.csv`.
+- **Rules:** `../ml-system-design/SKILL.md`, "Project folder", "Output
+  docs", "Check the output", "Skill improvement log".
+- **Mode:** Regular reports the full metric set and the overfit check.
+  Quick POC reports the metrics that show "does this work".
 
-Mode: Regular reports the full metric set below and checks overfit explicitly.
-Quick POC reports the metrics that actually distinguish "does this work" and
-stops there — see `ml-modeling` router for the keyword rule.
+Steps:
+1. Run "Design docs changed?" in `../ml-modeling/SKILL.md`.
+2. Score the model and the baseline on the test split, once. Save
+   `test_scores.csv`.
+3. Do the required checks, including the noise of the lift.
+4. Write `04-evaluate.md` and `04-evaluate.json`.
+5. Confirm that the dashboard responds (not in monkey-mode).
+6. Check.
+
+If `dataset.split.type` is `cutoff`, say in `04-evaluate.md` that this is
+a backtest at a later cutoff, not a random hold-out.
 
 ## Classification
 
@@ -60,35 +73,36 @@ def evaluate_regressor(y_true, y_pred):
 
 ## Required checks
 
-- **Baseline comparison**: report the model's metrics against a baseline,
-  not in isolation — a metric with no baseline is a number, not evidence.
-  Use the PRD's recommended baseline (Definition, "Baseline") if it is built
-  and scored on this split. If it is not built, use its floor (majority
-  class, mean prediction, or global popularity) and say in `04-evaluate.md`
-  that the recommended baseline was not scored.
-- **Overfit check**: train-vs-test gap on the primary metric. A large gap means
-  the reported test number isn't trustworthy even if it looks good.
-- **Class imbalance**: if the target is imbalanced, accuracy alone is misleading
-  — lead with F1/precision-recall/AUC-ROC instead.
-- **Log the comparison**: `python3 ../ml-modeling/scripts/experiment_tracker.py
-  --log-file <project-folder>/modeling/experiments.json compare --ids <ids>`
-  against prior runs (especially useful if `ml-modeling-multiagent` produced
-  multiple candidates). Always pass `--log-file`, before the subcommand; the
-  default is CWD-relative.
+- **Baseline.** Report the model against a baseline on the same split. Use
+  the PRD's recommended baseline (Definition, "Baseline"). If it is not
+  built and it is a simple rule (for example a recency rule or global
+  popularity), score it now: a model that only beats the floor can lose
+  to a one-line rule. Also report the floor (majority class, mean
+  prediction). If the recommended baseline cannot be built now, say so.
+- **Noise.** Give a 95% interval for the lift over the baseline: a paired
+  bootstrap on `test_scores.csv` (resample rows, recompute both metrics).
+  `hypothesis_tester.py` covers means and proportions, not AUC or top-k.
+- **Overfit.** Give the train-vs-test gap on the primary metric. A large
+  gap makes the test number unreliable.
+- **Class imbalance.** For an imbalanced target, lead with F1,
+  precision-recall, or AUC-ROC, not accuracy.
+- **Log the comparison.** Put `--log-file` before the subcommand:
 
-## A/B testing an already-shipped model
+  ```
+  python3 .agents/skills/personal/ml-modeling/scripts/experiment_tracker.py \
+    --log-file <project-folder>/modeling/experiments.json compare --ids <ids>
+  ```
 
-Out of the main chain — only relevant once a model is live and being compared
-against production traffic. See
-[references/ab-testing.md](references/ab-testing.md) for sample-size calculation
-and result analysis, and `../ml-modeling/scripts/hypothesis_tester.py` to
-actually run the test.
+## A/B test of a shipped model
 
-## Dashboard (Regular/Quick-POC only — never in monkey-mode)
+Only for a model that is live. Sample size and analysis:
+[references/ab-testing.md](references/ab-testing.md). Run the test with
+`python3 .agents/skills/personal/ml-modeling/scripts/hypothesis_tester.py`.
 
-Write the same results to `modeling/04-evaluate.json` (the dashboard reads this,
-not the `.md`) — this is the dashboard's Final Results section, the payoff view
-of the whole project:
+## Dashboard results
+
+Regular and Quick POC only. Write the results to `04-evaluate.json`. The
+dashboard reads the JSON, not the `.md`.
 
 ```json
 {
@@ -97,35 +111,37 @@ of the whole project:
   "baseline_metrics": {},
   "overfit_gap": {"train": 0.0, "test": 0.0},
   "success_bar": "<string>",
-  "verdict": "<one sentence: clears or misses the bar, and why>"
+  "verdict": "<one sentence: clears or misses the bar, and why>",
+  "verdict_status": "pass | partial | fail"
 }
 ```
 
-Then check the dashboard is actually reachable on this project's port: `curl -sf
-http://localhost:$(cat dashboard/.port) >/dev/null`. If it's not (the background
-process died — common after resuming in a new session), relaunch it the same way
-`ml-modeling-data` did: `uv run streamlit run dashboard/app.py --server.headless
-true --server.port $(cat dashboard/.port) &`. If `dashboard/.port` is missing,
-pick a free port the same way that skill does (first from 8501 upward with no
-listener) and write the file before launching. Never check bare `:8501` — with
-two projects open, that may be the other project's dashboard. Don't touch
-`dashboard/app.py` itself — it already knows to read this file once it exists;
-nothing about its code needs to change.
+Then run:
 
-Done when metrics are reported against a real baseline (not standalone), the
-overfit check has an actual train/test gap number, `04-evaluate.md` states
-plainly whether this model is good enough — not just what the numbers are —
-`04-evaluate.json` matches it, and the dashboard is confirmed reachable with the
-Results section visible.
+```
+bash .agents/skills/personal/ml-modeling-data/scripts/launch_dashboard.sh <project-folder>
+```
 
-## What comes after
+It reuses the project's running dashboard, or starts it again on the
+port in `dashboard/.port`. Do not check the bare port `:8501`: it can be
+another project's dashboard. Do not edit `dashboard/app.py`.
 
-Once `04-evaluate.json` exists, `ml-modeling-autoresearch` becomes available —
-an optional, user-invoked follow-up that keeps trying to beat this result.
-Self-contained, three modes: one round, until plateau, or for a duration — no
-external scheduling needed. See `../ml-modeling/SKILL.md` and
+## Check
+
+Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
+1. Is the model compared with the recommended baseline (or a simple rule)
+   on the same test split, not only with the floor?
+2. Does the 95% interval of the lift exclude zero? If not, does the
+   verdict say "inside the noise"?
+3. Does the overfit check give a real train/test gap number?
+4. Does `04-evaluate.md` say plainly if the model is good enough for the
+   PRD bar, not only the numbers? Does `04-evaluate.json` match it?
+
+Done when the 4 answers are yes, `check_doc.py` prints `OK`, and
+`launch_dashboard.sh` prints `RUNNING` or `STARTED`.
+
+## After this step
+
+`ml-modeling-autoresearch` (user-run only) tries to beat this result: one
+round, until plateau, or for a duration. See
 `../ml-modeling-autoresearch/SKILL.md`.
-
-If this run turns up a bug or a better design in this skill, or you ask for a
-change to how it works, log it — see `../ml-modeling/SKILL.md`'s Skill
-improvement log.
