@@ -6,6 +6,7 @@
 - [How a step works](#how-a-step-works)
 - [The flow](#the-flow)
 - [Rules to know](#rules-to-know)
+- [Design principles](#design-principles)
 - [Two speeds](#two-speeds)
 - [Training: one model or several in
   parallel](#training-one-model-or-several-in-parallel)
@@ -36,6 +37,10 @@ Other docs:
 - The reasons for the design decisions: `.agents/skills/personal/adr/`.
 - Style rules for the skill files and the docs, and how to check them:
   `docs/SKILL-STYLE-GUIDE.md`.
+- The design doc template, with each item that the design skills ask
+  for: `docs/ml-design-template.md`.
+- The principles that all skills apply:
+  `.agents/skills/personal/ml-design-principles.md`.
 
 The skills are written for Claude Opus 5.5, and tested on it. The evals
 are in the `tests/` folder of `ml-system-design`, `ml-modeling`, and
@@ -100,6 +105,9 @@ The diagram shows the order. The text below gives the rules.
    - `-prd` is the interview. It creates the project folder and writes
      `prd/`. `-definition` is for a project with no PRD, or for a review
      of a Definition.
+   - `-prd` reads the Definition checklist from `-definition` each run.
+     It keeps no copy, so a new checklist item is in the next PRD
+     (0023).
 2. **You can edit each file between steps.**
    - Edit any file in `prd/`, `design/`, `adr/`, `spec/`, or `modeling/`.
      Then tell Claude which file changed.
@@ -139,6 +147,44 @@ The diagram shows the order. The text below gives the rules.
 
    The skills with many steps also show a progress checklist. They tick
    each line.
+
+## Design principles
+
+All the skills apply 3 principles. The design skills write to them, and
+the critique skills check them. The full text is in
+`.agents/skills/personal/ml-design-principles.md`.
+
+```
+1 Simple by default      rule -> linear/GBDT -> complex, each step gated
+2 Intended behavior      the metric can be gamed: name it, check outputs
+3 Proven version ships   full gates, plan B kept, staged rollout,
+                         retrain inside each change cycle
+```
+
+1. **Simple by default. Complex only with evidence.** A complex option
+   wins only if its gain is larger than the noise. Its value must also be
+   larger than its added cost (the cost table).
+2. **The objective is the intended behavior, not the metric.** A model
+   can score well with bad outputs, for example the same popular items
+   for all users. What you give and get:
+   - `-prd` and `-definition` ask for the intended behavior, and the
+     ways the model can game the primary metric, each with a guardrail.
+   - `mm-evaluate` reads the top outputs for about 10 typical and 10
+     edge-case inputs, and names each degenerate pattern in
+     `04-evaluate.md`.
+3. **A proven version ships, and it keeps up with change.** What you
+   give and get:
+   - `-high-level`: each phase gate checks the metric, the stability,
+     the coverage, and the cost. If a date depends on an unproven
+     method, the last proven phase stays shippable.
+   - `-deep-dive`: one retrain must fit inside one cycle of scheduled
+     upstream changes (releases, catalog or rule updates).
+   - `-delivery`: an internal or opt-in stage before the random ramp
+     when the quality is partly subjective. A Retraining item names the
+     triggers, the owner after launch, and the runbook.
+
+Have your answers ready for these items before you run `-prd`. The
+template lists them all.
 
 ## Two speeds
 
@@ -259,7 +305,8 @@ labs/proj1/
   prd/<topic>.md           Definition (problem, scope, baseline, metrics, team)
   design/high-level.md     ML framing, architecture diagrams, phasing
   design/deep-dive.md      Paper deep dive (paper route only)
-  design/delivery.md       Rollout, evaluation, monitoring, fallback
+  design/delivery.md       Rollout, evaluation, monitoring, retraining,
+                           fallback
   design/post-delivery.md  Analysis, explainability, iteration, democratize
   adr/000N-*.md            One decision in each file
   spec/<topic>.md          Made when modeling starts; holds the design hashes
@@ -267,11 +314,12 @@ labs/proj1/
     01-data.md/.json       Profile, cleaning, and the `dataset` contract
     02-features.md         Feature decisions; features.py
     03-train.md            Model, loss, training setup; model.joblib
-    04-evaluate.md/.json   Metrics against the baseline; test_scores.csv
+    04-evaluate.md/.json   Metrics vs baseline, output review; test_scores.csv
     05-serve.md/.json      Mode, latency, capacity, cost; serve.py
     datasets/, build_dataset.py, experiments.json, autoresearch/
   dashboard/               eda.ipynb + app.py (Streamlit), own port
   monkey-mode/report.md    Independent fast baseline
+  monkey-mlp/report.md     Independent embedding-MLP baseline
   critique/<date>-<lens>.md  Critiques from ml-critique
   critique/<date>-final.md   Final critique from ml-critique-merge
   critique/<date>-share-out.md  Share-out plan from ml-critique-share-out
@@ -294,7 +342,7 @@ skills also start from plain language.
 | `sd-definition`       | Definition section, no interview               |
 | `sd-high-level`       | Framing, architecture, phasing; the fork       |
 | `sd-deep-dive`        | Paper deep dive, serving included (or `mm-*`)  |
-| `sd-delivery`         | Rollout, evaluation, monitoring, fallback      |
+| `sd-delivery`         | Rollout, eval, monitoring, retrain, fallback   |
 | `sd-post-delivery`    | Analysis, explainability, iteration, reuse     |
 | `sd-monkey-mode` cmd  | Fast baseline in the background                |
 | `sd-monkey-mlp` cmd   | Fast embedding-MLP baseline, background        |
@@ -303,7 +351,7 @@ skills also start from plain language.
 | `mm-features`         | Makes the features                             |
 | `mm-train`            | Trains one model                               |
 | `mm-multiagent`       | Trains N candidates in parallel                |
-| `mm-evaluate`         | Evaluates against a baseline                   |
+| `mm-evaluate`         | Evaluates vs a baseline; reviews outputs       |
 | `mm-serve`            | Measures latency; sizes capacity and cost      |
 | `mm-autoresearch` cmd | Optional automatic improvement loop            |
 | `ml-critique`         | Critiques a finished write-up (critique guide) |
@@ -437,7 +485,16 @@ in parentheses.
   names the ways the model can game its metric, each with a guardrail,
   and the evaluation reads a sample of outputs. Retraining fits the
   cadence of scheduled changes. Phase gates check more than the metric
-  (0022).
+  (0022). The PRD interview asks for the intended behavior (0023).
+- **A proven version ships, and it keeps up with change.** Principle 3
+  collects the production rules:
+  - full phase gates;
+  - a proven version that stays shippable;
+  - a staged rollout;
+  - a retrain that fits the change cadence, with an owner.
+
+  Delivery has a Retraining item. The template is markdown. It lists each
+  item that the design skills ask for (0023).
 - **Critique is different from Review mode.** It is a review by a reader
   with no context, with priorities, convergence, and a record of the
   decisions (0009).

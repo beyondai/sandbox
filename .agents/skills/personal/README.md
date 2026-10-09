@@ -1,8 +1,8 @@
 # ml-system-design-* / ml-modeling-* - operational reference
 
-Contents: Monkey-mode | Monkey-MLP | Autoresearch | Skill improvement log |
-Design drift: detect, then ask | Dashboard | Running things concurrently | When
-a git worktree earns its keep | ADR index
+Contents: Design principles | Monkey-mode | Monkey-MLP | Autoresearch | Skill
+improvement log | Design drift: detect, then ask | Dashboard | Running things
+concurrently | When a git worktree earns its keep | ADR index
 
 Entry point for a new project: `/ml-system-design <topic> [poc]`. Read
 `docs/ML-SKILLS-GUIDE.md` first for orientation. This file holds the
@@ -11,6 +11,21 @@ things run at once, the mechanics behind the drift check and the improvement
 log, autoresearch's modes, and when a git worktree is and is not worth it.
 Rationale for each decision is in `adr/`. Style rules for skill files and docs, and
 how to check them: `docs/SKILL-STYLE-GUIDE.md`.
+
+## Design principles
+
+`ml-design-principles.md` is the single source of truth for the principles.
+The design and modeling skills apply them; the critique catalogs check them.
+Each principle has a table of the skills that use it.
+
+| # | Principle | Applied in | Checked by |
+|---|---|---|---|
+| 1 | Simple by default, complex only with evidence | definition, high-level, deep-dive, train, multiagent | the complexity gate in both lenses |
+| 2 | The intended behavior, not the metric | prd, definition, evaluate (output review) | sys B7, mod I12 |
+| 3 | A proven version ships, and it keeps up with change | high-level (gates, plan B), deep-dive (retrain cadence), delivery (staged rollout, Retraining) | sys H2, H3, I5, F7 |
+
+To add a principle, follow the steps at the top of that file, then update
+this table, `docs/ML-SKILLS-GUIDE.md`, and `docs/ml-design-template.md`.
 
 ## Monkey-mode
 
@@ -193,3 +208,4 @@ edits stay on `main` regardless.
 | 0020 | Critique: one mode, `ml-critique-merge`, `ml-critique-share-out`, `[user]` tag, Done well rule |
 | 0021 | Critique: share-out never cuts a P1, one meaning for `[C]`, Done well and context in the Checks |
 | 0022 | Principle 2 (the intended behavior, not the metric), retrain fits the change cadence, fuller phase gates |
+| 0023 | Principle 2 skill-check fixes (the PRD keeps no checklist copy), Principle 3, delivery Retraining item, markdown template |

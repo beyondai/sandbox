@@ -271,7 +271,8 @@ sandbox root first.
 
 Usage paths: `../adr/0001-ml-modeling-family-and-continuity.md`.
 Principles: `../ml-design-principles.md` (Principle 1: start simple; a
-more complex model must pass the complexity gate).
+more complex model must pass the complexity gate. Principle 2: evaluate
+reads a sample of outputs, because the metric can be gamed).
 
 ## Check
 

@@ -199,7 +199,9 @@ Reason:
 
 - `../ml-design-principles.md`: the principles that each skill applies and
   that `ml-critique` uses. Principle 1: simple by default, complex only
-  with evidence.
+  with evidence. Principle 2: the objective is the intended behavior, not
+  the metric. Principle 3: a proven version ships, and it keeps up with
+  change.
 - `ml-critique`: judges the quality of a finished write-up, and settles
   each finding with the user. It writes `<project-folder>/critique/`. A
   section skill's Review mode checks only coverage.

@@ -6,7 +6,8 @@ metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
 estimates | tag user findings | Done well filter | share-out and merge
-skills | skill-check fixes | intended behavior and change cadence
+skills | skill-check fixes | intended behavior and change cadence |
+Principle 2 skill-check fixes | Principle 3 and Retraining item
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -471,3 +472,29 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   user asked for general ML wording, with no domain words from the
   source and no names.
 - **Suggested change**: as applied (ADR 0022).
+
+## 2026-10-09 - ml-system-design-prd, ml-critique, routers (Principle 2 skill-check fixes)
+- **Project**: none (skill checks on the `ml-*` design and critique skills)
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): PRD step 3 and Check; `ml-critique`
+  rule 4; "Related" in `ml-system-design` and `ml-modeling`; the
+  `ml-system-design-definition` description (ADR 0023).
+- **Finding**: the PRD had a copy of the Definition branches with no
+  intended-behavior branch, so the PRD interview skipped it. The critique
+  core and both routers named only Principle 1. Root cause: ADR 0022
+  changed the Definition checklist, and the PRD copy did not follow.
+- **Suggested change**: as applied (ADR 0023). Do not copy a checklist
+  into another skill; point to it.
+
+## 2026-10-09 - ml-design-principles.md, delivery, docs (Principle 3, Retraining item)
+- **Project**: none (docs update after ADR 0022)
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): Principle 3 and the summary table;
+  delivery Retraining item and Check question 6; Principle 3 pointers;
+  `docs/ml-design-template.md` (ADR 0023, part 2).
+- **Finding**: the user asked to bring the docs and the principles up to
+  date with the production ideas of ADR 0022. 3 of its lessons had no
+  principle, and delivery had no item for F7 (retrain cadence, owner),
+  though the coverage map pointed F7 at delivery.
+- **Suggested change**: as applied (ADR 0023). When a catalog item maps
+  to a design skill in `coverage.md`, that skill needs a checklist item.

@@ -58,7 +58,8 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
     that pays for the added complexity (`../ml-design-principles.md`,
     Principle 1).
   - Each phase gate checks the metric, the stability across seeds or
-    retrains, the segment and edge-case coverage, and the running cost.
+    retrains, the segment and edge-case coverage, and the running cost
+    (`../ml-design-principles.md`, Principle 3).
   - If a committed date depends on a method not yet shown to work on this
     problem, keep the last proven phase shippable and improving in
     parallel. Name the date and the evidence that decide which ships.

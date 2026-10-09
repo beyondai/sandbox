@@ -25,11 +25,11 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
    (`-<n>`)?
 2. **Load.** Call the Skill tool 2 times: `ml-system-design-definition`
    (the checklist) and `grilling` (the interview mechanics).
-3. **Seed the tree.** Each Definition bullet is a branch, for the topic in
-   `$ARGUMENTS`: Problem, Requirements (scope, non-functional), Baseline,
-   Metrics (offline, online), Team (stakeholders, reuse). Include all
-   branches, also when the topic seems obvious: the interview exists to
-   stop silent assumptions.
+3. **Seed the tree.** Each bullet of the `ml-system-design-definition`
+   checklist is a branch, for the topic in `$ARGUMENTS`. Read the bullets
+   from that skill each run. Reason: a copied list goes stale when the
+   checklist changes. Include all branches, also when the topic seems
+   obvious: the interview exists to stop silent assumptions.
 4. **Grill** in rounds until the frontier is empty.
    - Regular: push for precise answers.
    - Quick POC: the same coverage, a faster pace. Make the one-pass POC draft of
@@ -63,7 +63,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 2. Does the problem name the decision that the model controls, and who
    acts on it?
 3. Is there one primary offline metric, and does each metric have a
-   threshold?
+   threshold? Does the intended behavior name the ways to game the
+   primary metric, each with a guardrail?
 4. Is the out-of-scope list real and specific? Is the baseline named?
 
 Done when the PRD file exists, the 4 answers are yes, and `check_doc.py`

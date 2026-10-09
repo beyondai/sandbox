@@ -30,8 +30,9 @@
 This guide tells you how to use the `ml-critique` skills, with examples.
 - Skill files: `.agents/skills/personal/ml-critique*/`.
 - The reasons for the design: `adr/0009-ml-critique-skills.md`,
-  `adr/0018-critique-coverage-quick-mode-and-context.md`, and
-  `adr/0020-critique-merge-share-out-one-mode.md`.
+  `adr/0018-critique-coverage-quick-mode-and-context.md`,
+  `adr/0020-critique-merge-share-out-one-mode.md`, and
+  `adr/0022-intended-behavior-and-change-cadence.md`.
 - The principles that the review applies:
   `.agents/skills/personal/ml-design-principles.md`.
 
@@ -176,6 +177,16 @@ The review also applies Principle 2: the objective is the intended
 behavior, not the metric. A design that names no ways for the model to
 game its metric, or reads no sample of outputs, gets a finding (system
 B7, modeling I12) (0022).
+
+The review also applies Principle 3: a proven version ships, and it
+keeps up with change. These get a finding (0022, 0023):
+- a phase gate that checks only the metric (system H2);
+- a launch date that depends on an unproven method, with no proven
+  version kept shippable (system H3);
+- a rollout with no staged ramp, or no internal or opt-in stage when the
+  quality is partly subjective (system I5);
+- a retrain that does not fit the cadence of scheduled changes, or that
+  has no owner after launch (system F7).
 
 ## Checkpoints
 

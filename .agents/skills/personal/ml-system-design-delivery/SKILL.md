@@ -3,9 +3,10 @@ name: ml-system-design-delivery
 description: >-
   Use when writing or reviewing the Delivery section of an ML system design doc
   - execution timeline, deployment/rollout/testing strategy, A/B test and
-  offline eval methodology, production monitoring, or fallback plans. Trigger on
-  requests to design a rollout/ramp plan, an A/B test, a monitoring dashboard,
-  or a fallback/kill-switch for an ML system going to production.
+  offline eval methodology, production monitoring, retraining triggers and
+  owner, or fallback plans. Trigger on requests to design a rollout/ramp plan,
+  an A/B test, a monitoring dashboard, a retraining plan, or a
+  fallback/kill-switch for an ML system going to production.
 ---
 
 # Delivery
@@ -39,7 +40,8 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
   (unit, integration, load), CI/CD.
   - When the quality is partly subjective (the user experience), put an
     internal or opt-in stage before the random ramp. It collects feedback
-    and tests the guardrails before random users see the model.
+    and tests the guardrails before random users see the model
+    (`../ml-design-principles.md`, Principle 3).
   - The serving design comes from the route, like Eval: hands-on,
     `modeling/05-serve.md` and `.json`; paper, the Serving section of
     `design/deep-dive.md`. Cite it; do not design serving again here.
@@ -56,6 +58,11 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
 - **Monitoring:** system health (latency, error rate) and model health
   (prediction distribution, feature drift) on a live dashboard. Start the
   latency thresholds from the stage budgets in Serving.
+- **Retraining:** the triggers (drift, and each scheduled upstream change
+  from Training in `design/deep-dive.md` or `modeling/03-train.md`), the
+  owner after launch, and the runbook
+  that the owner runs without the model authors. Reason: a model that
+  only its authors can retrain stops being updated.
 
 ## Offer an ADR
 
@@ -74,5 +81,7 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    randomization unit, and its duration or power?
 5. Does the load test name its target: the peak QPS and the replica
    count (or the batch window) from Serving?
+6. Does retraining name each trigger, scheduled changes included, and
+   the owner after launch?
 
-Done when the 5 answers are yes and `check_doc.py` prints `OK`.
+Done when the 6 answers are yes and `check_doc.py` prints `OK`.

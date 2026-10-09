@@ -23,8 +23,10 @@ dispatch you, run it first.
    metrics. Use `01-data.json`'s `dataset` block for paths, label, and
    split.
 2. Use the problem type's playbook in `../ml-playbooks.md`. Do its
-   classic-mistakes check first. For complexity findings, use Principle 1
-   in `../ml-design-principles.md` (the complexity gate, the cost table).
+   classic-mistakes check first. Use the principles in
+   `../ml-design-principles.md`: Principle 1 for complexity findings (the
+   complexity gate, the cost table), Principle 2 for the metric and the
+   outputs, Principle 3 for phasing, rollout, and retraining.
    For negatives, architecture, and training setup, the typical options
    and values are in `../ml-model-training.md`. For serving (mode, latency
    budget, capacity, cost): `../ml-serving.md`.

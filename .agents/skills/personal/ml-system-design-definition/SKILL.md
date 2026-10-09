@@ -3,10 +3,11 @@ name: ml-system-design-definition
 description: >-
   Use when writing or reviewing the Definition section of an ML system design
   doc - problem statement, requirements (features, out-of-scope,
-  scale/latency/availability), success metrics (offline/online/guardrail), or
-  team/stakeholders/dependencies for an ML system. Trigger on requests to write
-  or check an ML design doc's problem statement, scope/out-of-scope list,
-  non-functional requirements, offline vs online metrics, guardrail metrics, or
+  scale/latency/availability), success metrics (offline/online/guardrail,
+  intended behavior), or team/stakeholders/dependencies for an ML system.
+  Trigger on requests to write or check an ML design doc's problem statement,
+  scope/out-of-scope list, non-functional requirements, offline vs online
+  metrics, guardrail metrics, ways a model can game its metric, or
   stakeholder/dependency mapping.
 ---
 

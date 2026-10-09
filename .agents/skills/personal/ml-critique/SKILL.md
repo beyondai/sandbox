@@ -66,7 +66,9 @@ change the result most.
 4. Apply `../ml-design-principles.md`. Principle 1: simple by default,
    complex only when it passes the complexity gate (gain > noise, and value
    of the gain > added running, maintenance, explainability, and risk
-   cost).
+   cost). Principle 2: the objective is the intended behavior, not the
+   metric (system B7, modeling I12). Principle 3: a proven version ships,
+   and it keeps up with change (system H2, H3, I5, F7).
 5. Write in approximately 80% of ASD-STE100, also in chat (the critique and
    the questions). Add a diagram next to the text when it helps. The text
    stays complete.

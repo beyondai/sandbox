@@ -1,9 +1,10 @@
 # ML design and review principles
 
-Contents: Principle 1, simple by default (Rule | The cost table | Budgets in
-the PRD | Why | How each skill uses this principle) | Principle 2, the
-intended behavior, not the metric (Rule | Why | How each skill uses this
-principle)
+Contents: Summary | Principle 1, simple by default (Rule | The cost table |
+Budgets in the PRD | Why | How each skill uses this principle) | Principle 2,
+the intended behavior, not the metric (Rule | Why | How each skill uses this
+principle) | Principle 3, a proven version ships, and it keeps up with
+change (Rule | Why | How each skill uses this principle)
 
 This file is the single source of truth for the principles that the `ml-*`
 skills use to design and to review ML systems. The design skills apply them
@@ -12,6 +13,14 @@ when they write. The `ml-critique` skills judge write-ups against them.
 To add a principle, give it a number, a one-line rule, the full text, the
 reason, and how each skill uses it. Then add a pointer in each skill that
 uses it.
+
+## Summary
+
+| # | Principle | Main checks |
+|---|---|---|
+| 1 | Simple by default. Complex only with evidence. | complexity gate, cost table |
+| 2 | The objective is the intended behavior, not the metric. | ways to game the metric, output review |
+| 3 | A proven version ships, and it keeps up with change. | full phase gates, proven fallback version, staged rollout, retrain cadence |
 
 ---
 
@@ -148,6 +157,61 @@ These forms are all valid:
 | Skill | Use |
 |---|---|
 | `ml-system-design-definition` | Success metrics: states the intended behavior, and lists the ways the model can game the primary metric, each with a guardrail. |
+| `ml-system-design-prd` | Asks for the intended behavior in the interview (a Definition branch), and checks that each way to game the metric has a guardrail. |
 | `ml-modeling-evaluate` | Output review: reads a sample of top outputs for typical and edge-case inputs, and reports the degenerate patterns. |
-| `ml-critique-system` | B7: no named ways to game the metric, or no check for each. |
-| `ml-critique-modeling` | I12: no output sample was read. |
+| `ml-critique` and lenses | System B7 `[C]`: no named ways to game the metric, or no check for each. Modeling I12: no output sample was read. |
+
+---
+
+## Principle 3: A proven version ships, and it keeps up with change.
+
+```
+   V0 (proven) --gate--> V1 --gate--> V2 ...      gate = metric + stability
+        |                 |                              + coverage + cost
+        +-- stays shippable until the next version passes its gate
+                              |
+   internal / opt-in --> shadow --> 1% --> ... --> 100%   (staged rollout)
+                              |
+   scheduled changes (releases, catalog, rules) --> retrain, inside one cycle
+```
+
+### Rule
+
+1. A phase gate checks more than the metric: the stability across seeds
+   or retrains, the coverage of segments and edge cases, and the running
+   cost. Reason: a metric gain that is unstable, narrow, or too costly
+   fails in production.
+2. Keep the last proven version (the baseline or the previous phase)
+   shippable, and keep improving it, while a new method is tested. If a
+   committed date depends on a method not yet shown to work on this
+   problem, name the date and the evidence that decide which version
+   ships.
+3. Roll out in stages, each with a gate: shadow, then a small random
+   share, then more. When the quality is partly subjective (the user
+   experience), put an internal or opt-in stage first: it collects
+   feedback and tests the guardrails.
+4. List the scheduled upstream changes (product releases, catalog or rule
+   updates, pricing or policy changes) and their cadence. One retrain
+   must fit inside one change cycle, in time and in cost. Each scheduled
+   change is a retrain or re-check trigger, next to the drift trigger.
+5. Name the owner after launch. The owner runs the retrain from a
+   runbook, without the authors of the model.
+
+### Why
+
+- A launch that depends on an unproven method has no plan B. A proven
+  version that keeps improving is the plan B, and often it is enough.
+- Most production breaks come from known changes on a known schedule,
+  not only from slow drift. A model that takes longer to retrain than one
+  change cycle is always out of date.
+- Offline metrics do not show all user-facing quality. A small internal
+  or opt-in group finds the problems before random users do.
+
+### How each skill uses this principle
+
+| Skill | Use |
+|---|---|
+| `ml-system-design-high-level` | Phasing: each gate checks the metric, the stability, the coverage, and the cost. The last proven phase stays shippable when a date depends on an unproven method. |
+| `ml-system-design-deep-dive` | Training: compares the retrain time and cost with the cadence of scheduled changes. |
+| `ml-system-design-delivery` | Deployment: an internal or opt-in stage before the random ramp for partly subjective quality. Monitoring: the retrain triggers, the owner, and the runbook. |
+| `ml-critique` and lenses | System H2 (full gates), H3 (proven version shippable), I5 (staged rollout), F7 (retrain cadence, owner). |

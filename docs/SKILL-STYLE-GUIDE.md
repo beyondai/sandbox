@@ -205,7 +205,7 @@ For each doc that describes a changed skill:
       script list show the current skills and files?
 - [ ] Do the keywords and commands match the skills (for example
       "parallel", "full chain", "poc")?
-- [ ] Does the template (`docs/ml-design-template.txt`) have each item
+- [ ] Does the template (`docs/ml-design-template.md`) have each item
       that the design skills require?
 - [ ] Does the "Key design decisions" list name each new ADR?
 
