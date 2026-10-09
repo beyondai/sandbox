@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import time
 from datetime import date
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -42,6 +43,7 @@ FEATURES = [
 ]
 
 
+@lru_cache(maxsize=2)
 def page_age(split: str) -> pl.DataFrame:
     """Age in days at cutoff T, from page ids calibrated to dates.
     Riot: replace with T - wiki.pages.created."""
@@ -59,11 +61,18 @@ def page_age(split: str) -> pl.DataFrame:
     return pages.with_columns(age_days=pl.Series(np.clip(age, 0, None)).fill_nan(None))
 
 
-def transform(pairs: pl.DataFrame, split: str) -> pl.DataFrame:
-    month = SPLITS[split][0]
-    feat = pl.read_parquet(OUT / "months" / f"{month}.parquet")
+@lru_cache(maxsize=2)
+def history(split: str) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    """The feature month and its per-page totals, loaded once per process.
+    Serving calls transform() many times; the history doesn't change."""
+    feat = pl.read_parquet(OUT / "months" / f"{SPLITS[split][0]}.parquet")
     out_n = feat.group_by("src").agg(out_n=pl.col("n").sum())
     in_n = feat.group_by("dst").agg(in_n=pl.col("n").sum())
+    return feat, out_n, in_n
+
+
+def transform(pairs: pl.DataFrame, split: str) -> pl.DataFrame:
+    feat, out_n, in_n = history(split)
     ages = page_age(split)
     qs = pairs.select("q").unique()
 

@@ -1,0 +1,12 @@
+{
+  "single_requests": 200,
+  "p50_ms": 522.204,
+  "p95_ms": 557.09,
+  "p99_ms": 572.314,
+  "max_ms": 581.909,
+  "qps_per_replica_1_worker": 1.9,
+  "batch_size": 1000,
+  "batch_rows_per_sec": 1789.1,
+  "model_mb": 0.378,
+  "machine": "x86_64 Darwin, 16 CPUs, python 3.12.1"
+}
