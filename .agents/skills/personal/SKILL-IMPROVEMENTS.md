@@ -255,3 +255,117 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   content similarity, or that the evaluation ranks the full catalog.
 - **Suggested change**: add an item-to-item variant to Recommendation:
   baseline, classic mistakes, and questions.
+
+## 2026-10-09 - ml-critique lenses (output exposure filters)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found gap (both lenses, Quick run on the interview report)
+- **Status**: modified and adopted (2026-10-09): not a catalog item. One classic
+  mistake each in `ml-playbooks.md`, Search ranking and RAG (ADR 0019).
+  Reason: both lenses found it through the Recommendation playbook.
+- **Finding**: neither catalog checks what the served items expose. System
+  C6 covers only PII in features. Modeling K4 and K5 cover latency, mode,
+  and cost. The permission filter, "exclude the query item", dedup, and
+  status filters appear only in the item-to-item playbook, so other
+  recommenders and search designs miss them.
+- **Suggested change**: add one catalog item to each lens: "Served
+  output filters: access rights per viewer, the query item, near
+  duplicates, archived or stale items. Retrieve more than K, then filter."
+
+## 2026-10-09 - ml-critique-modeling (sampled-ratio floor)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found gap
+- **Status**: declined (2026-10-09): both lenses found the 0.80 floor with the
+  current G0 check. No failure observed (ADR 0019).
+- **Finding**: the catalog does not tell the reviewer to compare accuracy
+  or AUC with the trivial floor at the sampled negative ratio. At 1:4, a
+  constant "0" gets accuracy 0.80. There is also no item for "the author
+  dismisses or misreads the one metric that matches the product".
+- **Suggested change**: in I1 (or G0), add: "With sampled negatives,
+  state the constant-prediction floor at that ratio." Add I12: "Does the
+  write-up read each metric correctly, and does it act on the metric that
+  matches the product?"
+
+## 2026-10-09 - ml-critique lenses (text-only hybrid report)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found gap
+- **Status**: deferred (2026-10-09): adopt if a run misses a finding or
+  the lenses contradict each other. The only cost was a merge (ADR 0019).
+- **Finding**: the modeling lens step 1 and its Evidence rules assume a
+  project folder with code and probe output. A text-only report (the
+  common interview case) has no rule. Both lenses also had no rule to
+  divide a mixed report, so they duplicated the split, metric, loss, and
+  filter findings.
+- **Suggested change**: in both lenses: "Text-only write-up: evidence is
+  `file:line`; probes are arithmetic only." In ml-critique step 2: "When
+  both lenses run on one file, tell each lens its owned sections. The
+  merge joins the overlap."
+
+## 2026-10-09 - ml-critique-system (index version at retrain)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found gap
+- **Status**: declined (2026-10-09): narrow (embedding retrieval only), and the
+  system lens found it anyway (ADR 0019).
+- **Finding**: F5 and F6 cover model versions, not the embedding index. A
+  weekly retrain (and a TF-IDF vocabulary refit) changes the embedding
+  space. A partial index update mixes 2 incompatible spaces.
+- **Suggested change**: add to F6: "Version the model and its index
+  together, swap the index atomically, keep the previous pair for
+  rollback, and gate promotion on the offline metric."
+
+## 2026-10-09 - ml-critique-modeling (two sources for the Quick budget)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: declined (2026-10-09): housekeeping, no effect on a finding.
+  Fix it in passing at the next edit of that file (ADR 0019).
+- **Finding**: the lens SKILL.md hardcodes the Quick budget (40 minutes).
+  The router also passes the budget. A context time limit that scales the
+  budget then conflicts with the lens text.
+- **Suggested change**: the lens says "use the budget that the router
+  gives" and removes the number.
+
+## 2026-10-09 - ml-critique (question format)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user feedback (confirmed approach)
+- **Status**: adopted (2026-10-09): `ml-critique` step 2 part 4, both
+  lenses step 5 and Check (ADR 0019).
+- **Finding**: part 4 gives a question and an expected answer only. The
+  user did not see why "What share of positives are on-page link
+  clicks?" mattered until it was expanded: what the question means (a
+  small path diagram), why it matters (3-4 effects), and a table of the
+  action for each answer. The user said this part was "very good" and
+  new to them. Ambiguous author claims ("recommendations are
+  subjective") also need a split into their possible meanings.
+- **Suggested change**: in ml-critique step 2 part 4 and both lenses,
+  each question gets: the question, the expected answer, why it matters
+  (one line), and what each likely answer changes. For a vague claim in
+  the write-up, ask "in which sense?" and list the meanings with the fix
+  for each.
+
+## 2026-10-09 - ml-critique (several versions of one critique)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: declined (2026-10-09): low value; add `-v<N>` by hand when a file
+  exists (ADR 0019).
+- **Finding**: the user runs several critique versions of one write-up
+  on the same day, then researches across them. The name
+  `critique/<date>-<lens>.md` collides. Also, the user stopped Converge
+  early ("no need to prioritize now, just note the priorities") to save
+  a version. The skill has no "save this version" exit.
+- **Suggested change**: name the file `<date>-<lens>-v<N>.md` when one
+  exists. Add a Converge exit: "save version". Accepted items are
+  recorded, open items go to Deferred ("compare versions first"), and
+  the priorities stay as noted.
+
+## 2026-10-09 - ml-system-design and ml-critique (log filter)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): `ml-system-design`, "Skill
+  improvement log"; `ml-critique` step 2.3; both lens Checks (ADR 0019).
+- **Finding**: the lens subagents were asked to report skill issues, so
+  each one returned some. 6 of 7 entries from the interview critique
+  showed no failure: the lenses found those problems anyway. The user
+  saw only 1 entry as an obvious improvement.
+- **Suggested change**: log an agent-found entry only with evidence that
+  the skill made the work worse (a missed, wrong, or late result, or
+  extra work for the user). The lenses return an issue only under the
+  same rule.

@@ -219,7 +219,11 @@ project's own docs.
 Log an entry when one of these occurs, in a skill run or between runs
 (discussion, follow-up work):
 1. **Agent-found:** a bug in the skill's instructions, or a better method
-   than the one written.
+   than the one written. Log filter: log it only with evidence that the
+   skill made the work worse: a missed, wrong, or late result, or extra
+   work for the user. Reason: a gap that the skill covered anyway (for
+   example through a playbook) is noise, and noise hides the useful
+   entries.
 2. **User-requested:** the user asks to change how the skill works (not a
    one-time request for this project). Log it at once.
 

@@ -409,8 +409,9 @@ in parentheses.
   (0017).
 - **Skill changes go to one shared log.**
   `.agents/skills/personal/SKILL-IMPROVEMENTS.md`, for all projects. The
-  agent reflects at the end of each session and offers a review (0004,
-  0016).
+  agent reflects at the end of each session and offers a review. An
+  agent-found entry needs evidence that the skill made the work worse
+  (0004, 0016, 0019).
 - **One reference for model and training choices.** `ml-model-training.md`
   holds negative sampling, architecture (shallow or deep, MLP, cross
   network, attention), the neural network training setup, and tree
@@ -436,6 +437,8 @@ in parentheses.
   check. Quick mode limits the whole run to 2 hours. Each run asks for
   the view (fresh or with your design) and a critique context; the
   context wins only on a conflict, and each conflict is noted (0018).
+  Each question gives why it matters and what each answer changes
+  (0019).
 - **One folder for each project.** All generated files go in
   `<parent>/<project>/`, never in `notes/` (0010).
 - **Each skill checks its own output.** Intent questions, a format script,

@@ -77,6 +77,10 @@ project it is working on) in the one shared log,
 - **Suggested change**: <the edit, concrete enough to apply as-is>
 ```
 
+An agent-found entry needs evidence that the skill made the work worse (a
+missed, wrong, or late result, or extra work for the user); a gap that the
+skill covered anyway is noise (`adr/0019`).
+
 Entries are appended, never overwritten or deleted. Nothing is applied
 automatically: a `SKILL.md` is shared by every future project, so a silent
 edit from one run would change behavior everywhere. At the end of a run, any
@@ -185,3 +189,4 @@ edits stay on `main` regardless.
 | 0016 | One shared skill improvement log; reflect at the end of every session |
 | 0017 | Ranking path, proxy rule, chain mode, bench --full, from the Riot wiki session |
 | 0018 | Critique: full coverage, sort key, Quick mode (2 hours), critique context, view asked each run |
+| 0019 | Critique questions give why and what changes; log only issues with evidence |

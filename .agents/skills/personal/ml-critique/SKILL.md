@@ -149,15 +149,19 @@ Progress (copy into your reply, tick each line):
    3. **Missing.** For each item: priority, why it is necessary, and the
       standard method.
    4. **Questions.** Clarifications about intent, and the questions that the
-      designer did not ask (from the playbook). Give an expected answer for
-      each question, from experience.
+      designer did not ask (from the playbook). For each question, give
+      the expected answer (from experience), why it matters, and what
+      each likely answer changes. For a vague claim in the write-up, ask
+      "in which sense?" and give each meaning with its fix. Reason: a
+      question with no "why" does not show its value to the reader.
 
    In Quick mode, it also returns the checks that it did not do (Not
    checked). With a context, it also returns each context conflict.
 3. Merge the critiques if 2 lenses ran. Join the items that are the same
    problem. Remove findings with no evidence. In Quick mode, apply its
-   limits to the merged result. Add each skill issue that a lens reports
-   to the skill improvement log.
+   limits to the merged result. Log a skill issue that a lens reports
+   only if it passes the log filter ("Skill improvement log" in
+   `../ml-system-design/SKILL.md`).
 4. If the view is "With my design", run the reference pass now.
 5. Show the top 3 changes, then the 4 parts. Show each context conflict
    in one line.

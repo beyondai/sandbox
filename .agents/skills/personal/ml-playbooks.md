@@ -188,6 +188,8 @@ user. Parts 1-8 above apply, with these changes:
    - No query understanding. Fix: spell correction and synonyms before
      ranking.
    - Pointwise loss for a ranking task. Fix: pairwise or listwise loss.
+   - Results are not filtered by the viewer's access rights. Fix: retrieve
+     more than k, then apply a permission filter at serving time.
 8. **Questions to ask.**
    - What is the query distribution? Expected: a long tail. Most unique
      queries are rare, so tail behavior is important.
@@ -365,6 +367,9 @@ user. Parts 1-8 above apply, with these changes:
      structure, and test chunk sizes.
    - No plan for prompt injection, PII, or hallucination. Fix: input and
      output guards, required citations, an "I do not know" path.
+   - Retrieval ignores the user's access rights, so the answer can quote a
+     restricted document. Fix: a permission filter on the retrieved chunks
+     before generation.
    - The cost and latency of the LLM are not in the budget. Fix: a budget
      for each query, caching, and a smaller model where it is sufficient.
 8. **Questions to ask.**

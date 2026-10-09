@@ -36,8 +36,9 @@ dispatch you, run it first.
 4. Put each result in one part: done well, change or fix, missing, or
    question. Give each finding a priority with the remedy from the
    catalog.
-5. Add the playbook's questions that the write-up did not answer, each with
-   an expected answer.
+5. Add the playbook's questions that the write-up did not answer. Give each
+   question the expected answer, why it matters, and what each likely
+   answer changes (the core's part 4).
 6. Do the cross-section checks (section K; Quick: the `[C]` items first).
    Errors across sections are often P1.
 7. If a critique context is given, apply it. On a conflict with this lens,
@@ -51,15 +52,17 @@ can list source tables to confirm that they exist. Do not profile data.
 
 Before you return the critique, read it again against these questions. Fix each
 "no", then check again (maximum 2 loops). Return the open items and each skill
-issue (a gap or error in this lens or its catalog) with the critique. The core
-logs them.
+issue (a gap or error in this lens or its catalog) with the critique. Return an
+issue only if it made this critique worse: a missed, wrong, or late finding.
+Reason: a gap that the playbook covered anyway adds noise to the log.
 1. Does each check that you did have a result, or a one-line reason why
    it does not apply? In Quick mode, is each skipped check in Not checked?
 2. Does each P1 and P2 finding have a quote with `file:line` (or a named
    missing section) and an alternative?
 3. Are the findings sorted with the core's sort key (priority, then
    upstream in catalog section order, then effect, then confidence)?
-4. Does each question have an expected answer?
+4. Does each question have an expected answer, why it matters, and what
+   each answer changes?
 5. Is each conflict with the critique context returned?
 
 Done when the 5 answers are yes.

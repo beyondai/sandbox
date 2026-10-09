@@ -98,7 +98,9 @@ Use a different skill for these tasks:
       and an alternative.
    3. **Missing:** each item with the standard method.
    4. **Questions:** clarifications, and the questions that the designer
-      did not ask, each with an expected answer.
+      did not ask. Each one has an expected answer, why it matters, and
+      what each answer changes. A vague claim gets an "in which sense?"
+      question (0019).
 3. **Converge.** The skill asks numbered questions, P1 first. Each
    question has a recommended answer. You answer each one:
    - **accept**;
@@ -363,4 +365,5 @@ labs/proj1/                 (the parent is labs/ unless you name another)
   for example an interview brief.
 - A skill problem found during a run goes to the shared
   `.agents/skills/personal/SKILL-IMPROVEMENTS.md`. The skill does not
-  change itself during the run.
+  change itself during the run. It logs a problem only if the problem
+  made the critique worse (0019).
