@@ -40,7 +40,8 @@ grilling rounds, and nothing is written to `design/`.
 - **Requirements, scope:** the must-have features, and an explicit
   out-of-scope list for this version. Reviews skip this item most often:
   check it first.
-- **Requirements, non-functional:** load, latency (for example p99),
+- **Requirements, non-functional:** peak load (QPS, not the average:
+  serving capacity is sized for it), latency (for example p99),
   availability, the explainability need (hard or soft), and the cost
   sensitivity. A level (`low`/`medium`/`high`) or `unknown` is a valid
   cost answer. See `../ml-design-principles.md`, Principle 1.

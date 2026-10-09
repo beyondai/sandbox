@@ -10,6 +10,8 @@ Usage:
     python hypothesis_tester.py proportion --successes-a 120 --trials-a 1000 --successes-b 145 --trials-b 1000
     python hypothesis_tester.py chi-square --file contingency.csv
     python hypothesis_tester.py ttest --file data.csv --col-a before --col-b after --paired --json
+
+Requires: python3 standard library only (no venv needed).
 """
 
 import argparse

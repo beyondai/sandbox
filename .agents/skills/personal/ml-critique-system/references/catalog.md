@@ -242,6 +242,16 @@ definition.**
 - Remedies: a budget for each component: feature fetch, retrieval,
   ranking, rules.
 
+**F4a. The capacity covers the peak load.**
+- Mistakes: no capacity plan. Sizing for the average QPS. No headroom
+  for spikes or a lost replica. A batch job with no check against its
+  scoring window.
+- Remedies: replicas = peak QPS x (1 - cache hit rate) / QPS per replica
+  x headroom (1.3-1.5); autoscaling between average and peak; a
+  degradation order under overload; a load test at the peak before
+  launch. For batch: job time = population / throughput, well inside
+  the window.
+
 **F5. There is a retraining schedule, trigger, and promotion procedure.**
 - Mistakes: "we will retrain periodically".
 - Remedies: a schedule, a drift trigger, and an automated gate (the new

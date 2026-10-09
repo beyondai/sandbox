@@ -358,3 +358,12 @@ cost.**
 - Mistakes: features re-written for serving. A skew that nobody tests.
 - Remedies: one feature pipeline for both paths. A parity test on a sample
   of rows.
+
+**K4. Serving latency and capacity are measured on the real artifact.**
+- Mistakes: a latency claim with no measurement, or a mean in place of
+  p99. A benchmark that times a batch and calls it a request. Capacity
+  from the average load. No comparison with the PRD p99 target.
+- Remedies: time the real scoring function (`serve.py`) after a warm-up:
+  single-request p50/p99 and batch throughput (`bench_serve.py` in
+  `ml-modeling-serve`). Replicas from the peak QPS with headroom, or the
+  batch job time against its window. A plain verdict against the target.

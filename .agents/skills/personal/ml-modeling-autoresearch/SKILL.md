@@ -163,6 +163,10 @@ duration, record the start time.
        `Path(__file__).resolve().parents[N]`), correct `N`.
      - Run the promoted `experiment.py` from its real location. Confirm
        that it gives the same metrics.
+     - If `modeling/05-serve.json` exists, it now describes the old
+       model. Say in `round-summary.md` and the end report: "05-serve is
+       stale; run `ml-modeling-serve` again". Do not run it here (it is
+       outside this skill's write boundary).
    - **Not improved:** keep the code in `rounds/` only. Add 1 to the
      streak.
 4. **Summary and Check.** Write `round-summary.md` with the candidate

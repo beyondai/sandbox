@@ -37,6 +37,12 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
   example sprint length, review cadence).
 - **Deployment:** the rollout plan (ramp %, schedule), the test plan
   (unit, integration, load), CI/CD.
+  - The serving design comes from the route, like Eval: hands-on,
+    `modeling/05-serve.md` and `.json`; paper, the Serving section of
+    `design/deep-dive.md`. Cite it; do not design serving again here.
+  - The load test runs at the peak QPS with the replica count from
+    Serving (or the batch job inside its window). That is its pass
+    target. Reason: it proves the capacity plan before users see it.
 - **Eval:** the A/B test design and the significance method; the offline
   method (for example a held-out window).
   - Hands-on route: use the real results in `modeling/04-evaluate.md`.
@@ -45,7 +51,8 @@ Rules: `../ml-system-design/SKILL.md`, "Project folder", "Output docs",
     uses the evaluation plan in `design/high-level.md`, marked as an
     assumption.
 - **Monitoring:** system health (latency, error rate) and model health
-  (prediction distribution, feature drift) on a live dashboard.
+  (prediction distribution, feature drift) on a live dashboard. Start the
+  latency thresholds from the stage budgets in Serving.
 
 ## Offer an ADR
 
@@ -62,5 +69,7 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    will monitor performance"?
 4. Does the A/B test name its metric (the PRD online metric), its
    randomization unit, and its duration or power?
+5. Does the load test name its target: the peak QPS and the replica
+   count (or the batch window) from Serving?
 
-Done when the 4 answers are yes and `check_doc.py` prints `OK`.
+Done when the 5 answers are yes and `check_doc.py` prints `OK`.

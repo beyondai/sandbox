@@ -4,7 +4,8 @@ description: >-
   Use to engineer and select features for an ML model - numerical transforms,
   categorical encoding, leave-one-out aggregation features, interaction/cross
   features, time-based/cyclical features, importance-based selection. Step 2
-  of the ml-modeling-* chain (data → features → train → evaluate). Trigger on
+  of the ml-modeling-* chain (data → features → train → evaluate → serve).
+  Trigger on
   "engineer features for this," "encode these columns," or continuing
   modeling work in an existing ML project folder.
 ---

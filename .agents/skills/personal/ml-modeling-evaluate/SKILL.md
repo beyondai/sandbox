@@ -3,8 +3,8 @@ name: ml-modeling-evaluate
 description: >-
   Use to evaluate a trained model rigorously - classification/regression
   metrics, baseline comparison, overfitting check. Also writes the project
-  dashboard's Final Results section. Step 4 (final) of the ml-modeling-* chain
-  (data → features → train → evaluate). Trigger on "evaluate this model,"
+  dashboard's Final Results section. Step 4 of the ml-modeling-* chain
+  (data → features → train → evaluate → serve). Trigger on "evaluate this model,"
   "compare to baseline," "is this overfitting," or continuing modeling work in
   an existing ML project folder.
 ---
@@ -142,6 +142,8 @@ Done when the 4 answers are yes, `check_doc.py` prints `OK`, and
 
 ## After this step
 
-`ml-modeling-autoresearch` (user-run only) tries to beat this result: one
-round, until plateau, or for a duration. See
-`../ml-modeling-autoresearch/SKILL.md`.
+- Next: `ml-modeling-serve` (step 5) measures how this model serves.
+- `ml-modeling-autoresearch` (user-run only) tries to beat this result:
+  one round, until plateau, or for a duration. See
+  `../ml-modeling-autoresearch/SKILL.md`. After a promotion, run step 5
+  again.

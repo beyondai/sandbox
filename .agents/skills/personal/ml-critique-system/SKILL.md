@@ -3,7 +3,8 @@ name: ml-critique-system
 description: >-
   System-design lens of ml-critique. Use to critique an ML system design
   write-up (PRD, design doc, RFC, or interview answer): goal, metrics,
-  framing and labels, data, architecture, modeling plan, delivery.
+  framing and labels, data, architecture, modeling plan, serving,
+  delivery.
 ---
 
 # ML Critique: System Lens
@@ -24,7 +25,8 @@ dispatch you, run it first.
    classic-mistakes check first. For complexity findings, use Principle 1
    in `../ml-design-principles.md` (the complexity gate, the cost table).
    For negatives, architecture, and training setup, the typical options
-   and values are in `../ml-model-training.md`.
+   and values are in `../ml-model-training.md`. For serving (mode, latency
+   budget, capacity, cost): `../ml-serving.md`.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections A (goal), B (metrics), and D (framing and labels) hold most P1
    findings. Do them first. Brief mode: `[C]` items, plus any P1 or P2

@@ -3,9 +3,10 @@ name: ml-modeling
 description: >-
   Use when executing the hands-on ML modeling workflow for a project that
   already has a PRD and a fork-grade `design/high-level.md` - building the
-  labeled table, profiling data, engineering features, training a model, and
-  evaluating it. The hands-on alternative to ml-system-design-deep-dive.
-  Entry point for the whole data-to-evaluated-model chain; for one step only,
+  labeled table, profiling data, engineering features, training a model,
+  evaluating it, and measuring how it serves. The hands-on alternative to
+  ml-system-design-deep-dive. Entry point for the whole data-to-served-model
+  chain; for one step only,
   trigger that step's own skill directly instead. Trigger on "let's
   build/train/prototype a model for X," "quick ML POC," or continuing modeling
   work in an existing ML project folder.
@@ -14,9 +15,9 @@ description: >-
 # ML Modeling
 
 Contents: Steps | Required upstream | Modes | Dashboard | Bundled tools | After
-step 4 | Check
+step 5 | Check
 
-4 steps. Each step is its own skill. Files in `<project-folder>/modeling/`
+5 steps. Each step is its own skill. Files in `<project-folder>/modeling/`
 connect the steps, not the conversation, so each step can run alone in a
 new session.
 
@@ -26,6 +27,7 @@ new session.
 | 2 | `ml-modeling-features` | `02-features.md` |
 | 3 | `ml-modeling-train` (sequential) or `ml-modeling-multiagent` (parallel) | `03-train.md` |
 | 4 | `ml-modeling-evaluate` | `04-evaluate.md`, `04-evaluate.json` |
+| 5 | `ml-modeling-serve`: mode, `serve.py`, measured latency, capacity | `05-serve.md`, `05-serve.json` |
 
 - The `dataset` block in `01-data.json` is the data contract. Later steps
   read table paths, the label, and the split roles from it, never from
@@ -38,14 +40,14 @@ Progress (copy into your reply, tick each line):
 
 ```
 [ ] 0 PRD and high-level exist; spec exists or is synthesized
-[ ] 1 data       [ ] 2 features      [ ] 3 train      [ ] 4 evaluate
+[ ] 1 data   [ ] 2 features   [ ] 3 train   [ ] 4 evaluate   [ ] 5 serve
 [ ] Check each step's output (see the Check step in each skill)
 ```
 
 1. `/ml-modeling <topic>` runs step 1, reports the result, and stops for
    the user's confirmation. Then step 2, and so on.
-2. Run all 4 steps without stops only when the user says so ("full
-   chain", "run all four steps", "don't stop between steps").
+2. Run all 5 steps without stops only when the user says so ("full
+   chain", "run all steps", "don't stop between steps").
 3. For one step, run that skill. It continues from the files that exist.
 
 Project folder, output format, the Check procedure, and the skill
@@ -83,8 +85,13 @@ What each step reads, and what it decides:
 - **`ml-modeling-evaluate`.** Reads the PRD offline metrics (primary,
   secondary, guardrails) and `dataset.split`. Writes `04-evaluate.md` and
   `.json`.
+- **`ml-modeling-serve`.** Reads the PRD non-functional requirements
+  (peak load, p99, cost sensitivity), the scoring cadence in the framing,
+  and `04-evaluate.json`. Decides the serving mode and the capacity
+  (`05-serve.md` and `.json`). Same items as the deep-dive Serving item.
 
-Handoff between steps 2, 3, and 4 (so evaluate never refits on test):
+Handoff between steps 2 to 5 (so evaluate never refits on test, and
+serving uses the training feature code):
 - Features writes `modeling/features.py` with `transform(df)`, fit on
   train only. The same function transforms train and test.
 - Train saves `modeling/model.joblib`: the fitted model and its decision
@@ -92,6 +99,9 @@ Handoff between steps 2, 3, and 4 (so evaluate never refits on test):
 - Evaluate loads both, scores `dataset.test` once, and saves the per-row
   scores to `modeling/test_scores.csv`. A metric change then reruns only
   the metric code.
+- Serve writes `modeling/serve.py` with `score(df)`: it calls
+  `transform()` and the model from `model.joblib`. No copied feature
+  logic.
 
 ### The spec
 
@@ -189,6 +199,11 @@ Step 3 has 2 skills for the same `03-train.md`:
 | "parallel", "multiagent", "concurrent" | `ml-modeling-multiagent` |
 | "sequential", or no preference | `ml-modeling-train` (default) |
 
+Both write `03-train.md` and `model.joblib`, so steps 4 and 5 are the same
+on either. Multiagent fits several reasonable candidates or a Quick POC;
+train fits one clear candidate, a restricted session, or a low token
+budget. Details: "When to use" in `../ml-modeling-multiagent/SKILL.md`.
+
 ## Dashboard
 
 Regular and Quick-POC only. Never in monkey-mode.
@@ -211,22 +226,25 @@ Reason: `../adr/0002-modeling-dashboard.md`.
 | `scripts/hypothesis_tester.py` | python3 stdlib | evaluate, critique |
 | `scripts/spec_hash_check.sh` | bash, git | each step |
 | `../ml-modeling-data/scripts/launch_dashboard.sh` | bash, lsof, curl, uv | data, evaluate |
+| `../ml-modeling-serve/scripts/bench_serve.py` | uv (pandas, and what `serve.py` imports) | serve |
 
 The stdlib scripts run with plain `python3`. The step code runs with `uv
 run` in the shared sandbox venv. On a new clone, run `uv sync` at the
 sandbox root first.
 
-## After step 4
+## After step 5
 
-- Iterate: run step 2 or 3 again.
+- Iterate: run step 2 or 3 again, then 4 and 5.
 - `ml-modeling-autoresearch` (user-run only): automatic improvement
-  rounds. It writes the winners to `04-evaluate.json`. Modes: one round,
+  rounds after step 4. It writes the winners to `04-evaluate.json`; run
+  step 5 again after a promotion. Modes: one round,
   `until plateau`, `for 20 minutes`. Not in monkey-mode. Reasons:
   `../adr/0003-autoresearch.md`,
   `../adr/0005-autoresearch-self-contained-looping.md`.
 - `ml-critique`: judge the quality of the modeling report (leakage, split,
   baseline, metric).
-- To ship: give `modeling/04-evaluate.md` to the `implement` skill.
+- To ship: give `modeling/04-evaluate.md` and `modeling/05-serve.md` to
+  the `implement` skill.
 - A Quick POC that becomes a real project: run `ml-system-design-prd` and
   `ml-system-design-high-level` again in Regular mode, and add `adr/`.
 

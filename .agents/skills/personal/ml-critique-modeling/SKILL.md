@@ -3,7 +3,7 @@ name: ml-critique-modeling
 description: >-
   Modeling lens of ml-critique. Use to critique an ML modeling or solution
   report and its code: baseline, dataset and labels, split, leakage,
-  features, model, loss, tuning, evaluation, reproducibility.
+  features, model, loss, tuning, evaluation, serving, reproducibility.
 ---
 
 # ML Critique: Modeling Lens
@@ -19,14 +19,15 @@ dispatch you, run it first.
 ## Steps
 
 1. Read the report from start to end, then the code that made each number.
-   In a project folder, read `spec/`, `modeling/01`-`04`, and the PRD
+   In a project folder, read `spec/`, `modeling/01`-`05`, and the PRD
    metrics. Use `01-data.json`'s `dataset` block for paths, label, and
    split.
 2. Use the problem type's playbook in `../ml-playbooks.md`. Do its
    classic-mistakes check first. For complexity findings, use Principle 1
    in `../ml-design-principles.md` (the complexity gate, the cost table).
    For negatives, architecture, and training setup, the typical options
-   and values are in `../ml-model-training.md`.
+   and values are in `../ml-model-training.md`. For serving (mode, latency
+   budget, capacity, cost): `../ml-serving.md`.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections are in priority order: A to D (baseline, labels, split,
    leakage) hold most P1 findings. Brief mode: `[C]` items, plus any P1

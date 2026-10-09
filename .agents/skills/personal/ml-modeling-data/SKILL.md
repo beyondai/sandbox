@@ -6,7 +6,7 @@ description: >-
   errors it finds (impossible values, sentinel-coded missingness, exact
   duplicates). Also creates the project's EDA notebook and bootstraps its
   Streamlit dashboard. Step 1 of the ml-modeling-* chain (data → features →
-  train → evaluate). Trigger on "profile this data," "check data quality,"
+  train → evaluate → serve). Trigger on "profile this data," "check data quality,"
   "clean this data," "set up a dashboard for this," or continuing modeling
   work in an existing ML project folder. Builds the labeled table first
   when the source is raw logs rather than a flat labeled table, and records

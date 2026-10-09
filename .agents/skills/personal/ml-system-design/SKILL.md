@@ -17,12 +17,15 @@ Related skills and docs | Skill improvement log
 
 A full design doc has 5 sections. Each section is its own skill:
 
-1. `ml-system-design-definition`: problem, requirements, metrics, team.
+1. `ml-system-design-definition`: problem, requirements, baseline,
+   metrics, team.
 2. `ml-system-design-high-level`: ML framing, architecture, phasing.
-3. `ml-system-design-deep-dive`: data, features, models, training.
+3. `ml-system-design-deep-dive`: data, features, models, training,
+   serving.
 4. `ml-system-design-delivery`: execution, deployment, evaluation,
    monitoring, fallback.
-5. `ml-system-design-post-delivery`: analysis, explainability, iteration.
+5. `ml-system-design-post-delivery`: analysis, explainability, iteration,
+   democratize.
 
 ```
 prd (= definition) -> high-level -> [ deep-dive (paper)          ] -> delivery -> post-delivery
@@ -180,11 +183,14 @@ Reason: `../adr/0001-ml-modeling-family-and-continuity.md`.
 After `design/high-level.md`, select one route:
 - **Paper:** `ml-system-design-deep-dive` writes `design/deep-dive.md`.
 - **Hands-on:** the `ml-modeling` chain (data -> features -> train ->
-  evaluate) writes `spec/<topic>.md` and `modeling/01`-`04`. It does not
-  read `design/deep-dive.md`.
+  evaluate -> serve) writes `spec/<topic>.md` and `modeling/01`-`05`. It
+  does not read `design/deep-dive.md`.
 
+Both routes answer the same 5 items, serving included, so delivery gets
+the same facts on either route (`../adr/0013-serving-on-both-routes.md`).
 Delivery uses the file that exists. If both exist, it uses the newer one
-(with modeling, the real numbers from `04-evaluate.md`). When execution
+(with modeling, the real numbers from `04-evaluate.md` and
+`05-serve.md`). When execution
 contradicts the framing, send the change back to `design/high-level.md`.
 Reason:
 `../adr/0006-fork-after-high-level.md`.

@@ -39,10 +39,11 @@ There are 3 skills:
 - **`ml-critique`**: the entry point. It selects the mode and the lens,
   and runs the full procedure.
 - **`ml-critique-system`**: the system lens. It reviews the goal,
-  metrics, framing, labels, data, architecture, phasing, and delivery.
+  metrics, framing, labels, data, architecture, phasing, serving, and
+  delivery.
 - **`ml-critique-modeling`**: the modeling lens. It reviews the baseline,
-  dataset, split, leakage, features, model, training setup, and
-  evaluation.
+  dataset, split, leakage, features, model, training setup, evaluation,
+  and serving.
 
 Use `ml-critique` in most cases. It calls the correct lens. Each lens skill
 also works alone, when you want only one view.

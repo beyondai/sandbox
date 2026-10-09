@@ -9,7 +9,7 @@ The template has 5 sections:
 
 Contents
 
-  1. Definition ........ Problem, Requirements, Metrics, Team
+  1. Definition ........ Problem, Requirements, Baseline, Metrics, Team
   2. High-level Design . ML framing, Architecture diagrams, Delivery phases
   3. Design Deep Dive .. Data, Features, Models, Training, Serving
   4. Delivery .......... Execution; Deployment, rollout, and testing;
@@ -17,7 +17,7 @@ Contents
   5. Post Delivery ..... Analysis, Explainability, Iteration, Democratize
 
 
-1. Definition: Problem, Requirements, Metrics, Team
+1. Definition: Problem, Requirements, Baseline, Metrics, Team
 
 This section sets the context. Define the why, what, how, and who of the
 project. Do this before the technical design starts.
@@ -39,12 +39,20 @@ Requirements
       rank a list of items".
     - List what V1 does not include. This controls the scope. Example:
       "no real-time personalization in V1".
-  - Scale, latency, and availability:
+  - Scale, latency, availability, explainability, and cost:
     - These are the critical non-functional requirements.
-    - Scale: the expected load. Example: "10 million requests per
-      minute".
+    - Scale: the peak load, not the average. Example: "10 million
+      requests per minute at peak".
     - Latency: the speed. Example: "p99 latency under 100 ms".
     - Availability: the uptime. Example: "99.99% availability".
+    - Explainability: hard (each decision needs a reason) or soft.
+    - Cost sensitivity: low, medium, or high.
+
+Baseline
+  The simple approach that the ML system must beat. It is often not ML.
+  - Status quo: what users do today without the system.
+  - Recommended baseline: a strong simple rule. Example: "most popular
+    items in the last 7 days".
 
 Metrics
   This part defines how you measure success.
@@ -120,8 +128,10 @@ Features
 
 Models
   - Candidate models and trade-offs:
-    - List the model types that you considered. Examples: logistic
-      regression, GBDT, deep neural network.
+    - List the model types that you considered, with the simplest one.
+      Examples: logistic regression, GBDT, deep neural network.
+    - Name the architecture. Example: two-tower retrieval, then a GBDT
+      ranker.
     - Explain the trade-offs between them: performance, training cost,
       and interpretability.
     - Give the reason for the model that you select for each phase.
@@ -131,8 +141,10 @@ Training
     - Loss function: what the training optimizes.
     - Algorithm: the training algorithm.
     - Labels: how you get the ground-truth labels.
-    - Sampling: the strategy for problems such as class imbalance, if
-      the data needs one.
+    - Sampling: the strategy for class imbalance, and the negatives if
+      the logs hold only positives.
+    - Setup: the key hyperparameters, the hardware, and the training
+      time.
 
 Serving
   - Inference mode, latency, scaling, and cost:
@@ -161,7 +173,8 @@ Deployment, rollout, and testing
   Describe how to deploy the new system safely:
   - Rollout plan. Example: "start with 1% of users, and increase over two
     weeks".
-  - Testing plan: unit tests, integration tests, load tests.
+  - Testing plan: unit tests, integration tests, load tests. The load
+    test runs at the peak load, with the capacity from Serving.
   - CI/CD strategy.
   The serving design is in section 3, Serving.
 

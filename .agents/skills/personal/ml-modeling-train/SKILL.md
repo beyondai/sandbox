@@ -3,7 +3,8 @@ name: ml-modeling-train
 description: >-
   Use to select and train one ML model candidate, sequentially - the
   algorithm-selection matrix, cross-validation, experiment logging. Step 3 of
-  the ml-modeling-* chain (data → features → train → evaluate), the sequential
+  the ml-modeling-* chain (data → features → train → evaluate → serve), the
+  sequential
   alternative to ml-modeling-multiagent. Trigger on "train a model for this,"
   "pick an algorithm," or continuing modeling work in an existing
   ML project folder.
@@ -35,7 +36,8 @@ budget | Log each run | Check
 This skill selects one model. It also trains the simplest option (a
 linear model or the playbook baseline) as the comparison, so the choice
 has evidence. For several candidates in parallel, use
-`ml-modeling-multiagent`.
+`ml-modeling-multiagent` ("When to use" there). If the Phasing names 2 or
+more model classes and the user did not choose, suggest it in one line.
 
 **Threshold.** For a metric at a threshold (F1, precision@k), choose the
 threshold on out-of-fold train predictions, never on test. Save it in
@@ -84,7 +86,11 @@ In `03-train.md`, write (the "What to record" list in
   optimizer, learning rate and schedule, batch size, epochs and early
   stopping, dropout, weight decay);
 - the hardware (CPU, GPU, MPS), the wall-clock training time, and the
-  tuning budget (trials, search method).
+  tuning budget (trials, search method);
+- the inference time: 1-row predictions on about 200 input rows after a
+  short warm-up (p50 and p99 in ms), the model size, and a comparison
+  with the PRD p99. A model over the target needs the user's acceptance:
+  step 5 (`ml-modeling-serve`) measures the full path and would fail it.
 
 ## Quick POC time budget
 
@@ -123,7 +129,7 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    that it passes the complexity gate?
 3. Does `03-train.md` hold the training code that ran, not a template?
    Does it record the hyperparameters or training setup, the hardware,
-   and the training time?
+   the training time, and the inference time against the PRD p99?
 4. Did no step read `dataset.test`? Is the threshold from out-of-fold
    predictions, and is `model.joblib` saved? Is the CV free of the leak
    above, or marked provisional?

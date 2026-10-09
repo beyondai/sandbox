@@ -7,6 +7,8 @@
 - [The flow](#the-flow)
 - [Rules to know](#rules-to-know)
 - [Two speeds](#two-speeds)
+- [Training: one model or several in
+  parallel](#training-one-model-or-several-in-parallel)
 - [Data](#data)
 - [Project folder](#project-folder)
 - [Command reference](#command-reference)
@@ -19,7 +21,7 @@
 The `ml-system-design-*` and `ml-modeling-*` skills are in
 `.agents/skills/personal/`. Use them to do these tasks:
 - Design an ML system.
-- Build and evaluate a model with real data.
+- Build, evaluate, and measure the serving of a model with real data.
 - Get a fast baseline that runs in the background.
 
 The steps share files in a project folder, not the conversation. Thus, you
@@ -32,6 +34,8 @@ Other docs:
 - Review of a finished design or modeling report:
   `docs/ML-CRITIQUE-GUIDE.md`.
 - The reasons for the design decisions: `.agents/skills/personal/adr/`.
+- Style rules for the skill files and the docs, and how to check them:
+  `docs/SKILL-STYLE-GUIDE.md`.
 
 The skills are written for Claude Opus 5.5, and tested on it.
 
@@ -71,10 +75,11 @@ topic
   |--> -deep-dive              -> design/deep-dive.md    (paper)
   |
   '--> ml-modeling-data -> -features -> -train | -multiagent -> -evaluate
-                                                -> modeling/01..04  (hands-on)
+         -> -serve                              -> modeling/01..05  (hands-on)
   v  the 2 routes join here
 -delivery                      -> design/delivery.md
-  v                               (uses 04-evaluate.md if modeling ran)
+  v                               (uses 04-evaluate.md and 05-serve.md
+  v                                if modeling ran)
 -post-delivery                 -> design/post-delivery.md
 ```
 
@@ -104,8 +109,8 @@ The diagram shows the order. The text below gives the rules.
    has hard line breaks. Code blocks are not wrapped. A wide table becomes
    a list of headed paragraphs.
 4. **After high-level, select paper or hands-on.**
-   - `-deep-dive` and `ml-modeling-*` answer the same 4 questions: data,
-     features, models, training.
+   - `-deep-dive` and `ml-modeling-*` answer the same 5 questions: data,
+     features, models, training, serving.
    - `-deep-dive` writes a design section. `ml-modeling-*` does the work
      and records it in `modeling/`.
    - `ml-modeling-*` reads `prd/` and `design/high-level.md`. It never
@@ -114,11 +119,11 @@ The diagram shows the order. The text below gives the rules.
    the second model gets its own folder.
 6. **`/ml-modeling <topic>` stops after each step.**
    - It runs step 1, reports the result, and waits for you. Then it runs
-     step 2, and continues to step 4.
-   - To run the 4 steps without stops, say "full chain" or "run all four
+     step 2, and continues to step 5.
+   - To run the 5 steps without stops, say "full chain" or "run all
      steps".
 7. **Each skill checks its own output.** The last step of each skill:
-   1. **Intent:** answers 2-5 questions for that skill, each yes or no.
+   1. **Intent:** answers 2-6 questions for that skill, each yes or no.
    2. **Format:** runs `check_doc.py` on each `.md` file that the skill
       wrote.
    3. **Fix:** fixes the output and checks again, at most 2 times. It
@@ -143,6 +148,66 @@ A keyword in your request selects the mode:
 
 Monkey-mode is different. It is always fast, always runs in the
 background, and never waits for you.
+
+## Training: one model or several in parallel
+
+Step 3 (train) has 2 skills. Both write `03-train.md` and `model.joblib`,
+so evaluate (step 4) and serve (step 5) are the same after either one.
+
+```
+                     ┌─ subagent: logistic regression ─┐
+02-features.md ────> ├─ subagent: GBDT                 ├─> compare -> winner
+(train table)        └─ subagent: two-tower / MLP     ─┘    03-train.md
+                       each: CV, metrics, 1-row p99         model.joblib
+```
+
+- **`mm-train`** (the default) trains 1 model, and the simplest option
+  for comparison, in sequence.
+- **`mm-multiagent`** trains several candidates at the same time, with 1
+  subagent for each candidate. Then it keeps 1 winner.
+
+**Use multiagent when:**
+- several candidates are reasonable (the Phasing names more than 1 model
+  class, or you do not know if GBDT beats a linear model);
+- speed matters (Quick POC): the total time is close to the time of 1
+  candidate;
+- you want evidence for the choice: a table with the metric and its
+  noise, training time, inference time, and explainability.
+
+**Use train when:**
+- 1 candidate is the clear choice;
+- the session cannot give subagents write access;
+- you want to use fewer tokens (the cost grows with each candidate).
+
+If you do not choose and the Phasing names 2 or more model classes, the
+skill suggests multiagent in one line.
+
+**How to start it:**
+- `/ml-modeling <topic> parallel` ("multiagent" or "concurrent" also
+  work). Add "poc" for 3-fold CV and about half the trees.
+- Or `/ml-modeling-multiagent` alone, when steps 1 and 2 are done.
+
+**Before you start:** use auto mode. Subagents get the permissions of
+the session. In plan mode they write a plan, stop, and report success.
+The skill checks the mode and makes 1 test write. If either fails, it
+tells you and waits.
+
+**How it selects the winner:**
+1. The simplest candidate inside the noise of the best one wins.
+2. A more complex candidate wins only if it passes the complexity gate.
+3. A candidate over the PRD p99 latency does not win unless you accept
+   it.
+4. A close result: the skill shows the table, and you select.
+
+The winner is refit on the full train table. Its threshold comes from
+out-of-fold predictions. The other candidates stay in
+`train-candidates/<type>/`.
+
+**A risk to know: the CV leak.** A feature built from the target over the
+whole table (leave-one-out or target encoding) leaks into CV. Boosted
+models use the leak most, so the wrong candidate can win. The skill
+computes the feature again in each fold, or marks the ranking as
+provisional.
 
 ## Data
 
@@ -180,11 +245,11 @@ Each project has one folder: `<parent>/<project>/`.
 
 ```
 labs/proj1/
-  prd/<topic>.md           Definition (problem, scope, metrics, team)
+  prd/<topic>.md           Definition (problem, scope, baseline, metrics, team)
   design/high-level.md     ML framing, architecture diagrams, phasing
   design/deep-dive.md      Paper deep dive (paper route only)
   design/delivery.md       Rollout, evaluation, monitoring, fallback
-  design/post-delivery.md  Analysis, explainability, iteration
+  design/post-delivery.md  Analysis, explainability, iteration, democratize
   adr/000N-*.md            One decision in each file
   spec/<topic>.md          Made when modeling starts; holds the design hashes
   modeling/
@@ -192,6 +257,7 @@ labs/proj1/
     02-features.md         Feature decisions; features.py
     03-train.md            Model, loss, training setup; model.joblib
     04-evaluate.md/.json   Metrics against the baseline; test_scores.csv
+    05-serve.md/.json      Mode, latency, capacity, cost; serve.py
     datasets/, build_dataset.py, experiments.json, autoresearch/
   dashboard/               eda.ipynb + app.py (Streamlit), own port
   monkey-mode/report.md    Independent fast baseline
@@ -213,17 +279,18 @@ skills also start from plain language.
 | `sd-prd` cmd          | Interview on the Definition, writes `prd/`     |
 | `sd-definition`       | Definition section, no interview               |
 | `sd-high-level`       | Framing, architecture, phasing; the fork       |
-| `sd-deep-dive`        | Paper deep dive (the other route is `mm-*`)    |
+| `sd-deep-dive`        | Paper deep dive, serving included (or `mm-*`)  |
 | `sd-delivery`         | Rollout, evaluation, monitoring, fallback      |
-| `sd-post-delivery`    | Analysis, explainability, iteration            |
+| `sd-post-delivery`    | Analysis, explainability, iteration, reuse     |
 | `sd-monkey-mode` cmd  | Fast baseline in the background                |
 | `sd-monkey-mlp` cmd   | Fast embedding-MLP baseline, background        |
-| `mm`                  | Router: data, features, train, evaluate        |
+| `mm`                  | Router: data, features, train, evaluate, serve |
 | `mm-data`             | Builds the table, profiles and cleans it       |
 | `mm-features`         | Makes the features                             |
 | `mm-train`            | Trains one model                               |
 | `mm-multiagent`       | Trains N candidates in parallel                |
 | `mm-evaluate`         | Evaluates against a baseline                   |
+| `mm-serve`            | Measures latency; sizes capacity and cost      |
 | `mm-autoresearch` cmd | Optional automatic improvement loop            |
 | `ml-critique`         | Critiques a finished write-up (critique guide) |
 
@@ -253,6 +320,19 @@ sandbox root.
   Python stdlib.
 - `ml-modeling/scripts/hypothesis_tester.py`: significance tests for
   means and proportions. Python stdlib.
+- `ml-modeling-serve/scripts/bench_serve.py --serve <serve.py> --rows <csv>`
+  - Times the project's `score(df)`: p50/p99 for 1 row, batch rows per
+    second, model size. Prints JSON.
+  - Needs: uv (pandas, and what `serve.py` imports).
+- `scripts/check_skill_style.py .agents/skills/personal`
+  - Checks the skill files against `docs/SKILL-STYLE-GUIDE.md`.
+  - Prints `OK` or `file:line: reason`.
+  - Needs: Python stdlib.
+- `scripts/check_docs.py`
+  - Checks `docs/` for style, and for consistency with the skills: each
+    skill named, each cited ADR present, links and paths that resolve.
+  - Prints `OK` or `file:line: reason`.
+  - Needs: Python stdlib.
 
 On a new clone, run `uv sync` at the sandbox root first.
 
@@ -266,8 +346,8 @@ types of words:
   select Regular.
 - **Training.** `parallel` or `multiagent` selects `mm-multiagent`. All
   other words select `mm-train`. This applies only through `/mm`.
-- **Continuation** (only for `/mm`). `full chain` or `run all four steps`
-  runs data -> features -> train -> evaluate without stops. All other
+- **Continuation** (only for `/mm`). `full chain` or `run all steps`
+  runs data -> features -> train -> evaluate -> serve without stops. All other
   words make the skill stop and wait after each step.
 
 | Command                          | Takes                                   |
@@ -278,7 +358,7 @@ types of words:
 | `/sd-monkey-mode <topic>`        | topic (required)                        |
 | `/sd-monkey-mlp <topic>`         | topic (required)                        |
 | `/mm <topic>`                    | topic or project, speed, training, cont. |
-| `/mm-data` .. `/mm-evaluate`     | project*, speed                         |
+| `/mm-data` .. `/mm-serve`        | project*, speed                         |
 | `/mm-autoresearch <project> ...` | project (required), stop, count         |
 
 Notes:
@@ -315,6 +395,14 @@ in parentheses.
   network, attention), the neural network training setup, and tree
   hyperparameters. Deep-dive, train, and the critique lenses check that a
   write-up states them (0012).
+- **Serving on both routes.** Deep-dive has a Serving item. The hands-on
+  chain has step 5, `mm-serve`, which measures latency and sizes the
+  capacity for the peak load. Delivery gets the same facts on both
+  routes, and its load test uses them (0013).
+- **Style rules are written and checked.** `docs/SKILL-STYLE-GUIDE.md`,
+  `check_skill_style.py`, and `check_docs.py`. The docs are updated and
+  checked after each skill change. The skills are checked after each
+  major skill change (0014).
 - **Simple by default, complex only with evidence.** The complexity gate
   in `ml-design-principles.md` applies to design, training, and critique.
 - **Critique is different from Review mode.** It is a review by a reader

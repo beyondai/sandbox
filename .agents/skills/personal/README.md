@@ -9,7 +9,8 @@ Entry point for a new project: `/ml-system-design <topic> [poc]`. Read
 detail that guide deliberately leaves out: how the pieces behave when several
 things run at once, the mechanics behind the drift check and the improvement
 log, autoresearch's modes, and when a git worktree is and is not worth it.
-Rationale for each decision is in `adr/`.
+Rationale for each decision is in `adr/`. Style rules for skill files and docs, and
+how to check them: `docs/SKILL-STYLE-GUIDE.md`.
 
 ## Monkey-mode
 
@@ -170,3 +171,6 @@ edits stay on `main` regardless.
 | 0009 | ml-critique: a core with system and modeling lenses, 2 modes |
 | 0010 | One folder per project, parent `labs/` unless the user names one |
 | 0011 | Skill-writing guides: Check step, scripts, checklists, TOCs |
+| 0012 | One shared reference for negatives, architecture, training setup |
+| 0013 | Serving on both routes: deep-dive item + `ml-modeling-serve` step 5 |
+| 0014 | Style guide; `check_skill_style.py` and `check_docs.py`; when to run them |
