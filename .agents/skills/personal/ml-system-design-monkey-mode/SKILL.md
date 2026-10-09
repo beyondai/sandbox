@@ -2,9 +2,9 @@
 name: ml-system-design-monkey-mode
 description: >-
   One-shot, fully autonomous ML baseline builder - ask up to 3 quick questions,
-  then build and evaluate a fast (5-10 min) baseline in the background while you
-  keep working. Never blocks - proceeds with self-inferred assumptions if you
-  don't answer. A third, independent track alongside the whole-design path and
+  then build and evaluate a fast (5-10 min) baseline in the background while
+  the user keeps working. Never blocks - proceeds with self-inferred
+  assumptions if the user does not answer. A third, independent track alongside the whole-design path and
   the ml-modeling-* path. Run by hand only, e.g. /ml-system-design-monkey-mode
   churn prediction for a subscription app.
 disable-model-invocation: true

@@ -174,3 +174,4 @@ edits stay on `main` regardless.
 | 0012 | One shared reference for negatives, architecture, training setup |
 | 0013 | Serving on both routes: deep-dive item + `ml-modeling-serve` step 5 |
 | 0014 | Style guide; `check_skill_style.py` and `check_docs.py`; when to run them |
+| 0015 | Anthropic skill checklist: evals per family, named constants, 3 more checks |

@@ -6,6 +6,7 @@
 - [Writing rules](#writing-rules)
 - [The 9 structure rules](#the-9-structure-rules)
 - [Shared references](#shared-references)
+- [Evals](#evals)
 - [How to check](#how-to-check)
 - [When to check](#when-to-check)
 
@@ -20,6 +21,8 @@ them:
 - ADR 0011 records how the `ml-*` skills applied them
   (`.agents/skills/personal/adr/0011-skill-writing-guides.md`).
 - ADR 0014 records this guide and its checker.
+- ADR 0015 records what the Anthropic skill checklist added: evals,
+  named constants, and 3 more checks.
 
 ## Writing rules
 
@@ -64,6 +67,9 @@ no em dashes                         no em dashes
 4. **Write for the target model.**
    - The skills are tuned for Claude Opus 5.5. Remove micromanagement that
      a strong model does not need.
+   - The evals run on Opus only. Reason: a smaller model needs the
+     micromanagement that this rule removes. This rule wins over the
+     Anthropic checklist item "test with Haiku, Sonnet, and Opus".
    - Record the target model in `docs/ML-SKILLS-GUIDE.md`. Do not use a
      `model:` field in the frontmatter. Reason: in Claude Code, that field
      changes the model that runs the skill.
@@ -84,6 +90,9 @@ no em dashes                         no em dashes
    4. Reflect: write each skill gap to `SKILL-IMPROVEMENTS.md`.
 9. **Declare the dependencies.**
    - Each script has a `Requires:` line.
+   - Each number in a script that is not obvious is a named constant
+     with a one-line reason. Reason: a number with no reason is
+     guesswork for the next reader.
    - `ml-modeling/SKILL.md`, "Bundled tools", lists each script and what
      it needs. Give the install command, for example `uv add <pkg>`.
 
@@ -99,6 +108,25 @@ top of `.agents/skills/personal/`. Each skill links that file directly.
 Reason: 1 file for each fact. A change goes to 1 place, and the skills
 stay the same.
 
+## Evals
+
+Each skill family has at least 3 evals in 1 test file.
+
+```
+family     test file                        tests
+design     ml-system-design/tests/<date>    D1-D3
+modeling   ml-modeling/tests/<date>         M1-M3
+critique   ml-critique/tests/<date>         T1-T4
+```
+
+- Each test has an input, an answer key, and pass criteria.
+- Use a real project from `labs/`. Run on a scratch copy.
+- Run in a new session. The session that wrote the skill knows too much.
+- Write the results in the test file. Fix the skills, then record the
+  fixes.
+- Run the evals again after a major skill change, and after a change of
+  the target model.
+
 ## How to check
 
 Steps 1-2 check the skills. Steps 3-5 update and check the docs.
@@ -113,6 +141,8 @@ It prints `OK (<n> files)`, or `file:line: reason` for each failure. It
 checks these rules:
 - `SKILL.md` frontmatter: `name` is the folder name, and `description`
   exists.
+- `description` has 1024 characters or fewer, and is in the third
+  person (no "you", "your", "I", "me", "my").
 - `SKILL.md` has 500 lines or fewer.
 - A file over 100 lines has Contents in its first 20 lines.
 - No em dash.
@@ -121,6 +151,7 @@ checks these rules:
   `../`, `references/`, `scripts/`, or `.agents/`).
 - `SKILL.md` names each file in its `references/` and `scripts/`.
 - Each script has a `Requires:` line.
+- No backslash path (for example `scripts\run.py`). Use forward slashes.
 
 The script skips `adr/` (historical records), `tests/`, and `assets/`.
 
@@ -134,6 +165,7 @@ For each changed skill file:
 - [ ] Does each list of items (sections, steps, chain steps) agree with
       the other skills and with `docs/`?
 - [ ] Does each fragile step use a script (rule 3)?
+- [ ] Does each number in a script have a name and a reason (rule 9)?
 - [ ] When 2 skills can do the same step (for example `ml-modeling-train`
       and `ml-modeling-multiagent`), do both write the files that the
       next steps load? Check each alternative, not only the default.

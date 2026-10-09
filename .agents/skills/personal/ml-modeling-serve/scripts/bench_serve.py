@@ -36,6 +36,21 @@ import statistics
 import sys
 import time
 
+# Defaults. Each reason says what the value makes reliable.
+# Warm-up calls: the first calls pay for imports, caches, and lazy setup.
+# 30 is enough for those costs to stop showing in a CPU model.
+WARMUP = 30
+# Timed 1-row calls: p99 needs at least 100 samples to mean anything.
+# 300 puts about 3 samples above p99.
+SINGLE = 300
+# Rows per batch call: large enough that the fixed cost of a call is small
+# next to the cost per row.
+BATCH_SIZE = 1000
+# Batch calls: the median of 5 ignores 1 or 2 slow runs.
+BATCHES = 5
+# Fixed sample seeds, so that a rerun scores the same rows.
+SEED_WARMUP, SEED_SINGLE, SEED_BATCH = 0, 1, 100
+
 
 def load_score(path):
     spec = importlib.util.spec_from_file_location("serve", path)
@@ -77,10 +92,10 @@ def main():
     ap.add_argument("--serve", required=True)
     ap.add_argument("--rows", required=True)
     ap.add_argument("--model")
-    ap.add_argument("--single", type=int, default=300)
-    ap.add_argument("--warmup", type=int, default=30)
-    ap.add_argument("--batch-size", type=int, default=1000)
-    ap.add_argument("--batches", type=int, default=5)
+    ap.add_argument("--single", type=int, default=SINGLE)
+    ap.add_argument("--warmup", type=int, default=WARMUP)
+    ap.add_argument("--batch-size", type=int, default=BATCH_SIZE)
+    ap.add_argument("--batches", type=int, default=BATCHES)
     ap.add_argument("--out")
     args = ap.parse_args()
     for p in (args.serve, args.rows):
@@ -97,11 +112,11 @@ def main():
     def sample(n, seed):
         return rows.sample(n=n, replace=len(rows) < n, random_state=seed)
 
-    warm = sample(args.warmup, 0)
+    warm = sample(args.warmup, SEED_WARMUP)
     for i in range(len(warm)):
         call(score, warm.iloc[[i]])
 
-    single = sample(args.single, 1)
+    single = sample(args.single, SEED_SINGLE)
     times = []
     for i in range(len(single)):
         row = single.iloc[[i]]
@@ -111,7 +126,7 @@ def main():
 
     batch_rates = []
     for b in range(args.batches):
-        df = sample(args.batch_size, 100 + b)
+        df = sample(args.batch_size, SEED_BATCH + b)
         t0 = time.perf_counter()
         call(score, df)
         batch_rates.append(len(df) / (time.perf_counter() - t0))

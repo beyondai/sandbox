@@ -3,8 +3,9 @@ name: ml-system-design-monkey-mlp
 description: >-
   One-shot, fully autonomous embedding-MLP baseline builder - ask up to 3
   quick questions, then build and evaluate a fast (10-15 min) PyTorch
-  embedding-MLP baseline in the background while you keep working. Never
-  blocks - proceeds with self-inferred assumptions if you don't answer. A
+  embedding-MLP baseline in the background while the user keeps working.
+  Never blocks - proceeds with self-inferred assumptions if the user does not
+  answer. A
   sibling to ml-system-design-monkey-mode: same fast/autonomous contract, but
   learned categorical embeddings instead of one-hot + a tree/linear model -
   reach for it when the task has high-cardinality identity columns (user/item

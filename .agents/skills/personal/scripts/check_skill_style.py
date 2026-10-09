@@ -15,7 +15,9 @@ references, for example .agents/skills/personal. Checks:
     references/, scripts/, or .agents/, resolves;
   - each file in a skill's references/ and scripts/ is named in its
     SKILL.md (links one level deep);
-  - each script has a "Requires:" line (declared dependencies).
+  - each script has a "Requires:" line (declared dependencies);
+  - the SKILL.md description is at most 1024 characters, in third person;
+  - no Windows-style backslash path in a .md file or a script.
 Skipped: adr/ (historical records), tests/, assets/, and this script's own
 folder. The rules that need judgment (freedom level, reasons, plain
 English) are a manual checklist in the style guide.
@@ -34,6 +36,15 @@ SKIP_DIRS = {"adr", "tests", "assets", "scripts", "__pycache__"}
 MAX_SKILL_LINES = 500
 TOC_OVER = 100
 TOC_WITHIN = 20
+# Hard limit for the description field in the Agent Skills spec.
+MAX_DESCRIPTION = 1024
+# The description goes into the system prompt. "you" or "I" there reads as
+# a different speaker and makes triggering less reliable.
+NOT_THIRD_PERSON = re.compile(r"\b(you|your|I|me|my)\b")
+# "dir\file.py", "dir\\file.py" (escaped in source), or "C:\". Two or
+# more characters on each side so that escapes such as \t\r\n and regex
+# classes such as \s+ do not match.
+BACKSLASH_PATH = re.compile(r"[A-Za-z]:\\|\w{2,}\\{1,2}\w{2,}")
 PATH_PREFIXES = ("../", "references/", "scripts/", ".agents/")
 # Subfolders of a project folder (ml-system-design, "Project folder"). A
 # path into one of them is a path in a project, not in the skills tree.
@@ -68,6 +79,23 @@ def frontmatter(lines):
         if m:
             meta[m.group(1)] = m.group(2).strip()
     return meta, 0
+
+
+def description(lines):
+    """The full description value, with folded (>-) lines joined."""
+    for i, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            return ""
+        m = re.match(r"description:\s*(.*)", line)
+        if not m:
+            continue
+        parts = [] if m.group(1) in (">", ">-", "|", "|-") else [m.group(1)]
+        for nxt in lines[i + 1:]:
+            if not nxt.startswith((" ", "\t")):
+                break
+            parts.append(nxt.strip())
+        return " ".join(p for p in parts if p).strip("\"'")
+    return ""
 
 
 def path_refs(line):
@@ -105,6 +133,14 @@ def check_md(path, root, problems):
             problems.append((path, 1, f'frontmatter name is not "{folder}"'))
         if "description" not in meta:
             problems.append((path, 1, "frontmatter has no description"))
+        desc = description(lines)
+        if len(desc) > MAX_DESCRIPTION:
+            problems.append((path, 1, f"description over {MAX_DESCRIPTION} "
+                                      f"characters ({len(desc)})"))
+        m = NOT_THIRD_PERSON.search(desc)
+        if m:
+            problems.append((path, 1, f'description not in third person '
+                                      f'("{m.group(0)}")'))
         if len(lines) > MAX_SKILL_LINES:
             problems.append((path, 0, f"SKILL.md over {MAX_SKILL_LINES} "
                                       f"lines ({len(lines)}); split it"))
@@ -119,6 +155,8 @@ def check_md(path, root, problems):
     for i, line in enumerate(lines[body:], start=body + 1):
         if EM_DASH in line:
             problems.append((path, i, "em dash"))
+        if BACKSLASH_PATH.search(line):
+            problems.append((path, i, "backslash path; use forward slashes"))
         if re.match(r"\s*(```|~~~)", line):
             fence = not fence
             continue
@@ -154,9 +192,15 @@ def check_skill_dir(skill_dir, problems):
             if f"{sub}/{name}" not in text:
                 problems.append((skill_md, 0, f"{sub}/{name} is not named "
                                               "in SKILL.md"))
-            if sub == "scripts" and "Requires:" not in "\n".join(
-                    read_lines(p)[:60]):
+            if sub != "scripts":
+                continue
+            script = read_lines(p)
+            if "Requires:" not in "\n".join(script[:60]):
                 problems.append((p, 0, 'no "Requires:" line'))
+            for i, line in enumerate(script, start=1):
+                if BACKSLASH_PATH.search(line):
+                    problems.append((p, i, "backslash path; use forward "
+                                           "slashes"))
 
 
 def main():

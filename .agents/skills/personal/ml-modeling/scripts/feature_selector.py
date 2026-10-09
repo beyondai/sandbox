@@ -21,6 +21,41 @@ import os
 import sys
 from collections import Counter
 
+# Thresholds and weights. Each is a heuristic for a first ranking, not a
+# tuned value; the reason says what it protects against.
+
+# A column is numeric when more than 80% of its non-null values parse as
+# numbers. Reason: a few stray tokens ("N/A", "-") must not make it text.
+NUMERIC_SHARE = 0.8
+# A text column with more than 95% distinct values is likely an ID. Below
+# 50 rows, a high distinct share happens by chance, so do not flag it.
+ID_DISTINCT_SHARE = 0.95
+ID_MIN_ROWS = 50
+# A text column with under 1 distinct value per 100 rows is nearly constant.
+CONSTANT_DISTINCT_SHARE = 0.01
+# Score for an ID-like or nearly constant column. Low, but not 0, so the
+# column stays in the ranking for a person to review.
+PENALTY_SCORE = 0.1
+# Cardinality score = distinct share * 5, capped at 1. Reason: a column
+# with 20% or more distinct values gets the full score.
+DISTINCT_SCALE = 5
+# Correlation needs more than 5 numeric pairs. Reason: with fewer pairs,
+# |r| is mostly noise.
+MIN_CORR_PAIRS = 5
+# Equal-width bins for mutual information on numeric columns. Reason: 10
+# bins show the shape and keep about 10% of the rows in each bin.
+MI_BINS = 10
+# Composite weights. Correlation and mutual information measure the link
+# to the target, so they weigh most. Null rate and variance measure only
+# data quality.
+WEIGHTS = {
+    "null_completeness": 0.15,
+    "variance": 0.20,
+    "cardinality": 0.20,
+    "abs_correlation": 0.35,
+    "mutual_info": 0.30,
+}
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -82,7 +117,7 @@ def _mutual_information(feature_vals: list, target_vals: list) -> float:
     if n == 0:
         return 0.0
 
-    # Bin numeric features into 10 bins
+    # Bin numeric features into MI_BINS bins
     joint = Counter(zip(feature_vals, target_vals))
     f_counts = Counter(feature_vals)
     t_counts = Counter(target_vals)
@@ -97,7 +132,7 @@ def _mutual_information(feature_vals: list, target_vals: list) -> float:
     return mi
 
 
-def _bin_numeric(values: list, bins: int = 10) -> list:
+def _bin_numeric(values: list, bins: int = MI_BINS) -> list:
     """Bin numeric values into discrete categories."""
     floats = _to_floats(values)
     if not floats:
@@ -127,7 +162,7 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
     columns = [c for c in data[0].keys() if c != target_col]
     target_values = [row.get(target_col, "") for row in data]
     target_numeric = _to_floats(target_values)
-    target_is_numeric = len(target_numeric) > len(target_values) * 0.8
+    target_is_numeric = len(target_numeric) > len(target_values) * NUMERIC_SHARE
 
     results = []
 
@@ -146,7 +181,7 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
 
         # 2. Variance / cardinality score
         numeric_vals = _to_floats(raw_values)
-        is_numeric = len(numeric_vals) > len(non_null) * 0.8 if non_null else False
+        is_numeric = len(numeric_vals) > len(non_null) * NUMERIC_SHARE if non_null else False
 
         if is_numeric and numeric_vals:
             std = _std(numeric_vals)
@@ -158,12 +193,12 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
             unique = len(set(str(v) for v in non_null))
             card_ratio = unique / len(non_null) if non_null else 0
             # Penalize very low (constant) and very high (unique ID) cardinality
-            if card_ratio > 0.95 and len(non_null) > 50:
-                var_score = 0.1  # Likely a unique ID
-            elif card_ratio < 0.01:
-                var_score = 0.1  # Nearly constant
+            if card_ratio > ID_DISTINCT_SHARE and len(non_null) > ID_MIN_ROWS:
+                var_score = PENALTY_SCORE  # Likely a unique ID
+            elif card_ratio < CONSTANT_DISTINCT_SHARE:
+                var_score = PENALTY_SCORE  # Nearly constant
             else:
-                var_score = min(1.0, card_ratio * 5)
+                var_score = min(1.0, card_ratio * DISTINCT_SCALE)
             score_components["cardinality"] = round(var_score, 4)
 
         # 3. Correlation with target (numeric features vs numeric target)
@@ -174,7 +209,7 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
                 fv, tv = row.get(col, ""), row.get(target_col, "")
                 if _is_numeric(str(fv)) and _is_numeric(str(tv)):
                     paired.append((float(fv), float(tv)))
-            if len(paired) > 5:
+            if len(paired) > MIN_CORR_PAIRS:
                 fx, fy = zip(*paired)
                 corr = abs(_correlation(list(fx), list(fy)))
                 score_components["abs_correlation"] = round(corr, 4)
@@ -190,17 +225,10 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
             score_components["mutual_info"] = round(min(1.0, mi_normalized), 4)
 
         # Composite score (weighted average)
-        weights = {
-            "null_completeness": 0.15,
-            "variance": 0.20,
-            "cardinality": 0.20,
-            "abs_correlation": 0.35,
-            "mutual_info": 0.30,
-        }
         total_weight = 0
         weighted_sum = 0
         for key, value in score_components.items():
-            w = weights.get(key, 0.1)
+            w = WEIGHTS[key]
             weighted_sum += value * w
             total_weight += w
         composite = weighted_sum / total_weight if total_weight > 0 else 0

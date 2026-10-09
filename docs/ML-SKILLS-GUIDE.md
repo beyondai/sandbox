@@ -37,7 +37,9 @@ Other docs:
 - Style rules for the skill files and the docs, and how to check them:
   `docs/SKILL-STYLE-GUIDE.md`.
 
-The skills are written for Claude Opus 5.5, and tested on it.
+The skills are written for Claude Opus 5.5, and tested on it. The evals
+are in the `tests/` folder of `ml-system-design`, `ml-modeling`, and
+`ml-critique`.
 
 ## How a step works
 
@@ -403,6 +405,8 @@ in parentheses.
   `check_skill_style.py`, and `check_docs.py`. The docs are updated and
   checked after each skill change. The skills are checked after each
   major skill change (0014).
+- **Each skill family has evals.** At least 3 tests for each family, run
+  on Opus only. Scripts have no unexplained numbers (0015).
 - **Simple by default, complex only with evidence.** The complexity gate
   in `ml-design-principles.md` applies to design, training, and critique.
 - **Critique is different from Review mode.** It is a review by a reader
