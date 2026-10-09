@@ -61,6 +61,15 @@ names several models, build the one that "This folder builds" names.
   python3`. It applies the label definition, horizon, population, and
   exclusions from the framing. It writes
   `modeling/datasets/<task>_train.csv` and `<task>_test.csv`.
+  - **Large tables** (over about 1M rows): write parquet under the
+    sandbox-root `data/<dataset>/modeling/`, not CSV in the project
+    folder. CSV at that size is slow and large, and generated data stays
+    out of git. Check each path with `git check-ignore -v`. Record the
+    paths in the `dataset` block (relative to `modeling/`).
+  - **Ranking tasks:** one row is a (query, candidate) pair. Record the
+    query column as `dataset.group`, and write a truth table for each
+    split with every true item per query, also items that no candidate
+    rule found. Recall metrics need it (`truth_train`, `truth_test`).
   - Features use only rows before the cutoff. Labels use only rows at or
     after the cutoff.
   - Assert that the positive rate is not near 0% or 100%. A degenerate
@@ -122,6 +131,8 @@ JSON, not the `.md`.
     "train": "datasets/<task>_train.csv",
     "test": "datasets/<task>_test.csv",
     "label": "<col>", "id": "<col>",
+    "group": "<query col, ranking only>",
+    "truth_train": "<path, ranking only>", "truth_test": "<path, ranking only>",
     "split": {"type": "cutoff|random", "train_cutoff": 0, "test_cutoff": 0,
               "horizon_days": 0, "seed": 0, "test_share": 0.0},
     "exclusions": ["<rule>"],

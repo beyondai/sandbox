@@ -2,7 +2,11 @@
 
 ## 2026-10-08 - ml-system-design-monkey-mode
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted with a change (2026-10-09, user decision): monkey-mode
+  and monkey-mlp now always ask the user which data to use and wait for
+  that answer. A public proxy and synthetic data are options in the
+  question, never a silent default. This project keeps the Wikipedia
+  proxy.
 - **Finding**: with no data referenced, the skill falls back to a synthetic
   dataset. For recommender and text tasks, synthetic text and behavior only
   replay what the generator encoded, so the baseline number is meaningless.
@@ -29,7 +33,8 @@
 
 ## 2026-10-08 - ml-system-design-monkey-mode
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): monkey-mode "Fast defaults" now
+  require a graded target for ranking scored with graded nDCG.
 - **Finding**: for ranking tasks scored with graded nDCG, the planned binary
   label (clicked or not) made the reranker unable to order candidates by
   volume. It scored -5.8% overall nDCG@10 against the click baseline, and
@@ -41,7 +46,9 @@
 
 ## 2026-10-08 - ml-system-design-monkey-mode
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): monkey-mode and monkey-mlp agents
+  return `report.md` as text; the main session saves it verbatim and
+  checks it.
 - **Finding**: Process step 3 tells the background agent to write
   `monkey-mode/report.md`. Claude Code blocks subagents from writing report
   files ("Subagents should return findings as text, not write report
@@ -102,7 +109,10 @@
 
 ## 2026-10-08 - ml-modeling-data
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): ml-modeling-data allows parquet under
+  `data/<dataset>/modeling/` for large tables, and adds `group` and
+  `truth_train`/`truth_test` for ranking. Finding 2 (`dashboard/.port`
+  and `.pid`) was fixed in `.gitignore` by the user.
 - **Finding**: The skill writes the labeled table as
   `modeling/datasets/<task>_{train,test}.csv` inside the project folder. For
   large tables (here 8.6M pair rows) CSV is slow and large. It also clashes
@@ -121,7 +131,8 @@
 
 ## 2026-10-09 - ml-modeling-features
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): ml-modeling-features has a "Needed but
+  not available" rule under "Embeddings".
 - **Finding**: In a POC on a proxy dataset, the skill lists text and
   embeddings under "not used" with no further record. For the Riot wiki
   project, text and embeddings are core to the real use case (new pages,

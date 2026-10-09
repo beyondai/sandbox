@@ -107,6 +107,15 @@ embedding model is on hold (laptop resources). Use frequency or target
 encoding for categoricals and IDs. For free text, use "Cheap text
 signals".
 
+**Needed but not available.** When the target use case needs text or
+embedding features that the POC data can't supply (for example a proxy
+dataset with no text), never list them as dropped. Keep them in
+`02-features.md` as a "not built" design section: each feature, its
+reason, the cost and model choice for the real system, and how to test
+it. Point to a feasibility note for getting the data (for example
+`research/<topic>.md`). The design assumes them; the train step accepts
+them as extra, possibly null, columns.
+
 ## Interaction and cross features
 
 Combine 2 or 3 categorical columns, or take a ratio or product of 2

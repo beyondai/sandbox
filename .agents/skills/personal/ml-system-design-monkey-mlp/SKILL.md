@@ -4,8 +4,8 @@ description: >-
   One-shot, fully autonomous embedding-MLP baseline builder - ask up to 3
   quick questions, then build and evaluate a fast (10-15 min) PyTorch
   embedding-MLP baseline in the background while the user keeps working.
-  Never blocks - proceeds with self-inferred assumptions if the user does not
-  answer. A
+  Always asks the user which data to use and waits for that answer; the
+  other questions never block. A
   sibling to ml-system-design-monkey-mode: same fast/autonomous contract, but
   learned categorical embeddings instead of one-hot + a tree/linear model -
   reach for it when the task has high-cardinality identity columns (user/item
@@ -50,7 +50,7 @@ Progress (copy into your reply, tick each line):
 
 ```
 [ ] 1 Resolve the project folder
-[ ] 2 Ask the 3 questions (never block)
+[ ] 2 Ask the 3 questions (wait only for the data choice)
 [ ] 3 Dispatch the background agent
 [ ] 4 Report the results, the Check result, and the skill issues
 ```
@@ -58,11 +58,13 @@ Progress (copy into your reply, tick each line):
 1. **Project folder:** as in monkey-mode.
 2. **The 3 questions:** use "The 3 questions" in
    `../ml-system-design-monkey-mode/SKILL.md` (task and data, primary
-   metric, success bar), with AskUserQuestion. Never block.
+   metric, success bar), with AskUserQuestion. Wait for the data choice;
+   the other two never block.
 3. **Dispatch** a background `general-purpose` agent. Give it the
    resolved answers (each marked "answered by user" or "self-inferred"),
    the fast defaults, the eval rules, the deliverable, the Check, and the
-   output path.
+   output path. The agent does not write `report.md`: it returns the full
+   text in its final message (subagents can't write report files).
    - The project folder is shared and in progress. Never delete or reset
      the folder or a sibling (`prd/`, `design/`, `adr/`, `spec/`,
      `modeling/`, `monkey-mode/`). Create only `monkey-mlp/` with
@@ -73,8 +75,10 @@ Progress (copy into your reply, tick each line):
      not make a project venv.
    - Device: `"mps"` if `torch.backends.mps.is_available()`, else
      `"cuda"` if `torch.cuda.is_available()`, else `"cpu"`.
-4. **Report** the results. Add each skill issue that the agent reports to
-   the skill improvement log.
+4. **Save and report.** Save the returned text verbatim to
+   `<project-folder>/monkey-mlp/report.md`, run `check_doc.py` on it, then
+   report the results. Add each skill issue that the agent reports to the
+   skill improvement log.
 
 ## Fast defaults (build with these; do not ask)
 
@@ -106,7 +110,8 @@ Progress (copy into your reply, tick each line):
 
 ## Deliverable
 
-`<project-folder>/monkey-mlp/report.md`, with the 7 sections of
+`<project-folder>/monkey-mlp/report.md`, saved by the main session from
+the agent's returned text, with the 7 sections of
 monkey-mode's Deliverable (Requirements, Input, Design, Implementation,
 Results, Learnings, Suggested Next Steps). Additions:
 - Results: the selected validation epoch and its AUC, separate from the
