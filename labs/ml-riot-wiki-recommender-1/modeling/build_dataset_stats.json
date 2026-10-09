@@ -1,0 +1,111 @@
+{
+  "months": {
+    "2026-07": {
+      "raw_rows": 34399047,
+      "raw_clicks": 6175563591,
+      "rows": 22214725,
+      "clicks": 2160753266,
+      "min_n": 10
+    },
+    "2026-08": {
+      "raw_rows": 34127898,
+      "raw_clicks": 5943744061,
+      "rows": 22757859,
+      "clicks": 2174971362,
+      "min_n": 10
+    },
+    "2026-09": {
+      "raw_rows": 33553254,
+      "raw_clicks": 5697053135,
+      "rows": 21654016,
+      "clicks": 2010737281,
+      "min_n": 10
+    }
+  },
+  "catalog_pages": 3776397,
+  "train": {
+    "feature_month": "2026-07",
+    "label_month": "2026-08",
+    "population": {
+      "cold": 252403,
+      "tail": 653509,
+      "torso": 1003205,
+      "head": 264047
+    },
+    "population_total": 2173164,
+    "queries": {
+      "head": 12150,
+      "cold": 11615,
+      "tail": 30072,
+      "torso": 46163
+    },
+    "queries_total": 100000,
+    "queries_share_of_population": 0.04601585522307566,
+    "cold_never_seen": 3526,
+    "candidate_recall": {
+      "cold": {
+        "recall": 0.1829,
+        "recall_w": 0.0624
+      },
+      "torso": {
+        "recall": 0.8512,
+        "recall_w": 0.9327
+      },
+      "head": {
+        "recall": 0.6713,
+        "recall_w": 0.9185
+      },
+      "tail": {
+        "recall": 0.7601,
+        "recall_w": 0.7982
+      }
+    },
+    "pairs": 5664045,
+    "truth_pairs": 1038457,
+    "positive_rate": 0.1342,
+    "candidates_per_query_mean": 56.6
+  },
+  "test": {
+    "feature_month": "2026-08",
+    "label_month": "2026-09",
+    "population": {
+      "cold": 202751,
+      "tail": 614668,
+      "torso": 1022308,
+      "head": 272951
+    },
+    "population_total": 2112678,
+    "queries": {
+      "head": 6460,
+      "torso": 24195,
+      "cold": 5000,
+      "tail": 14547
+    },
+    "queries_total": 50202,
+    "queries_share_of_population": 0.023762258138722514,
+    "cold_never_seen": 1591,
+    "candidate_recall": {
+      "tail": {
+        "recall": 0.7823,
+        "recall_w": 0.7895
+      },
+      "torso": {
+        "recall": 0.8727,
+        "recall_w": 0.9386
+      },
+      "cold": {
+        "recall": 0.1707,
+        "recall_w": 0.0465
+      },
+      "head": {
+        "recall": 0.6807,
+        "recall_w": 0.9255
+      }
+    },
+    "pairs": 2910738,
+    "truth_pairs": 513803,
+    "positive_rate": 0.1313,
+    "candidates_per_query_mean": 58.0
+  },
+  "query_overlap_train_test": 2111
+}

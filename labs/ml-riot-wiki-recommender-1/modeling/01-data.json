@@ -1,0 +1,312 @@
+{
+  "dataset": {
+    "train": "../../../data/wikipedia-clickstream/modeling/pairs_train.parquet",
+    "test": "../../../data/wikipedia-clickstream/modeling/pairs_test.parquet",
+    "truth_train": "../../../data/wikipedia-clickstream/modeling/truth_train.parquet",
+    "truth_test": "../../../data/wikipedia-clickstream/modeling/truth_test.parquet",
+    "queries_train": "../../../data/wikipedia-clickstream/modeling/queries_train.parquet",
+    "queries_test": "../../../data/wikipedia-clickstream/modeling/queries_test.parquet",
+    "months": "../../../data/wikipedia-clickstream/modeling/months/",
+    "label": "label",
+    "id": [
+      "q",
+      "item"
+    ],
+    "group": "q",
+    "raw_count": "r",
+    "split": {
+      "type": "cutoff",
+      "train_cutoff": "2026-08-01",
+      "test_cutoff": "2026-09-01",
+      "horizon_days": 30,
+      "feature_window_days": 31,
+      "seed": 42,
+      "train_features": "2026-07",
+      "train_labels": "2026-08",
+      "test_features": "2026-08",
+      "test_labels": "2026-09"
+    },
+    "exclusions": [
+      "type external (search, empty referrer, other sites) as source",
+      "Main_Page as source or candidate",
+      "self pairs (q = item)",
+      "pairs with n < 10 a month (upstream Wikimedia filter; min n = 10)",
+      "bot traffic (upstream Wikimedia filter, user agents)"
+    ],
+    "built_by": "modeling/build_dataset.py"
+  },
+  "shape": {
+    "rows": 5664045,
+    "columns": 9,
+    "memory_mb": 156.9
+  },
+  "nulls": {
+    "q": 0.0,
+    "item": 0.0,
+    "cand_opened_next": 0.0,
+    "cand_twohop": 0.0,
+    "cand_reverse": 0.0,
+    "cand_popular": 0.0,
+    "r": 0.0,
+    "label": 0.0,
+    "bucket": 0.0
+  },
+  "target": {
+    "column": "label",
+    "type": "regression",
+    "class_balance": {
+      "label > 0": 0.1342,
+      "label = 0": 0.8658
+    },
+    "distribution": {
+      "label": {
+        "min": 0.0,
+        "max": 11.8502,
+        "mean": 0.4972,
+        "median": 0.0,
+        "std": 1.3272,
+        "skew": 2.6411
+      },
+      "label_where_positive": {
+        "min": 2.3979,
+        "max": 11.8502,
+        "mean": 3.7055,
+        "median": 3.434,
+        "std": 1.1134,
+        "skew": 1.343
+      },
+      "r_where_positive": {
+        "min": 10.0,
+        "max": 140110.0,
+        "mean": 118.6268,
+        "median": 30.0,
+        "std": 711.8387,
+        "skew": 56.5006
+      },
+      "r_quantiles_positive": {
+        "0.5": 30.0,
+        "0.9": 190.0,
+        "0.99": 1493.0,
+        "0.999": 7559.0
+      },
+      "positive_rate_by_bucket": {
+        "head": 0.3271,
+        "torso": 0.1018,
+        "tail": 0.0409,
+        "cold": 0.0144
+      }
+    }
+  },
+  "numeric_distributions": {
+    "candidates_per_query": {
+      "min": 20.0,
+      "max": 138.0,
+      "mean": 56.6405,
+      "median": 55.0,
+      "std": 27.9481,
+      "skew": 0.289
+    },
+    "positives_per_query": {
+      "min": 0.0,
+      "max": 84.0,
+      "mean": 7.5993,
+      "median": 3.0,
+      "std": 11.7364,
+      "skew": 2.6316
+    },
+    "src_out_f (query, feature month)": {
+      "min": 0.0,
+      "max": 754032.0,
+      "mean": 968.0572,
+      "median": 76.0,
+      "std": 7866.4703,
+      "skew": 46.6319
+    }
+  },
+  "categorical_distributions": {
+    "bucket (pairs)": {
+      "cardinality": 4,
+      "top_values": {
+        "torso": 3122223,
+        "head": 1205146,
+        "tail": 1087850,
+        "cold": 248826
+      }
+    },
+    "candidate source (share of pairs)": {
+      "cardinality": 4,
+      "top_values": {
+        "cand_opened_next": 0.1449,
+        "cand_twohop": 0.4958,
+        "cand_reverse": 0.1102,
+        "cand_popular": 0.3531
+      }
+    },
+    "candidate source (positive rate)": {
+      "cardinality": 4,
+      "top_values": {
+        "cand_opened_next": 0.8543,
+        "cand_twohop": 0.093,
+        "cand_reverse": 0.4454,
+        "cand_popular": 0.0002
+      }
+    }
+  },
+  "candidate_recall_train": {
+    "cold": {
+      "recall": 0.1829,
+      "recall_w": 0.0624
+    },
+    "torso": {
+      "recall": 0.8512,
+      "recall_w": 0.9327
+    },
+    "head": {
+      "recall": 0.6713,
+      "recall_w": 0.9185
+    },
+    "tail": {
+      "recall": 0.7601,
+      "recall_w": 0.7982
+    }
+  },
+  "candidate_recall_test": {
+    "tail": {
+      "recall": 0.7823,
+      "recall_w": 0.7895
+    },
+    "torso": {
+      "recall": 0.8727,
+      "recall_w": 0.9386
+    },
+    "cold": {
+      "recall": 0.1707,
+      "recall_w": 0.0465
+    },
+    "head": {
+      "recall": 0.6807,
+      "recall_w": 0.9255
+    }
+  },
+  "build_stats": {
+    "months": {
+      "2026-07": {
+        "raw_rows": 34399047,
+        "raw_clicks": 6175563591,
+        "rows": 22214725,
+        "clicks": 2160753266,
+        "min_n": 10
+      },
+      "2026-08": {
+        "raw_rows": 34127898,
+        "raw_clicks": 5943744061,
+        "rows": 22757859,
+        "clicks": 2174971362,
+        "min_n": 10
+      },
+      "2026-09": {
+        "raw_rows": 33553254,
+        "raw_clicks": 5697053135,
+        "rows": 21654016,
+        "clicks": 2010737281,
+        "min_n": 10
+      }
+    },
+    "catalog_pages": 3776397,
+    "train": {
+      "feature_month": "2026-07",
+      "label_month": "2026-08",
+      "population": {
+        "cold": 252403,
+        "tail": 653509,
+        "torso": 1003205,
+        "head": 264047
+      },
+      "population_total": 2173164,
+      "queries": {
+        "head": 12150,
+        "cold": 11615,
+        "tail": 30072,
+        "torso": 46163
+      },
+      "queries_total": 100000,
+      "queries_share_of_population": 0.04601585522307566,
+      "cold_never_seen": 3526,
+      "candidate_recall": {
+        "cold": {
+          "recall": 0.1829,
+          "recall_w": 0.0624
+        },
+        "torso": {
+          "recall": 0.8512,
+          "recall_w": 0.9327
+        },
+        "head": {
+          "recall": 0.6713,
+          "recall_w": 0.9185
+        },
+        "tail": {
+          "recall": 0.7601,
+          "recall_w": 0.7982
+        }
+      },
+      "pairs": 5664045,
+      "truth_pairs": 1038457,
+      "positive_rate": 0.1342,
+      "candidates_per_query_mean": 56.6
+    },
+    "test": {
+      "feature_month": "2026-08",
+      "label_month": "2026-09",
+      "population": {
+        "cold": 202751,
+        "tail": 614668,
+        "torso": 1022308,
+        "head": 272951
+      },
+      "population_total": 2112678,
+      "queries": {
+        "head": 6460,
+        "torso": 24195,
+        "cold": 5000,
+        "tail": 14547
+      },
+      "queries_total": 50202,
+      "queries_share_of_population": 0.023762258138722514,
+      "cold_never_seen": 1591,
+      "candidate_recall": {
+        "tail": {
+          "recall": 0.7823,
+          "recall_w": 0.7895
+        },
+        "torso": {
+          "recall": 0.8727,
+          "recall_w": 0.9386
+        },
+        "cold": {
+          "recall": 0.1707,
+          "recall_w": 0.0465
+        },
+        "head": {
+          "recall": 0.6807,
+          "recall_w": 0.9255
+        }
+      },
+      "pairs": 2910738,
+      "truth_pairs": 513803,
+      "positive_rate": 0.1313,
+      "candidates_per_query_mean": 58.0
+    },
+    "query_overlap_train_test": 2111
+  },
+  "quality_flags": [
+    "proxy: monthly click counts, not distinct readers in 14 days",
+    "proxy: pairs with fewer than 10 clicks a month are removed upstream, so label 0 means r < 10, not r = 0",
+    "proxy: no session ids, no page text, no permissions or archive status",
+    "duplicate (q, item) pairs: 0 (asserted in build_dataset.py)",
+    "self pairs (q = item): 0 (asserted)",
+    "label is zero-inflated: 86.6% of pairs have label 0",
+    "queries with no positive candidate: cold 71.9%, head 0.0%, tail 4.0%, torso 0.1% (these queries score 0 nDCG for every model)",
+    "r is heavy-tailed (unusual, not impossible): kept as is, log1p label"
+  ]
+}

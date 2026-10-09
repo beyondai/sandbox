@@ -99,3 +99,22 @@
     `ml-playbooks.md`. The 3 critique skills point to the new path.
     `adr/0009-ml-critique-skills.md` keeps the old path as history.
   - Monkey mode is unchanged. It stays a separate track.
+
+## 2026-10-08 - ml-modeling-data
+- **Source**: agent-found better design
+- **Status**: proposed
+- **Finding**: The skill writes the labeled table as
+  `modeling/datasets/<task>_{train,test}.csv` inside the project folder. For
+  large tables (here 8.6M pair rows) CSV is slow and large. It also clashes
+  with the monkey-mode rule that generated data goes under the sandbox-root
+  `data/<dataset>/`. The skill also assumes one row per entity. A ranking
+  task needs a group id (the query) and a separate truth table for recall.
+- **Suggested change**: In "Build or register the labeled table", allow
+  parquet under `<sandbox>/data/<dataset>/modeling/` for tables over about
+  1M rows, check each path with `git check-ignore`, and record the paths in
+  the `dataset` block. Add optional `group` and `truth_train`/`truth_test`
+  keys to the `dataset` schema for ranking tasks.
+- **Finding 2**: `dashboard/.port` and `dashboard/.pid` are not git-ignored
+  by the sandbox `.gitignore`, so they show up as untracked files.
+- **Suggested change 2**: Ask the user once to add `dashboard/.port` and
+  `dashboard/.pid` to `.gitignore`, or write them under `data/`.
