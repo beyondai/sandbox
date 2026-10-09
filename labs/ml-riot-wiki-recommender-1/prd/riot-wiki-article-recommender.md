@@ -127,6 +127,33 @@ Scaled to an internal tool. These numbers are assumptions to check.
   - A new or edited page gets recommendations within 24 hours.
   - Permission changes take effect at serve time, with no delay.
 
+## Baseline
+
+The simple approach the ML system must beat. It is not ML. Building it is
+decided later.
+
+- **Status quo.** There is no panel. Readers move between pages through
+  links in the page text and through search.
+- **Recommended baseline, day one (no logs, no ML).**
+  - Candidates: the page's out-links, back-links and siblings in the page
+    tree.
+  - Rank them by page views over the last 30 days. Show the top 5.
+  - Drop archived pages and pages the viewer can't access.
+- **Recommended baseline, after logs exist (no ML).** Co-view click
+  popularity: rank pages by how many readers of page A opened them next.
+  Fill empty slots from the day-one baseline.
+- **Floor.** The 5 most-read pages in the same space. It shows whether the
+  offline metric means anything.
+- **Build decision.** Later. A stand-in for the floor and the co-view
+  baseline was already scored on the Wikipedia proxy in monkey mode (B0 and
+  B1).
+
+```
+day one      page A -> out-links + back-links + siblings -> sort by views -> top 5
+after logs   page A -> pages readers opened next from A  -> sort by count -> top 5
+floor        space  -> most-read pages in the space      -----------------> top 5
+```
+
 ## Metrics - offline
 
 - **Primary.** nDCG@5 on next-page replay from Riot wiki logs. K = 5
@@ -212,3 +239,4 @@ real Riot stack.
   only content the user wrote or pasted.
 - 2026-10-08: offline metrics changed from @10 to @5 to match the 5-page
   panel. Added recall@100 for the candidate stage.
+- 2026-10-08: added the Baseline section (new Definition checklist item).

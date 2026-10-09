@@ -17,7 +17,8 @@
 
 ## 2026-10-08 - ml-system-design-monkey-mode
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: declined (replaced by the 2026-10-08 entry "Baseline as a
+  design decision" below)
 - **Finding**: the user asked for a click baseline plus an ML challenger. The
   skill's "one model, trained once" default conflicted with that, and the run
   had to override it ad hoc.
@@ -73,3 +74,28 @@
   metrics at any K, write the metrics file). A metric or cutoff change runs
   `eval` only." Apply the same rule to `ml-system-design-monkey-mlp` and the
   `ml-modeling-*` evaluate step.
+
+## 2026-10-08 - ml-system-design-definition (Baseline as a design decision)
+- **Source**: user-requested
+- **Status**: adopted (2026-10-08)
+- **Finding**: no skill called out a simple, often non-ML baseline early in
+  the design. Baselines appeared only at the end (`ml-modeling-evaluate`,
+  majority class or mean only, nothing for ranking) or in the critique
+  playbooks. The user wants the baseline named at the PRD stage, with a
+  recommendation, even if it is never built.
+- **Change applied**:
+  - `ml-system-design-definition`: new checklist bullet "Baseline" (status
+    quo, recommended baseline from the playbook, floor, build decision).
+    Never skipped, like out-of-scope.
+  - `ml-system-design-high-level`: Phasing V0 is the PRD baseline, or says
+    why not. Later phases state their gain over it.
+  - `ml-system-design-delivery`: the default fallback heuristic is the PRD
+    baseline.
+  - `ml-modeling-evaluate`: compare against the PRD baseline if built,
+    else its floor, and say so.
+  - `ml-system-design`: the never-skip list is now out-of-scope, baseline
+    and fallback.
+  - `ml-critique/references/playbooks.md` moved to the shared
+    `ml-playbooks.md`. The 3 critique skills point to the new path.
+    `adr/0009-ml-critique-skills.md` keeps the old path as history.
+  - Monkey mode is unchanged. It stays a separate track.
