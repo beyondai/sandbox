@@ -2,6 +2,10 @@
 
 Contents: Setup | Changes to older tests | Tests | Results
 
+Note (ADR 0020): Quick mode is removed. T5-T7 test Quick mode and stay as
+history. The merge and share-out skills are tested in
+`2026-10-09-merge-share-out-test.md`.
+
 Date: 2026-10-09. Skills under test: `ml-critique`, `ml-critique-system`,
 `ml-critique-modeling`, `ml-playbooks.md`, and
 `ml-critique/references/coverage.md`. Reason for this file: ADR 0018

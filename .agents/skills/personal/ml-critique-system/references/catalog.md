@@ -13,9 +13,8 @@ Each item is one check. Each item has:
 `[C]` marks a classic-mistake item: the most likely P1 or P2. Check
 order (most important first): the playbook's classic mistakes, then the
 sections in order. Inside a section, check the `[C]` items first, then the
-others in ID order. Quick mode follows this order until its budget is
-used. Normal mode uses all items. Coverage of the design and modeling
-skills: `../../ml-critique/references/coverage.md`.
+others in ID order. Each run uses all items. Coverage of the design and
+modeling skills: `../../ml-critique/references/coverage.md`.
 
 Sections: A Business goal, B Success metrics, C Requirements and scope,
 D Framing and labels, E Data, F Architecture, G Modeling plan, H Phasing,

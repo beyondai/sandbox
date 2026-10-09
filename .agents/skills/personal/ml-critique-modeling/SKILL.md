@@ -31,12 +31,13 @@ dispatch you, run it first.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections are in priority order: A to D (baseline, labels, split,
    leakage) hold most P1 findings. Inside a section, check the `[C]` items
-   first (the most likely P1), then the others in ID order. Quick mode
-   follows this order until the critique budget (40 minutes) is used.
-   Return the items that you did not check as Not checked.
+   first (the most likely P1), then the others in ID order. Check all
+   items.
 4. Put each result in one part: done well, change or fix, missing, or
    question. Give each finding a priority with the remedy from the
-   catalog.
+   catalog. List a strength only if losing it would make the result
+   worse, with what breaks if it is lost (the core's "Done well" rule).
+   Do not list basic hygiene.
 5. Add the playbook's questions that the report did not answer. Give each
    question the expected answer, why it matters, and what each likely
    answer changes (the core's part 4).
@@ -46,10 +47,9 @@ dispatch you, run it first.
 
 ## Evidence
 
-- Quick mode: `file:line` or a number from existing output. You can read
-  any file (code, params, logs). Run one probe only for a P1 that needs
-  proof. Run no new training.
-- Normal mode: command output for each P1 and P2 finding. Standard probes:
+- With code or data: command output for each P1 and P2 finding. You can
+  read any file (code, params, logs). Run no new training. Standard
+  probes:
   - **Leakage:** train on the suspect feature only. A score near the full
     model shows a leak.
   - **Split:** count entities in both train and test. Compare date ranges.
@@ -57,6 +57,11 @@ dispatch you, run it first.
   - **Noise:** bootstrap the metric, or run
     `python3 .agents/skills/personal/ml-modeling/scripts/hypothesis_tester.py`.
   - **Threshold:** compute precision and recall at the action capacity.
+- Text-only write-up (no code or data, for example an interview report):
+  evidence is a quote with `file:line` and arithmetic from the stated
+  numbers. Show each calculation (for example the accuracy of a constant
+  predictor at the sampled base rate). Reason: a probe needs data that
+  does not exist, and a shown calculation lets the reader check it.
 
 Run probes with `uv run`, and write them in the session scratchpad. Do not
 change the project's code or data.
@@ -69,9 +74,9 @@ issue (a gap or error in this lens or its catalog) with the critique. Return an
 issue only if it made this critique worse: a missed, wrong, or late finding.
 Reason: a gap that the playbook covered anyway adds noise to the log.
 1. Does each check that you did have a result, or a one-line reason why
-   it does not apply? In Quick mode, is each skipped check in Not checked?
-2. Does each P1 and P2 finding have the evidence that the mode requires
-   (Quick: `file:line` or existing output; Normal: probe output) and an
+   it does not apply?
+2. Does each P1 and P2 finding have the required evidence (probe output,
+   or for a text-only write-up a quote and a shown calculation) and an
    alternative?
 3. Did no probe change the project's code or data?
 4. Are the findings sorted with the core's sort key (priority, then

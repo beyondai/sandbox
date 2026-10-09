@@ -30,16 +30,16 @@ dispatch you, run it first.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections A (goal), B (metrics), and D (framing and labels) hold most P1
    findings. Do them first. Inside a section, check the `[C]` items first
-   (the most likely P1), then the others in ID order. Quick mode follows
-   this order until the critique budget (40 minutes) is used. Return the
-   items that you did not check as Not checked.
+   (the most likely P1), then the others in ID order. Check all items.
 4. Put each result in one part: done well, change or fix, missing, or
    question. Give each finding a priority with the remedy from the
-   catalog.
+   catalog. List a strength only if losing it would make the result
+   worse, with what breaks if it is lost (the core's "Done well" rule).
+   Do not list basic hygiene.
 5. Add the playbook's questions that the write-up did not answer. Give each
    question the expected answer, why it matters, and what each likely
    answer changes (the core's part 4).
-6. Do the cross-section checks (section K; Quick: the `[C]` items first).
+6. Do the cross-section checks (section K, the `[C]` items first).
    Errors across sections are often P1.
 7. If a critique context is given, apply it. On a conflict with this lens,
    follow the context, and return the conflict: the rule, the context
@@ -47,6 +47,8 @@ dispatch you, run it first.
 
 Evidence is a quote with `file:line`, or a section that is not there. You
 can list source tables to confirm that they exist. Do not profile data.
+For a number in the write-up, arithmetic from the stated numbers is
+evidence (show the calculation).
 
 ## Check
 
@@ -56,7 +58,7 @@ issue (a gap or error in this lens or its catalog) with the critique. Return an
 issue only if it made this critique worse: a missed, wrong, or late finding.
 Reason: a gap that the playbook covered anyway adds noise to the log.
 1. Does each check that you did have a result, or a one-line reason why
-   it does not apply? In Quick mode, is each skipped check in Not checked?
+   it does not apply?
 2. Does each P1 and P2 finding have a quote with `file:line` (or a named
    missing section) and an alternative?
 3. Are the findings sorted with the core's sort key (priority, then

@@ -190,3 +190,4 @@ edits stay on `main` regardless.
 | 0017 | Ranking path, proxy rule, chain mode, bench --full, from the Riot wiki session |
 | 0018 | Critique: full coverage, sort key, Quick mode (2 hours), critique context, view asked each run |
 | 0019 | Critique questions give why and what changes; log only issues with evidence |
+| 0020 | Critique: one mode, `ml-critique-merge`, `ml-critique-share-out`, `[user]` tag, Done well rule |

@@ -12,7 +12,7 @@ description: >-
 # ML Critique
 
 Contents: Purpose | Reviewer | Priority | Steps | Critique context |
-Reference design | Modes | Done when
+Reference design | Checkpoints | Done when
 
 ## Purpose
 
@@ -23,19 +23,27 @@ Reference design | Modes | Done when
   problems first, and settle each one with the user.
 - **Output.** One critique file with the decisions, the trade-offs, the
   deferred items, and a verdict.
-- **Coverage.** In Normal mode, the 2 lens catalogs check each key decision
-  and step of the `ml-system-design-*` and `ml-modeling-*` skills. The map:
+- **Coverage.** The 2 lens catalogs check each key decision and step of
+  the `ml-system-design-*` and `ml-modeling-*` skills. The map:
   [references/coverage.md](references/coverage.md).
+- **One mode.** Each run checks the full catalog. Reason: the agent part
+  takes minutes. The real limit is the user's share-out time, and
+  `ml-critique-share-out` handles it.
+- **After the critique.** `ml-critique-merge` joins 2 or more critiques
+  of one write-up into a final critique. `ml-critique-share-out` turns a
+  final critique into a discussion plan for a share-out context.
 - Rationale: `../adr/0009-ml-critique-skills.md`,
-  `../adr/0018-critique-coverage-quick-mode-and-context.md`.
+  `../adr/0018-critique-coverage-quick-mode-and-context.md`,
+  `../adr/0020-critique-merge-share-out-one-mode.md`.
 
 ```
- write-up --> 1 Select: mode, view, context (ask), lens, problem type
+ write-up --> 1 Select: view, context (ask), lens, problem type
                 |-- design content  --> ml-critique-system   (subagent)
                 '-- results content --> ml-critique-modeling (subagent)
           --> 2 Critique (4 parts, sorted by importance)
           --> 3 Converge (accept | modify | reject | defer)
           --> 4 Document (critique/<date>-<lens>.md)
+          --> optional: ml-critique-merge --> ml-critique-share-out
 
  view "with my design" (asked each run; can come at any phase)
           --> reference pass (separate subagent) --> [ref] items merged
@@ -87,7 +95,11 @@ Also:
   the playbook's classic mistakes, then the sections in the order that
   the lens names (the sections with most P1 findings first). Inside a
   section, the `[C]` items (the most likely P1) come first.
-- **Done well.** Put first the strength that is most costly to lose.
+- **Done well.** List a strength only if losing it in a rewrite would make
+  the result worse. Say what breaks if it is lost. Do not list basic
+  hygiene (train and test both reported, a stated cleaning rule).
+  Maximum 5. Put first the strength that is most costly to lose. Reason:
+  filler strengths read as encouragement and hide the ones to keep.
 - **Top 3.** The summary starts with the **top 3 changes**, selected across
   all parts with the sort key. Each one is a single change. Do not put
   several changes in one item.
@@ -97,7 +109,7 @@ Also:
 Progress (copy into your reply, tick each line):
 
 ```
-[ ] 1 Select: mode, view, context (ask and wait), lens, problem type
+[ ] 1 Select: view, context (ask and wait), lens, problem type
 [ ] 2 Critique: lens subagents, merge, top 3
 [ ] 3 Converge: rounds until no item is open (or Deferred)
 [ ] 4 Document: critique/<date>-<lens>.md
@@ -116,16 +128,14 @@ Progress (copy into your reply, tick each line):
      architecture, rollout: system. Dataset, split, training, results:
      modeling.
    - Both types of content get both lenses, run in parallel.
-3. Ask one message with 3 questions. Reason: each choice changes the whole
-   run, so do not assume one.
-   1. **Mode:** Quick (2 hours at most) or Normal (complete). Skip this
-      question if a keyword selected the mode ("quick", "brief", "2
-      hours", "1 hour", "45 min": Quick; "normal", "full": Normal).
-   2. **View:** Fresh (no reference) or With my design (give the path or
+3. Ask one message with 2 questions. Reason: each choice changes the whole
+   run, so do not assume one. Skip a question that the user's words
+   already answered ("fresh", a context path).
+   1. **View:** Fresh (no reference) or With my design (give the path or
       the text). See "Reference design".
-   3. **Critique context:** what this critique is for (purpose, audience,
-      required topics, format, time limit), as a path or text, or "none".
-      See "Critique context".
+   2. **Critique context:** what this critique is for (purpose, audience,
+      required topics, format), as a path or text, or "none". See
+      "Critique context".
 
    In the same message, give the lens and the problem type in one line.
 4. Wait for the answers to all questions that you asked. Do not start
@@ -134,15 +144,19 @@ Progress (copy into your reply, tick each line):
 ### 2. Critique
 
 1. Dispatch each lens as a new subagent with: the lens `SKILL.md` path, the
-   playbooks path, the write-up, the mode (in Quick mode, also the
-   critique budget: 40 minutes), the problem type, the critique context
+   playbooks path, the write-up, the problem type, the critique context
    (if any), and the Priority section above. Do not give it the
    reference design. The subagent has no session history, so it reads the
    text, not the author's intent. With no subagent tool, run each lens
    inline, right after Select, before you read notes or other critiques.
+   - **Both lenses on one file:** tell each lens the sections it owns
+     (system: problem, metrics, architecture, serving, rollout; modeling:
+     dataset, label, split, training, results). Each lens can name an
+     overlap item in one line. Reason: with no owner, both lenses write
+     the same findings and can give them different priorities.
 2. Each lens returns 4 parts. Each part is sorted by importance:
-   1. **Done well.** Specific strengths, with reasons. These tell the author
-      what to keep.
+   1. **Done well.** Strengths that are costly to lose (see "Priority"),
+      each with what breaks if it is lost.
    2. **Change or fix.** For each item: priority, evidence (a quote or
       `file:line`), effect (the failure that can occur), and the
       alternative.
@@ -155,12 +169,11 @@ Progress (copy into your reply, tick each line):
       "in which sense?" and give each meaning with its fix. Reason: a
       question with no "why" does not show its value to the reader.
 
-   In Quick mode, it also returns the checks that it did not do (Not
-   checked). With a context, it also returns each context conflict.
+   With a context, it also returns each context conflict.
 3. Merge the critiques if 2 lenses ran. Join the items that are the same
-   problem. Remove findings with no evidence. In Quick mode, apply its
-   limits to the merged result. Log a skill issue that a lens reports
-   only if it passes the log filter ("Skill improvement log" in
+   problem. If the lenses gave different priorities, keep one and say
+   why. Remove findings with no evidence. Log a skill issue that a lens
+   reports only if it passes the log filter ("Skill improvement log" in
    `../ml-system-design/SKILL.md`).
 4. If the view is "With my design", run the reference pass now.
 5. Show the top 3 changes, then the 4 parts. Show each context conflict
@@ -176,18 +189,23 @@ reason), or **defer** (with an owner and the condition that unblocks it).
 The user can answer in chat or in a notes file (see "Answers in a notes file"
 in `../ml-system-design-prd/SKILL.md`).
 
+**User findings.** Tag each new item that the user adds `[user]` (a
+strength, a change, a missing item, or a question), like `[ref]`. An item
+that only agrees with or explains a lens item gets no tag. Reason: the
+reader must see who found what.
+
 ### 4. Document
 
 1. Write `<project-folder>/critique/<YYYY-MM-DD>-<lens>.md`, where
-   `<lens>` is `system`, `modeling`, or `both`. With no
-   project folder, write `critique/<YYYY-MM-DD>-<slug>.md` in the folder
-   of the write-up. For pasted text, ask the user where to write it. Never
-   write in `notes/`: it holds only what the user typed or pasted. Use
-   "Output docs" in `../ml-system-design/SKILL.md`.
-2. Sections: Summary (the view, the context source or "none", and the top
-   3 changes), Context, Done well, Change or fix, Missing, Questions,
-   Decisions and trade-offs, Deferred, Conclusion. Quick mode adds
-   Appendix and Not checked before Conclusion.
+   `<lens>` is `system`, `modeling`, or `both`. If the file exists, add
+   `-v<N>`. With no project folder, write `critique/<YYYY-MM-DD>-<slug>.md`
+   in the folder of the write-up. For pasted text, ask the user where to
+   write it. Never write in `notes/`: it holds only what the user typed or
+   pasted. Use "Output docs" in `../ml-system-design/SKILL.md`.
+2. Sections: Summary (the view, the context source or "none", the count
+   of `[user]` items, and the top 3 changes), Context, Done well, Change
+   or fix, Missing, Questions, Decisions and trade-offs, Deferred,
+   Conclusion.
    - **Context:** the context source, or "none (general rules)". Then one
      entry for each conflict: the general rule, the context requirement,
      and what was done.
@@ -195,23 +213,21 @@ in `../ml-system-design-prd/SKILL.md`).
      why.
    - **Deferred entry:** the item, the reason, the owner, the unblock
      condition, and the risk.
-   - **Appendix** (Quick): the findings that a limit did not present, one
-     line each, sorted by importance.
-   - **Not checked** (Quick): the catalog sections or items that the time
-     budget skipped.
    - **Conclusion:** `ready`, `ready with changes`, or `needs rework`, and
      the top 3 changes from the Summary, in the same order (updated only
      if a decision changed one).
 3. Do not edit the write-up. In the Check, run `check_doc.py` with:
 
    ```
-   Normal: --sections "Summary,Context,Done well,Change or fix,Missing,Questions,Decisions and trade-offs,Deferred,Conclusion"
-   Quick:  --sections "Summary,Context,Done well,Change or fix,Missing,Questions,Decisions and trade-offs,Deferred,Appendix,Not checked,Conclusion"
+   --sections "Summary,Context,Done well,Change or fix,Missing,Questions,Decisions and trade-offs,Deferred,Conclusion"
    ```
 
 4. Offer an ADR for each decision that is difficult to reverse. If the
    write-up came from the `ml-*` chain, offer to send each accepted fix to
    the skill that owns it.
+5. Offer the next skills: `ml-critique-merge` if the project has another
+   critique of the same write-up, and `ml-critique-share-out` if the
+   critique is for a share-out (an interview, a review meeting).
 
 ### 5. Check
 
@@ -223,13 +239,15 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 4. Does the verdict follow from the decisions? Is the write-up unchanged?
 5. Is each conflict between the context and the general rules in the
    Context section, with what was done?
+6. Is each new user item tagged `[user]`, and does each strength say what
+   breaks if it is lost?
 
 ## Critique context
 
 A critique context says what this critique is for. Example: an interview
 brief that asks for 4 specific parts, a time limit, and sketches.
 
-- **Ask each run** (Select, question 3). The user can add or change the
+- **Ask each run** (Select, question 2). The user can add or change the
   context in any later phase.
 - **No context:** follow the general rules. The Context section says
   "none (general rules)".
@@ -238,15 +256,18 @@ brief that asks for 4 specific parts, a time limit, and sketches.
   "sketch" section) without a note.
 - **Note each conflict, each time.** Say it in chat when it changes what
   you do. Write it in the Context section: the rule, the context
-  requirement, and what was done. Example: the context says "prepare in
-  less than 2 hours" and Normal mode has no limit. Done: the 2-hour limit.
+  requirement, and what was done.
+- **A time limit is not a conflict.** A limit such as "prepare in less
+  than 2 hours" is the user's share-out time, not the critique's. Run the
+  full critique. Record the limit in the Context section for
+  `ml-critique-share-out`.
 - **The lenses get the context.** Reason: it says what to cover, not what
   the answer is, so it does not spoil the fresh view.
 
 ## Reference design
 
 A reference design is the reviewer's own design, system, or folder for the
-same problem. The user chooses the view each run (Select, question 2):
+same problem. The user chooses the view each run (Select, question 1):
 **Fresh** or **With my design**.
 
 - **Only what the user gives.** Use a reference design only if the user
@@ -275,34 +296,12 @@ Merge by phase:
 
 The Summary names the view: "fresh" or the reference design.
 
-## Modes
+## Checkpoints
 
-Quick takes 2 hours at most for the whole run, Select to Check. It is not
-complete: it checks the most important topics first and stops at the
-budget. Normal is complete.
-
-```
- Quick:  0 min    10           50                 100       120
-         |-select-|- critique -|- present+converge -|-document-|
-```
-
-| | Quick (2 hours at most) | Normal (no limit) |
-|---|---|---|
-| Checks | In importance order: playbook classic mistakes, `[C]` items, then the other items in catalog order. Stop at the critique budget. | Full catalog |
-| Evidence | `file:line` or existing output. One probe only for a P1 that needs proof. | Command output for each modeling P1 and P2 |
-| Presented | P1 and P2. Maximum 5 each in parts 2, 3, 4, and 3 strengths. A limit never removes a P1. | All, P1 to P3 |
-| Not presented | Appendix, one line each | - |
-| Not checked | Listed by catalog section or item | - |
-| Converge | Maximum 2 rounds of 6 questions, P1 first, then P2. Items that do not fit go to Deferred ("no time"). | Rounds until no items stay open |
-| Checkpoints | None | After each phase and each round |
-| Time | Select 10, Critique 40, Present and converge 50, Document and Check 20 (minutes) | No limit |
-
-- A context time limit that is shorter than 2 hours wins. Scale the phase
-  budgets and note the conflict.
-- In both modes, each open item at the end goes to Deferred with its
-  reason. In Normal mode, the user can go to the next step at each
-  checkpoint. The open items then go to Deferred with the reason "the
-  user went to the next step".
+- After each phase and each Converge round, the user can go to the next
+  step. The open items then go to Deferred with the reason "the user went
+  to the next step".
+- Each open item at the end goes to Deferred with its reason.
 
 ## Done when
 
@@ -310,6 +309,6 @@ budget. Normal is complete.
 2. Each decision has its trade-off. Each deferred item has its reason,
    owner, unblock condition, and risk.
 3. The conclusion gives a verdict and the top changes.
-4. The Check passed (5 yes answers, `check_doc.py` prints `OK`), or the
+4. The Check passed (6 yes answers, `check_doc.py` prints `OK`), or the
    open items are reported.
 5. The user confirms.

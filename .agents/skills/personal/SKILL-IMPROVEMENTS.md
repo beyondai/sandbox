@@ -5,7 +5,8 @@ Contents: open entries from `labs/ml-riot-wiki-recommender-1`
 metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
-estimates | tag user findings | Done well filter
+estimates | tag user findings | Done well filter | share-out and merge
+skills
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -289,8 +290,9 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-critique lenses (text-only hybrid report)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found gap
-- **Status**: deferred (2026-10-09): adopt if a run misses a finding or
-  the lenses contradict each other. The only cost was a merge (ADR 0019).
+- **Status**: adopted (2026-10-09), reopened: the next run met the unblock
+  condition (the lenses gave P1 vs P2 for 2 findings). `ml-critique` step
+  2.1, both lens Evidence sections (ADR 0020). Earlier: deferred (ADR 0019).
 - **Finding**: the modeling lens step 1 and its Evidence rules assume a
   project folder with code and probe output. A text-only report (the
   common interview case) has no rule. Both lenses also had no rule to
@@ -374,7 +376,9 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-critique (time estimates are human time, not agent time)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: modified and adopted (2026-10-09): Quick mode is removed,
+  not redefined. Each run checks the full catalog; the share-out limit is
+  handled by `ml-critique-share-out` (ADR 0020).
 - **Finding**: the skill states its budgets in wall-clock time (Quick: 2
   hours, critique 40 minutes) and treats a context time limit ("prepare
   in less than 2 hours") as a run limit. The agent part of a Normal run
@@ -395,7 +399,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-critique (tag the user's own findings)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): `ml-critique` step 3 and step 4,
+  `ml-critique-merge`, `ml-critique-share-out` (ADR 0020).
 - **Finding**: in Converge the user adds their own findings (new
   strengths, new questions for the author). The critique file mixes
   them with the lens findings, so a reader cannot tell who found what.
@@ -410,7 +415,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-critique (Done well lists only real strengths)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-10-09), from the user's comment: `ml-critique`
+  "Priority" and step 2, both lenses step 4. The cap is 5 (ADR 0020).
 - **Finding**: the merged Done well part had 10 items. The user agreed
   with 2 and said the others "seem for encouragement". Items such as
   "train and test are both reported" or "stub rule with a count" are
@@ -419,3 +425,21 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   lenses: "List a strength only if losing it in a rewrite would make
   the result worse (a design choice to keep). Do not list basic hygiene.
   Maximum 5 in Normal mode. For each, say what breaks if it is lost."
+
+## 2026-10-09 - ml-critique (share-out and merge skills)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): new skills `ml-critique-merge` and
+  `ml-critique-share-out`; Quick mode removed (ADR 0020).
+- **Finding**: the user, on the "critique time estimates" entry: "in all
+  modes, research finished within minutes. 2 hours is overestimate." The
+  real limit is the share-out (an interview, a team review), not the
+  critique. No skill turns a full critique into what to discuss in a
+  fixed time. The user also has 2 independent critiques of one report and
+  no skill to merge them. The user named it "share-out", not
+  "presentation", and asked for a separate merge skill.
+- **Suggested change**: `ml-critique-merge`: critique files in; join,
+  evidence, disagreements, tags, decisions; discuss until the user says
+  to write; `critique/<date>-final.md` out. `ml-critique-share-out`: a
+  final critique and a share-out context in (limit, format, topics,
+  audience); discuss until "write"; `critique/<date>-share-out.md` out.

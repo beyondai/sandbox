@@ -10,8 +10,8 @@ Each playbook has the same 8 parts:
 4. **Features**: the typical strong features.
 5. **Model and loss**: the usual model family and objective.
 6. **Metrics**: the correct offline and online metrics.
-7. **Classic mistakes**: each with its standard fix. Quick mode always runs
-   these.
+7. **Classic mistakes**: each with its standard fix. The critique lenses
+   check these first.
 8. **Questions to ask**: each with the expected answer. Part 4 of the
    critique uses these.
 

@@ -273,6 +273,8 @@ labs/proj1/
   dashboard/               eda.ipynb + app.py (Streamlit), own port
   monkey-mode/report.md    Independent fast baseline
   critique/<date>-<lens>.md  Critiques from ml-critique
+  critique/<date>-final.md   Final critique from ml-critique-merge
+  critique/<date>-share-out.md  Share-out plan from ml-critique-share-out
   research/                Research notes for this project
   SKILL-IMPROVEMENTS.md    Older skill proposals (history; new ones go
                            to the shared log in .agents/skills/personal/)
@@ -305,6 +307,8 @@ skills also start from plain language.
 | `mm-serve`            | Measures latency; sizes capacity and cost      |
 | `mm-autoresearch` cmd | Optional automatic improvement loop            |
 | `ml-critique`         | Critiques a finished write-up (critique guide) |
+| `ml-critique-merge`   | Merges critiques into one final critique       |
+| `ml-critique-share-out` | Plans what to discuss in a fixed time        |
 
 ### Bundled scripts
 
@@ -434,11 +438,16 @@ in parentheses.
   decisions (0009).
 - **Critique covers every design step, most important first.** A
   coverage map links each design and modeling skill item to a catalog
-  check. Quick mode limits the whole run to 2 hours. Each run asks for
-  the view (fresh or with your design) and a critique context; the
-  context wins only on a conflict, and each conflict is noted (0018).
-  Each question gives why it matters and what each answer changes
-  (0019).
+  check. Each run asks for the view (fresh or with your design) and a
+  critique context; the context wins only on a conflict, and each
+  conflict is noted (0018). Each question gives why it matters and what
+  each answer changes (0019).
+- **One critique mode; the share-out cuts for time.** Each run checks
+  the full catalog, because the agent part takes minutes.
+  `ml-critique-merge` joins critiques into a final critique.
+  `ml-critique-share-out` plans what to discuss in a fixed time. New
+  user findings get `[user]`. Done well lists only strengths that are
+  costly to lose (0020).
 - **One folder for each project.** All generated files go in
   `<parent>/<project>/`, never in `notes/` (0010).
 - **Each skill checks its own output.** Intent questions, a format script,
