@@ -66,7 +66,9 @@ suggest this skill in one line, then follow the user's answer.
    (parallel tool calls). Each subagent:
    - reads `modeling/02-features.md`;
    - trains its candidate with CV inside the input table, starting from
-     `../ml-model-training.md` and the same tuning budget as the others;
+     `../ml-model-training.md` and the same tuning budget as the others
+     (ranking tasks: folds by query, per `../ml-modeling-train/SKILL.md`,
+     "Ranking tasks"; LightGBM or XGBoost: the import check there);
    - computes the metrics that `ml-modeling-evaluate` uses;
    - times its inference: 1-row predictions on about 200 input rows after
      a short warm-up (p50 and p99 in ms), and the model size;

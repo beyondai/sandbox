@@ -14,8 +14,8 @@ description: >-
 
 # ML Modeling
 
-Contents: Steps | Required upstream | Modes | Dashboard | Bundled tools | After
-step 5 | Check
+Contents: Steps | Required upstream | Modes | Proxy data | Dashboard | Bundled
+tools | After step 5 | Check
 
 5 steps. Each step is its own skill. Files in `<project-folder>/modeling/`
 connect the steps, not the conversation, so each step can run alone in a
@@ -109,10 +109,12 @@ The first step that runs without `spec/<topic>.md` synthesizes it from
 `prd/`, `adr/`, and `design/high-level.md`. Each section is a summary, not
 a copy. The first 2 lines hold the hashes from `git hash-object -w <file>`.
 The `-w` stores the blob, so `git diff` works for an uncommitted version.
+Line 3 holds the chain's mode (see "Modes").
 
 ```
 prd-hash: <sha>
 high-level-hash: <sha>
+mode: quick-poc | regular
 
 # Spec: <topic>
 ## Problem Statement      <- PRD Problem, one paragraph
@@ -154,9 +156,13 @@ Each step runs this check first, in both modes:
 4. Record the answer as one line in the step's output `.md`. Example:
    `high-level changed since spec (ML framing); user chose: apply going
    forward, spec kept`.
-5. If the spec was synthesized again, or the user chose "apply", run the
-   script with `--refresh prd` or `--refresh high-level`. If the user
-   chose the earlier decisions, do not refresh: the next step asks again.
+5. If the spec was synthesized again, or the user chose "apply": first
+   update every spec line that cites the changed content (renamed terms,
+   changed gates, metrics or slices), then run the script with `--refresh
+   prd` or `--refresh high-level`. A refresh means "applied", not only
+   "seen": a refresh with no update leaves stale lines (one project kept
+   an old slice name in its gate this way). If the user chose the earlier
+   decisions, do not refresh: the next step asks again.
 
 `ml-modeling-autoresearch` runs unattended, so it does not ask. On
 `CHANGED`, it records the change in `round-summary.md` and continues. The
@@ -171,7 +177,8 @@ steps" in `../ml-system-design/SKILL.md`).
 - **Upstream.** If a step finds that an upstream decision must change (for
   example, the label horizon does not work, or a source table does not
   exist), tell the user. Offer to update `design/high-level.md` or
-  `prd/<topic>.md`. After the update, run `spec_hash_check.sh <project-folder>
+  `prd/<topic>.md`. After the update, update the spec lines that cite the
+  changed content, then run `spec_hash_check.sh <project-folder>
   --refresh prd` (or `high-level`).
 - **Spec.** After a step records its decision in `0N-*.md`, read the
   Implementation Decisions and Testing Decisions of `spec/<topic>.md`. If
@@ -186,6 +193,11 @@ steps" in `../ml-system-design/SKILL.md`).
 ## Modes
 
 The keyword in the request selects the mode. There are no flags.
+
+The first step writes the mode to line 3 of the spec (`mode:`). A later
+step with no mode word in its request uses that mode, so the chain keeps
+the mode it started with; a mode word in the request overrides it for
+that step. Each step records the mode it used in its `0N-*.md`.
 
 | Words in the request | Mode |
 |---|---|
@@ -203,6 +215,15 @@ Both write `03-train.md` and `model.joblib`, so steps 4 and 5 are the same
 on either. Multiagent fits several reasonable candidates or a Quick POC;
 train fits one clear candidate, a restricted session, or a low token
 budget. Details: "When to use" in `../ml-modeling-multiagent/SKILL.md`.
+
+## Proxy data
+
+When the data is a stand-in for the target system (a public dataset in
+place of the real logs), each finding in `0N-*.md` gets a "For
+<target>" line: the design input it gives the target system. Proxy numbers
+are evidence or a lower bound, never the target's numbers. Name the
+signals that the proxy lacks, and say which results they make a lower
+bound. Reason: without the line, a proxy result reads as a target result.
 
 ## Dashboard
 

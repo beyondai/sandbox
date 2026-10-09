@@ -156,7 +156,9 @@ python3 .agents/skills/personal/ml-modeling/scripts/feature_selector.py --file <
 ```
 
 `<csv>` is `dataset.train` (or the "Output table"). `<col>` is
-`dataset.label`. The score combines variance, correlation, cardinality,
+`dataset.label`. For a parquet table, run it with `uv run python3` and add
+`--sample 200000 --drop <id columns>`: the script holds all rows in
+memory. The score combines variance, correlation, cardinality,
 and null rate. It is a rough screen: remove the id column first, and do
 not drop a feature on this score alone. Confirm a drop with model
 importance or a CV ablation.

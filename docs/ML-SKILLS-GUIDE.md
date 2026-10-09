@@ -152,6 +152,10 @@ A keyword in your request selects the mode:
   Quick POC.
 - All other words select Regular.
 
+In the modeling chain, the first step writes the mode into the spec. A
+later step with no mode word keeps that mode; a mode word overrides it
+for that step.
+
 Monkey-mode is different. It is always fast and always runs in the
 background. It waits for you only on one question: which data to use.
 
@@ -325,12 +329,15 @@ sandbox root.
 - `ml-modeling/scripts/experiment_tracker.py`: the experiment log. "Best"
   is the lowest value for error and loss metrics. Python stdlib.
 - `ml-modeling/scripts/feature_selector.py`: a rough feature ranking.
-  Python stdlib.
+  Python stdlib for CSV. For parquet, run it with `uv run` and add
+  `--sample N --drop <id columns>`.
 - `ml-modeling/scripts/hypothesis_tester.py`: significance tests for
   means and proportions. Python stdlib.
 - `ml-modeling-serve/scripts/bench_serve.py --serve <serve.py> --rows <csv>`
   - Times the project's `score(df)`: p50/p99 for 1 row, batch rows per
     second, model size. Prints JSON.
+  - `--full` (and `--chunk N`) times a whole batch job in file order: use
+    it for batch serving.
   - Needs: uv (pandas, and what `serve.py` imports).
 - `scripts/check_skill_style.py .agents/skills/personal`
   - Checks the skill files against `docs/SKILL-STYLE-GUIDE.md`.
@@ -396,6 +403,10 @@ in parentheses.
   results only (0002).
 - **Autoresearch controls its own loop.** One round, until plateau, or for
   a time. No external scheduler (0003, 0005).
+- **Ranking is a first-class task.** Train folds by query and scores per
+  query; evaluate scores against the full truth, per query and item
+  segment. With proxy data, each finding gets a "For <target>" line
+  (0017).
 - **Skill changes go to one shared log.**
   `.agents/skills/personal/SKILL-IMPROVEMENTS.md`, for all projects. The
   agent reflects at the end of each session and offers a review (0004,

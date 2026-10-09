@@ -15,7 +15,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling-train (ranking path)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): `ml-modeling-train`, "Ranking tasks";
+  multiagent points to it (ADR 0017).
 - **Finding**: the skill has no ranking path. The matrix, the threshold
   rule and the CV text assume one row per entity. For this recommender I
   had to add folds grouped by query, a per-query metric, and "no
@@ -30,7 +31,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling-train (LightGBM needs libomp)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): import check in `ml-modeling-train`,
+  "Algorithm selection" (ADR 0017).
 - **Finding**: `uv add lightgbm` installs, but the import fails on macOS:
   the wheel needs the system `libomp`. The LambdaMART candidate could not
   run. XGBoost wheels have the same need.
@@ -44,7 +46,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling-evaluate (ranking metrics)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): `ml-modeling-evaluate`, "Ranking" (ADR
+  0017).
 - **Finding**: the skill has classification and regression templates
   only. A ranking evaluation needs a truth table, not only the candidate
   rows: nDCG over the candidates alone hid that 55% of new pages had no
@@ -60,7 +63,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling-serve (bench_serve.py in batch mode)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): `--full` and `--chunk` in `bench_serve.py`;
+  serve skill "Measure" (ADR 0017).
 - **Finding**: `bench_serve.py` times single rows and 1,000-row random
   batches. When `transform()` joins each call against a history table,
   every call pays a fixed cost: 1,789 rows/s in the 1,000-row batches,
@@ -75,7 +79,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-serving.md (cache history in the feature code)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: declined as its own rule (2026-10-09): a coding detail; one
+  sentence went into `ml-modeling-serve`, "serve.py".
 - **Finding**: `features.py` read a 22M-row history table on every
   `transform()` call. Fine in training (one call), slow in serving (many
   calls). The fix was a per-process cache inside `features.py`, so serving
@@ -88,7 +93,7 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling scripts (feature_selector.py reads CSV only)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): parquet, `--sample`, `--drop` (ADR 0017).
 - **Finding**: `feature_selector.py` takes only `--file <csv>`. The train
   table was 6.2M rows in parquet; I had to write a 200k-row CSV sample to
   the scratchpad first.
@@ -98,7 +103,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling (chain mode carries to later steps)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found better design
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): `mode:` line in the spec; "Modes" in the
+  router (ADR 0017).
 - **Finding**: the mode is chosen by keyword in each request. The chain
   started in Quick POC, but `/ml-modeling-train` and later steps were run
   with no keyword, which means Regular by the rule. I kept Quick POC and
@@ -110,7 +116,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling (hash refresh left the spec stale)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: agent-found bug
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): router, "Design docs changed?" step 5 and
+  "Closing the loop" (ADR 0017).
 - **Finding**: `design/high-level.md` renamed the "cold" slice to "new"
   and the hash in the spec was refreshed, but the spec's gate line still
   said "cold and long-tail" until the train step found it. A hash refresh
@@ -123,7 +130,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-system-design-high-level (gate per segment)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: declined (2026-10-09): fits products with clear segments; stays a
+  Riot wiki project decision (`adr/0002` there).
 - **Finding**: the V1 gate was all-or-nothing over two slices, and its
   fallback covered only one failure shape. The user changed it to
   per-slice routing (the model ranks only the slices where it wins with a
@@ -137,7 +145,8 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-playbooks.md and ml-system-design-definition (slices)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: declined (2026-10-09): a recommender default, not general; stays
+  in the Riot wiki PRD.
 - **Finding**: the PRD first had one "cold" slice. The user separated
   cold-start (new: no time to learn yet) from long-tail (rarely used,
   even when old), on both the query side and the item side. The data
@@ -151,7 +160,7 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 ## 2026-10-09 - ml-modeling and ml-system-design (proxy data rule)
 - **Project**: `labs/ml-riot-wiki-recommender-1`
 - **Source**: user-requested
-- **Status**: proposed
+- **Status**: adopted (2026-10-09): router, "Proxy data" (ADR 0017).
 - **Finding**: the user said the Wikipedia data is only a proxy, and every
   design suggestion must still be for the Riot wiki. The skills have no
   rule for proxy data; this lives only in project memory.

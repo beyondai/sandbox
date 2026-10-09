@@ -81,7 +81,10 @@ raw input (the columns of `dataset.test` without the label):
   consumer needs a decision.
 
 One code path for training and serving prevents training-serving skew. Do
-not copy the feature logic into `serve.py`.
+not copy the feature logic into `serve.py`. If `transform()` loads history
+or lookup tables, cache them once per process inside the feature module
+(for example `functools.lru_cache`), then check that serving scores equal
+the evaluate scores.
 
 ## Measure
 
@@ -99,6 +102,13 @@ It prints p50/p95/p99 for single-row requests, the QPS of 1 worker, batch
 rows per second, the model size, and the machine. Compare the p99 with the
 ranking or scoring stage budget from step 3. The laptop is not the
 production machine: say so next to the numbers.
+
+**Batch mode:** add `--full` (and `--chunk N` if the job scores in
+chunks). It scores the whole table in file order, as the batch job does,
+and reports `full_batch.rows_per_sec`. Use that number as
+`batch_rows_per_sec` in `05-serve.json`. The random 1,000-row batches pay
+any fixed cost per call 1,000 times, so they can understate a batch job by
+100x or more.
 
 ## Capacity and cost
 

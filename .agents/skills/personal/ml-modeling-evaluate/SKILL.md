@@ -11,8 +11,8 @@ description: >-
 
 # Evaluate
 
-Contents: Classification | Regression | Required checks | A/B test of a shipped
-model | Dashboard results | Check | After this step
+Contents: Classification | Regression | Ranking | Required checks | A/B test
+of a shipped model | Dashboard results | Check | After this step
 
 - **Reads:** the offline metrics in `<project-folder>/prd/<topic>.md`
   (primary, secondary, guardrails: they define "good enough") and
@@ -25,7 +25,9 @@ model | Dashboard results | Check | After this step
 - **Scores on:** `01-data.json` -> `dataset.test`. The train number for the
   overfit gap comes from the table that the model was fit on.
 - **Writes:** `modeling/04-evaluate.md`, `modeling/04-evaluate.json`, and
-  the per-row scores in `modeling/test_scores.csv`.
+  the per-row scores in `modeling/test_scores.csv` (for over about 1M
+  rows: parquet under `data/<dataset>/modeling/`, as in
+  `../ml-modeling-data/SKILL.md`).
 - **Rules:** `../ml-system-design/SKILL.md`, "Project folder", "Output
   docs", "Check the output", "Skill improvement log".
 - **Mode:** Regular reports the full metric set and the overfit check.
@@ -70,6 +72,24 @@ def evaluate_regressor(y_true, y_pred):
             "rmse": np.sqrt(mean_squared_error(y_true, y_pred)),
             "r2": r2_score(y_true, y_pred)}
 ```
+
+## Ranking
+
+For (query, candidate) rows (`dataset.group` set):
+
+- **Score against the full truth** (`dataset.truth_test`): every true item
+  per query, also items that no candidate rule found. nDCG over the
+  candidates alone hides the candidate misses.
+- **Metrics at K** (the panel or page size): nDCG@K (primary unless the
+  PRD says otherwise), recall@K, click- or volume-weighted recall, hit@K,
+  and catalog coverage of the top K.
+- **Candidate recall** of the candidate rules: the ceiling for any
+  ranker. Report it next to the ranker metrics.
+- **Segments:** per query segment, weighted by the population share; and
+  for recommenders, per item segment (recall@K of true items in that
+  segment). Item-side metrics show what query-side metrics hide (for
+  example, a model that shows new items less often than the baseline).
+- **Noise:** paired bootstrap over queries, not over rows.
 
 ## Required checks
 

@@ -5,12 +5,16 @@ Computes feature importance via variance, correlation with target, cardinality,
 null rate, and information-theoretic measures.  Produces a ranked list with
 composite scores to guide feature selection.
 
-Requires: python3 standard library only (no venv needed).
+Requires: python3 standard library only (no venv needed) for a CSV file.
+A .parquet file needs pandas and pyarrow: run it with `uv run python3`
+from the sandbox root (the shared venv has both).
 
 Usage:
     python feature_selector.py --file dataset.csv --target churn
     python feature_selector.py --file dataset.csv --target revenue --top 10 --json
     python feature_selector.py --file dataset.csv --target label --method all
+    uv run python3 feature_selector.py --file train.parquet --target label \
+        --sample 200000 --drop q,item
 """
 
 import argparse
@@ -18,6 +22,7 @@ import csv
 import json
 import math
 import os
+import random
 import sys
 from collections import Counter
 
@@ -246,21 +251,45 @@ def score_features(data: list, target_col: str, method: str = "all") -> list:
     return results
 
 
+# Seed for --sample, so that a rerun ranks the same rows.
+SAMPLE_SEED = 42
+
+
+def load_rows(path, sample=None, drop=()):
+    """Rows as dicts of strings (the CSV reader's shape), from .csv or
+    .parquet, optionally a seeded sample, without the dropped columns."""
+    if path.endswith(".parquet"):
+        import pandas as pd  # only for parquet; see Requires
+        df = pd.read_parquet(path)
+        if sample and sample < len(df):
+            df = df.sample(n=sample, random_state=SAMPLE_SEED)
+        df = df.drop(columns=[c for c in drop if c in df.columns])
+        df = df.astype(object).where(df.notna(), "")
+        return [{k: str(v) for k, v in row.items()} for row in df.to_dict("records")]
+    with open(path, "r", newline="") as f:
+        data = list(csv.DictReader(f))
+    if sample and sample < len(data):
+        data = random.Random(SAMPLE_SEED).sample(data, sample)
+    return [{k: v for k, v in row.items() if k not in drop} for row in data]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Score and rank features for predictive modeling.")
-    parser.add_argument("--file", required=True, help="Path to CSV data file")
+    parser.add_argument("--file", required=True, help="Path to a .csv or .parquet data file")
     parser.add_argument("--target", required=True, help="Target column name")
     parser.add_argument("--top", type=int, help="Show only top N features")
     parser.add_argument("--method", choices=["all", "correlation", "mutual_info"], default="all", help="Scoring method (default: all)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--sample", type=int, help="Score a seeded sample of N rows (large tables)")
+    parser.add_argument("--drop", default="", help="Comma-separated columns to leave out (id columns)")
     args = parser.parse_args()
 
     if not os.path.exists(args.file):
         print(f"Error: File not found: {args.file}", file=sys.stderr)
         sys.exit(1)
 
-    with open(args.file, "r", newline="") as f:
-        data = list(csv.DictReader(f))
+    drop = [c for c in args.drop.split(",") if c]
+    data = load_rows(args.file, args.sample, drop)
 
     if not data:
         print("Error: No data rows found.", file=sys.stderr)

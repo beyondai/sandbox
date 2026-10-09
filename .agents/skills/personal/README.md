@@ -183,3 +183,4 @@ edits stay on `main` regardless.
 | 0014 | Style guide; `check_skill_style.py` and `check_docs.py`; when to run them |
 | 0015 | Anthropic skill checklist: evals per family, named constants, 3 more checks |
 | 0016 | One shared skill improvement log; reflect at the end of every session |
+| 0017 | Ranking path, proxy rule, chain mode, bench --full, from the Riot wiki session |

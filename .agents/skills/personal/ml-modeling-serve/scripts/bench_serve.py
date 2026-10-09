@@ -5,7 +5,7 @@ Usage (from the sandbox root):
   uv run python3 .agents/skills/personal/ml-modeling-serve/scripts/bench_serve.py \
       --serve <project>/modeling/serve.py --rows <test table .csv|.parquet> \
       [--model <project>/modeling/model.joblib] [--single 300] [--warmup 30] \
-      [--batch-size 1000] [--batches 5] [--out <file.json>]
+      [--batch-size 1000] [--batches 5] [--full [--chunk N]] [--out <file.json>]
 
 `serve.py` must define `score(df) -> scores` (one score per input row). The
 script imports it, so the measured path is the real serving path:
@@ -15,7 +15,13 @@ script imports it, so the measured path is the real serving path:
   3. Batch: `--batches` calls of `--batch-size` rows -> rows per second
      (the batch throughput, and the QPS of 1 replica for a 1-row request
      is 1000 / p50_ms).
-  4. Size: the model file on disk, if `--model` is given.
+  4. Full batch (`--full`): score every row of the table, in file order,
+     in one call (or in calls of `--chunk` rows) -> rows per second of a
+     batch job. Use it for batch serving: when `score()` has a fixed cost
+     per call (for example a join against a history table), the random
+     1,000-row batches above understate a batch job's throughput (measured:
+     1,789 against 607,009 rows per second in one project).
+  5. Size: the model file on disk, if `--model` is given.
 
 Rows are sampled with replacement when the table is smaller than needed.
 Prints one JSON object (and writes it to `--out` if given). Exit code 0 on
@@ -44,7 +50,8 @@ WARMUP = 30
 # 300 puts about 3 samples above p99.
 SINGLE = 300
 # Rows per batch call: large enough that the fixed cost of a call is small
-# next to the cost per row.
+# next to the cost per row, for a model with no per-call setup. Use --full
+# when score() has a fixed cost per call.
 BATCH_SIZE = 1000
 # Batch calls: the median of 5 ignores 1 or 2 slow runs.
 BATCHES = 5
@@ -96,6 +103,8 @@ def main():
     ap.add_argument("--warmup", type=int, default=WARMUP)
     ap.add_argument("--batch-size", type=int, default=BATCH_SIZE)
     ap.add_argument("--batches", type=int, default=BATCHES)
+    ap.add_argument("--full", action="store_true")
+    ap.add_argument("--chunk", type=int)
     ap.add_argument("--out")
     args = ap.parse_args()
     for p in (args.serve, args.rows):
@@ -131,6 +140,16 @@ def main():
         call(score, df)
         batch_rates.append(len(df) / (time.perf_counter() - t0))
 
+    full = None
+    if args.full:
+        step = args.chunk or len(rows)
+        t0 = time.perf_counter()
+        for start in range(0, len(rows), step):
+            call(score, rows.iloc[start:start + step])
+        secs = time.perf_counter() - t0
+        full = {"rows": len(rows), "chunk": step, "seconds": round(secs, 3),
+                "rows_per_sec": round(len(rows) / secs, 1)}
+
     p50 = percentile(times, 0.50)
     result = {
         "single_requests": len(times),
@@ -141,6 +160,7 @@ def main():
         "qps_per_replica_1_worker": round(1000 / p50, 1) if p50 > 0 else None,
         "batch_size": args.batch_size,
         "batch_rows_per_sec": round(statistics.median(batch_rates), 1),
+        "full_batch": full,
         "model_mb": (round(os.path.getsize(args.model) / 1e6, 3)
                      if args.model and os.path.isfile(args.model) else None),
         "machine": f"{platform.machine()} {platform.system()}, "

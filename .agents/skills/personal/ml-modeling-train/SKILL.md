@@ -12,8 +12,8 @@ description: >-
 
 # Train (sequential)
 
-Contents: Algorithm selection | Record the training setup | Quick POC time
-budget | Log each run | Check
+Contents: Algorithm selection | Ranking tasks | Record the training setup |
+Quick POC time budget | Log each run | Check
 
 - **Reads:** the Phasing in `<project-folder>/design/high-level.md` (the
   model class for each phase), `modeling/01-data.md` (class balance), and
@@ -64,9 +64,18 @@ Steps:
 | Medium data, high accuracy needed | XGBoost/LightGBM | none (default workhorse for tabular data) |
 | Large data, complex patterns | Neural network | only after tree methods plateau |
 | Unsupervised grouping | K-Means/DBSCAN | validate `k` with the silhouette score |
+| Ranking: (query, candidate) rows | GBDT regression on the graded label | LambdaMART (listwise loss) |
 
 Use cross-validation, not one train/test split, to compare candidates.
 Make the folds inside the train table, never across the `dataset` split.
+
+**LightGBM or XGBoost: check that it loads.** Run
+`uv run python3 -c "import lightgbm"` (or `xgboost`) before you pick it.
+On macOS the wheel needs the system library `libomp`; without it, the
+import fails after a clean install. A system library is the user's
+decision (this user: `homebrew.brews` in the nix-darwin config). Ask; do
+not install it. If it can't load, remove the package again
+(`uv remove`) and use scikit-learn's `HistGradientBoosting`.
 
 **CV leak check.** Is a feature built from the target once for the
 whole table, without per-fold computation (a leave-one-out or target
@@ -75,6 +84,23 @@ If yes, compute it again in each fold, or mark the CV ranking as
 provisional in `03-train.md` until `ml-modeling-evaluate`. A boosted model
 uses this leak more than a linear or bagged model, so the ranking can be
 wrong.
+
+## Ranking tasks
+
+One row is a (query, candidate) pair, and `dataset.group` names the query
+column (`../ml-modeling-data/SKILL.md`).
+
+- **Folds:** `GroupKFold` by `dataset.group`, so no query is in both the
+  fit part and the scored part.
+- **Metric:** per query (nDCG@K at the panel or page size), then the mean.
+  Weight by segment when the PRD defines segments.
+- **Target:** the graded label (for example `log1p` of a count), not a
+  binary "clicked" label. A binary label can't order candidates by volume
+  (measured: -5.8% to -8% nDCG in one project).
+- **Simplest option:** the PRD baseline rule, scored on the same folds.
+- **Threshold:** none. Save `threshold: None` in `model.joblib`.
+- The nDCG over the candidates alone hides the candidate misses. Say so in
+  `03-train.md`; `ml-modeling-evaluate` scores against the full truth.
 
 ## Record the training setup
 
