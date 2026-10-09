@@ -4,7 +4,8 @@ Contents: open entries from `labs/ml-riot-wiki-recommender-1`
 (2026-10-09): train ranking path | train LightGBM check | evaluate ranking
 metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
-slices | proxy data rule
+slices | proxy data rule | critique time
+estimates | tag user findings | Done well filter
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -369,3 +370,52 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   the skill made the work worse (a missed, wrong, or late result, or
   extra work for the user). The lenses return an issue only under the
   same rule.
+
+## 2026-10-09 - ml-critique (time estimates are human time, not agent time)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: proposed
+- **Finding**: the skill states its budgets in wall-clock time (Quick: 2
+  hours, critique 40 minutes) and treats a context time limit ("prepare
+  in less than 2 hours") as a run limit. The agent part of a Normal run
+  takes about 5 minutes (another session: "Brewed for 5m 18s", both
+  lenses merged). So the time limit gave no reason to pick Quick: I
+  recommended Quick only because of the context's 2-hour limit, and the
+  user had to correct it. The real cost is the user's time in Converge
+  (reading and answering items) and tokens.
+- **Suggested change**: in `ml-critique` "Modes", say that the agent
+  phases (Critique, Document, Check) take minutes in both modes. Express
+  the Quick limits as user effort (items presented, converge rounds),
+  not minutes. A context time limit is the user's prep time: it limits
+  what to present and converge, not the agent's checks. Do not recommend
+  Quick only because of a context time limit. Remove the minute values
+  from the router table and the lenses ("40 minutes"), which also closes
+  the declined "two sources for the Quick budget" entry.
+
+## 2026-10-09 - ml-critique (tag the user's own findings)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: proposed
+- **Finding**: in Converge the user adds their own findings (new
+  strengths, new questions for the author). The critique file mixes
+  them with the lens findings, so a reader cannot tell who found what.
+  The user asked: "separate my critique from your critique in all
+  reports, if mine is new."
+- **Suggested change**: in `ml-critique` step 3 and step 4: "Tag each
+  new item that the user adds `[user]`, like `[ref]` for the reference
+  pass. An item that only agrees with a lens item gets no tag. In the
+  critique file, put `[user]` items in the same 4 parts, sorted with the
+  sort key, and count them in the Summary."
+
+## 2026-10-09 - ml-critique (Done well lists only real strengths)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: proposed
+- **Finding**: the merged Done well part had 10 items. The user agreed
+  with 2 and said the others "seem for encouragement". Items such as
+  "train and test are both reported" or "stub rule with a count" are
+  basic hygiene, not strengths that change a decision.
+- **Suggested change**: in `ml-critique` step 2 part 1 and in both
+  lenses: "List a strength only if losing it in a rewrite would make
+  the result worse (a design choice to keep). Do not list basic hygiene.
+  Maximum 5 in Normal mode. For each, say what breaks if it is lost."
