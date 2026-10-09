@@ -1,11 +1,10 @@
 prd-hash: 84910b6cbe81b1d298fc7edd2b36912fc35b0076
-high-level-hash: 77588966467d33c483d34839e212884eb7cdf134
+high-level-hash: b8631619d5e709829d96934a9e60d38142f467bc
 
 # Spec: Riot wiki article recommender
 
 Synthesized 2026-10-08 by the first `ml-modeling-*` step (Quick POC), from
-`prd/riot-wiki-article-recommender.md` and `design/high-level.md`. There is
-no `adr/` yet.
+`prd/riot-wiki-article-recommender.md`, `design/high-level.md` and `adr/`.
 
 ## Problem Statement
 
@@ -73,8 +72,10 @@ time spent looking for docs and faster onboarding for new hires.
   proxy it beats V0 overall and on long_tail, not on new, and is slightly
   worse on head: ship with the hybrid (V0 on head) and the gate on Riot
   data with the text and structure features.
-- **ADRs.** None yet. Candidate: nightly batch precompute plus serve-time
-  permission filtering.
+- **ADR 0001.** Nightly batch ranking (top 20 per page in a KV store);
+  permissions filtered at serve time.
+- **ADR 0002.** V0 is always computed next to V1; a per-slice flag picks
+  which one the API reads (the fallback and the V1 rollout).
 
 ## Testing Decisions
 

@@ -294,9 +294,8 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
   route is `ml-modeling-*`. Riot data is not available in this sandbox, so a
   hands-on route would run on the Wikipedia Clickstream proxy with a
   temporal split (2026-08 features, 2026-09 labels).
-- **ADR candidate.** Nightly batch precompute plus serve-time permission
-  filtering, instead of online scoring. It is hard to reverse, and it fixes
-  the 24-hour freshness for new pages.
+- **ADR recorded.** Nightly batch precompute plus serve-time permission
+  filtering: `adr/0001-nightly-batch-with-serve-time-permissions.md`.
 - **Label sweep (decided by the user, 2026-10-08).** Keep `log1p(r)` as the
   V1 default. It matches the nDCG@5 gain and won in monkey-mode. In the
   modeling step, run a short sweep of label options. Change the model and
@@ -343,3 +342,5 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
   with a CI above 0; new pages are also judged on candidate recall.
 - 2026-10-09: added the item-side new-page guardrail after the test
   evaluation (a click-trained model shows new pages less often than V0).
+- 2026-10-09: the batch-precompute ADR candidate is now
+  `adr/0001`.
