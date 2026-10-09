@@ -184,3 +184,4 @@ edits stay on `main` regardless.
 | 0015 | Anthropic skill checklist: evals per family, named constants, 3 more checks |
 | 0016 | One shared skill improvement log; reflect at the end of every session |
 | 0017 | Ranking path, proxy rule, chain mode, bench --full, from the Riot wiki session |
+| 0018 | Critique: full coverage, sort key, Quick mode (2 hours), critique context, view asked each run |

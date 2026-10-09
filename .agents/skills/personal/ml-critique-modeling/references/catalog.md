@@ -10,8 +10,12 @@ Each item is one check. Each item has:
 - **Mistakes**: the common failures.
 - **Remedies**: the standard alternatives to propose.
 
-`[C]` marks a classic-mistake item. Brief mode uses only `[C]` items and
-the playbook's classic mistakes. Normal mode uses all items.
+`[C]` marks a classic-mistake item: the most likely P1 or P2. Check
+order (most important first): the playbook's classic mistakes, then the
+sections in order. Inside a section, check the `[C]` items first, then the
+others in ID order. Quick mode follows this order until its budget is
+used. Normal mode uses all items. Coverage of the design and modeling
+skills: `../../ml-critique/references/coverage.md`.
 
 Sections: A Problem and baseline, B Training dataset and labels, C Split
 and validation, D Leakage, E Features, F Model choice, G Objective,
@@ -83,6 +87,20 @@ data (point-in-time correctness).**
 - Mistakes: drop rows with nulls, and remove all new users.
 - Remedies: report the rows removed by each rule and the population that
   they belong to.
+
+**B8. The data is profiled before features.**
+- Mistakes: no row counts, null rates, or distributions. Sentinel values
+  (-1, 9999, "unknown") read as real values. Exact duplicates kept.
+- Remedies: a profile (rows, null rate and distribution for each column,
+  class balance), quality flags, and a record of each cleaning rule and
+  the rows it changed.
+
+**B9. Proxy data is marked as a proxy.**
+- Mistakes: results from a public stand-in dataset read as the target
+  system's numbers. The signals that the proxy lacks are not named.
+- Remedies: a "For <target>" line for each finding: the design input for
+  the target system. Proxy numbers are evidence or a lower bound. Name
+  the missing signals and the results that they make a lower bound.
 
 ## C. Split and validation
 
@@ -314,7 +332,7 @@ cost.**
 - Remedies: metrics for each segment: new and old users, regions,
   platforms, cohorts, sensitive groups.
 
-**I8. The overfit gap and the learning curves are examined.**
+**I8 [C]. The overfit gap and the learning curves are examined.**
 - Mistakes: no train score. No idea if more data can help.
 - Remedies: report the train, validation, and test scores. A learning
   curve on training-set size.
@@ -329,6 +347,17 @@ cost.**
   serve.
 - Remedies: a test set that is the same as the first production period
   and population.
+
+**I11 [C]. A ranking or retrieval model is scored against the full
+truth** (ranking and recommendation only).
+- Mistakes: AUC or accuracy on (positive, sampled negative) pairs, in
+  place of a ranking over the full catalog. nDCG over the candidates
+  only, which hides the candidate misses. A bootstrap over rows, not
+  over queries.
+- Remedies: recall@K and nDCG@K at the page size over every true item;
+  the candidate recall as the ceiling; hit@K and catalog coverage;
+  segments on the query side and the item side; a paired bootstrap over
+  queries.
 
 ## J. Interpretability and sanity
 
@@ -367,3 +396,12 @@ cost.**
   single-request p50/p99 and batch throughput (`bench_serve.py` in
   `ml-modeling-serve`). Replicas from the peak QPS with headroom, or the
   batch job time against its window. A plain verdict against the target.
+
+**K5. The serving mode and the cost are justified.**
+- Mistakes: online serving for a decision that is made on a schedule. No
+  cost estimate. A scoring function that does not reuse the training
+  feature code.
+- Remedies: the mode from the scoring cadence (batch when the decision is
+  scheduled), a `serve.py` that reuses the training feature code, the
+  hardware, and the cost at peak load compared with the value of the
+  model.

@@ -10,7 +10,7 @@ Each playbook has the same 8 parts:
 4. **Features**: the typical strong features.
 5. **Model and loss**: the usual model family and objective.
 6. **Metrics**: the correct offline and online metrics.
-7. **Classic mistakes**: each with its standard fix. Brief mode always runs
+7. **Classic mistakes**: each with its standard fix. Quick mode always runs
    these.
 8. **Questions to ask**: each with the expected answer. Part 4 of the
    critique uses these.
@@ -126,6 +126,38 @@ Contents:
      content-based retrieval.
    - What are the impressions? Expected: impression logs are necessary for
      hard negatives and for position-bias correction.
+
+**Variant: item-to-item (related items).** The query is the item that the
+user views now (for example "articles related to this page"), not the
+user. Parts 1-8 above apply, with these changes:
+- **Baseline.** Untrained content similarity (TF-IDF or BM25 cosine),
+  item-item co-click counts, and the links that are already on the page.
+  A trained model must beat the untrained similarity of its own input.
+- **Classic mistakes.**
+  - The trained model is not compared with its untrained input (for
+    example TF-IDF cosine). Fix: score the untrained similarity and
+    co-click on the same test set.
+  - AUC or accuracy on (positive, random negative) pairs, in place of a
+    ranking over the full catalog. Fix: recall@k and nDCG@k over all
+    items, at the panel size.
+  - A random split of pairs puts the same items and the same pair (A to
+    B, B to A) in train and test. Fix: a time-based split, and new items
+    as a separate slice.
+  - Clicks follow the links that already exist on the page, so the model
+    learns the link graph (a position-bias analog). Fix: separate link
+    clicks from other navigation, or weight them; compare with the
+    links-on-page baseline.
+  - Cold start: new items have no clicks. Fix: a content tower or content
+    similarity as a fallback, and a new-item slice.
+  - Stale items and access rights are not handled. Fix: freshness and
+    status filters, and a permission filter at serving time.
+- **Questions to ask.**
+  - How many items get no click in the log? Expected: many; they need
+    content-based retrieval.
+  - Does the model beat TF-IDF cosine with no training? Expected: if
+    not, ship the cosine.
+  - Can each user see each recommended item? Expected: a permission
+    filter at serving time.
 
 ## Search ranking
 

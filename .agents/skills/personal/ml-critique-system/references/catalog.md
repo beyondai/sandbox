@@ -10,8 +10,12 @@ Each item is one check. Each item has:
 - **Mistakes**: the common failures.
 - **Remedies**: the standard alternatives to propose.
 
-`[C]` marks a classic-mistake item. Brief mode uses only `[C]` items and
-the playbook's classic mistakes. Normal mode uses all items.
+`[C]` marks a classic-mistake item: the most likely P1 or P2. Check
+order (most important first): the playbook's classic mistakes, then the
+sections in order. Inside a section, check the `[C]` items first, then the
+others in ID order. Quick mode follows this order until its budget is
+used. Normal mode uses all items. Coverage of the design and modeling
+skills: `../../ml-critique/references/coverage.md`.
 
 Sections: A Business goal, B Success metrics, C Requirements and scope,
 D Framing and labels, E Data, F Architecture, G Modeling plan, H Phasing,
@@ -131,6 +135,13 @@ K Cross-section consistency.
   plan.
 - Remedies: a data review, retention rules, and the fairness slices to
   monitor.
+
+**C7. Stakeholders, dependencies, and reuse are named.**
+- Mistakes: no owner for the action. A blocking team (data, platform,
+  legal) found late. A new component built when one exists.
+- Remedies: the stakeholders to inform, the collaborating teams, the
+  blocking and blocked dependencies, the existing components to reuse,
+  and the downstream consumers of the output.
 
 ## D. ML framing and labels
 
@@ -263,10 +274,26 @@ definition.**
 
 ## G. Modeling plan
 
+**G0. The baseline has all its parts.**
+- Mistakes: no status quo (what users do today). No floor, so no reader
+  knows if the metric means anything. No decision when to build the
+  baseline.
+- Remedies: the status quo, the recommended baseline from the playbook,
+  the floor (random, majority class, global popularity), and the build
+  decision (now, later, or never).
+
 **G1 [C]. The baseline is strong.**
 - Mistakes: compare with random, or with a weak model.
 - Remedies: the playbook's baseline. The current production rule if it
   exists.
+
+**G1a. The feature list is concrete.**
+- Mistakes: "user features, item features". No transform for a
+  high-cardinality ID or for text. No source for each feature.
+- Remedies: a list by group (user, item, context, cross), each with its
+  source and its nontrivial transform (for example embeddings for
+  `user_id`, TF-IDF or a text encoder for text). The playbook's typical
+  features.
 
 **G2. The model choice is justified.**
 - Mistakes: a deep model on 50k tabular rows. A choice by fashion.
@@ -388,6 +415,19 @@ performance.**
 - Mistakes: the procedure exists only in one person's head.
 - Remedies: a written runbook with the commands.
 
+**I10. There is a test plan and CI/CD.**
+- Mistakes: no unit or integration tests for the feature code. No load
+  test, or a load test at the average load. Manual deploys.
+- Remedies: unit tests for the feature and scoring code, an integration
+  test of the full path, a load test at the peak QPS with the planned
+  replicas (or the batch job inside its window), and a CI/CD pipeline
+  with the promotion gate from F5.
+
+**I11. The execution plan is realistic.**
+- Mistakes: no milestones, or milestones with no dates. No team process.
+- Remedies: epics or milestones with dates and owners, and the team
+  process (sprint length, review cadence). Check it against H4.
+
 ## J. Post-delivery and responsible ML
 
 **J1. There is a plan to analyze the results by segment.**
@@ -411,6 +451,12 @@ performance.**
 - Mistakes: a roadmap fixed before the launch.
 - Remedies: name the questions that the launch will answer, and the
   decisions that depend on them.
+
+**J6. Reusable components are named.**
+- Mistakes: features, models, or pipeline parts that only this team uses,
+  when other teams need the same thing.
+- Remedies: name each reusable component (features, architecture,
+  platform part) and the team that can reuse it.
 
 ## K. Cross-section consistency
 

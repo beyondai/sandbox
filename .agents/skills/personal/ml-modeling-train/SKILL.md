@@ -73,9 +73,11 @@ Make the folds inside the train table, never across the `dataset` split.
 `uv run python3 -c "import lightgbm"` (or `xgboost`) before you pick it.
 On macOS the wheel needs the system library `libomp`; without it, the
 import fails after a clean install. A system library is the user's
-decision (this user: `homebrew.brews` in the nix-darwin config). Ask; do
-not install it. If it can't load, remove the package again
-(`uv remove`) and use scikit-learn's `HistGradientBoosting`.
+decision: ask, do not install it. On this user's Intel Mac, Homebrew can't
+install `libomp` (no bottle, and the source build fails; 2026-10-09), so
+skip LightGBM and XGBoost here. Remove the package again (`uv remove`)
+and use scikit-learn's `HistGradientBoosting`; for LambdaMART, record it
+as not run.
 
 **CV leak check.** Is a feature built from the target once for the
 whole table, without per-fold computation (a leave-one-out or target

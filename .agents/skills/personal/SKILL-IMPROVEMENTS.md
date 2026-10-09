@@ -33,6 +33,9 @@ Reasons: `adr/0004-skill-improvement-log.md`,
 - **Source**: agent-found bug
 - **Status**: adopted (2026-10-09): import check in `ml-modeling-train`,
   "Algorithm selection" (ADR 0017).
+  Update: Homebrew can't install `libomp` on the user's Intel Mac (no
+  bottle; source build failed); the dotfiles change was reverted, and the
+  skill now says to use `HistGradientBoosting` on this machine.
 - **Finding**: `uv add lightgbm` installs, but the import fails on macOS:
   the wheel needs the system `libomp`. The LambdaMART candidate could not
   run. XGBoost wheels have the same need.
@@ -169,3 +172,86 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   <target>' line with the design input. Proxy numbers are evidence or a
   lower bound, never the target's numbers. Name the signals the proxy
   lacks."
+
+## 2026-10-09 - ml-critique (Normal mode covers every design step)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: the user wants Normal mode to check every key decision and
+  step of the ml-system-design and ml-modeling skills. A comparison found
+  items with no catalog check: definition Team (stakeholders,
+  dependencies, reuse), the baseline parts (status quo, floor, build
+  decision), the deep-dive feature list, the delivery test plan, CI/CD
+  and execution, post-delivery Democratize, the data profile, proxy
+  data, ranking evaluation against the full truth, and serving mode and
+  cost. No map shows which skill item each check covers.
+- **Suggested change**: add `ml-critique/references/coverage.md` (each
+  skill checklist item -> catalog IDs). Add system C7, G0, G1a, I10, I11,
+  J6 and modeling B8, B9, I11, K5. Mark modeling I8 `[C]`.
+
+## 2026-10-09 - ml-critique (importance order has no single sort key)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: "Priority" rule 1 (upstream first) has no scope, and rule 2
+  says "inside one priority". A reader can put an upstream P2 before a
+  downstream P1. The checks inside a catalog section have no order.
+  "Done well" has no order rule.
+- **Suggested change**: one sort key: priority, then upstream, then
+  effect, then confidence. Order the checks in each section from the
+  most likely P1. Order strengths by the cost to lose them.
+
+## 2026-10-09 - ml-critique (Quick mode replaces Brief, 2-hour budget)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: the user wants a quick mode that limits the whole critique
+  (select to document) to 2 hours at most. It checks the most important
+  topics first and is not complete. Brief limits only the checks and the
+  presentation, to 45 minutes.
+- **Suggested change**: rename Brief to Quick. Checks in importance order
+  until the critique budget is used. Add "Appendix" (found, not
+  presented) and "Not checked" (skipped for time) sections.
+
+## 2026-10-09 - ml-critique (critique context)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: a critique can have a purpose with its own demands (for
+  example a Riot interview with required topics and a time limit). The
+  skill has no place for it.
+- **Suggested change**: ask for a critique context in Select. The
+  general rules apply; the context wins only on a conflict. Note each
+  conflict in chat and in a "Context" section. No context: general
+  rules.
+
+## 2026-10-09 - ml-critique (ask fresh or reference view every time)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: Select asks about a reference design with the default
+  "no". The user wants to choose fresh or with-my-design on each run.
+- **Suggested change**: Select asks mode, view, and context in one
+  message, with no default for view and context, and waits for the
+  answers.
+
+## 2026-10-09 - ml-critique (one mixed file gets both lenses)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: the lens is selected by folder (`prd/` or `spec/`). A single
+  report with design and results content (the Riot interview report) has
+  no rule.
+- **Suggested change**: for one file, select the lens by its sections;
+  both kinds of content get both lenses.
+
+## 2026-10-09 - ml-playbooks.md (item-to-item recommendation)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found better design
+- **Status**: adopted (2026-10-09): ADR 0018.
+- **Finding**: the Recommendation playbook assumes user-to-item ranking
+  with impressions. A "related items" recommender (the Riot interview
+  report) gets no check that the trained model beats its untrained
+  content similarity, or that the evaluation ranks the full catalog.
+- **Suggested change**: add an item-to-item variant to Recommendation:
+  baseline, classic mistakes, and questions.

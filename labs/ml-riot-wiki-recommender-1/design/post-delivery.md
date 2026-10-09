@@ -129,7 +129,8 @@ decides the order inside each version.
 - **V1.1 - tune V1 on Riot data** (2-4 weeks after the V1 switch):
   - re-run the label sweep and the feature importance on Riot logs, with
     the text and structure features (`modeling/02-features.md`);
-  - LambdaMART on 0-4 grades, after `libomp` is installed;
+  - LambdaMART on 0-4 grades, in a training environment where LightGBM
+    loads (Homebrew can't install `libomp` on the sandbox's Intel Mac);
   - re-check the head slice: if the model still loses there, keep V0 for
     head pages (no change to the routing flag);
   - stored candidates per page above 20 if short panels show up in
@@ -189,3 +190,4 @@ Team - reuse; assumption):
 ## Change log
 
 - 2026-10-09: created (Quick POC).
+- 2026-10-09: LambdaMART moved to an environment where LightGBM loads.

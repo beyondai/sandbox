@@ -18,7 +18,9 @@ Adopted:
    threshold) and a LambdaMART row; `ml-modeling-multiagent` points to
    it.
 2. `ml-modeling-train`: check that LightGBM or XGBoost loads before using
-   it; `libomp` is a system install the user approves.
+   it; `libomp` is a system install the user approves. On the user's
+   Intel Mac, Homebrew could not install `libomp` (tried and reverted,
+   2026-10-09), so the skill says to use `HistGradientBoosting` there.
 3. `ml-modeling-evaluate`: a "Ranking" section (full truth, candidate
    recall, query and item segments, bootstrap over queries; parquet for
    large score files).

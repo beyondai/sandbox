@@ -29,15 +29,20 @@ dispatch you, run it first.
    budget, capacity, cost): `../ml-serving.md`.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections A (goal), B (metrics), and D (framing and labels) hold most P1
-   findings. Do them first. Brief mode: `[C]` items, plus any P1 or P2
-   found while reading.
+   findings. Do them first. Inside a section, check the `[C]` items first
+   (the most likely P1), then the others in ID order. Quick mode follows
+   this order until the critique budget (40 minutes) is used. Return the
+   items that you did not check as Not checked.
 4. Put each result in one part: done well, change or fix, missing, or
    question. Give each finding a priority with the remedy from the
    catalog.
 5. Add the playbook's questions that the write-up did not answer, each with
    an expected answer.
-6. Do the cross-section checks (section K; Brief: the `[C]` items). Errors
-   across sections are often P1.
+6. Do the cross-section checks (section K; Quick: the `[C]` items first).
+   Errors across sections are often P1.
+7. If a critique context is given, apply it. On a conflict with this lens,
+   follow the context, and return the conflict: the rule, the context
+   requirement, and what you did.
 
 Evidence is a quote with `file:line`, or a section that is not there. You
 can list source tables to confirm that they exist. Do not profile data.
@@ -48,12 +53,13 @@ Before you return the critique, read it again against these questions. Fix each
 "no", then check again (maximum 2 loops). Return the open items and each skill
 issue (a gap or error in this lens or its catalog) with the critique. The core
 logs them.
-1. Does each check in the mode's scope have a result, or a one-line
-   reason why it does not apply?
+1. Does each check that you did have a result, or a one-line reason why
+   it does not apply? In Quick mode, is each skipped check in Not checked?
 2. Does each P1 and P2 finding have a quote with `file:line` (or a named
    missing section) and an alternative?
-3. Are the findings in priority order, upstream (catalog section order)
-   first?
+3. Are the findings sorted with the core's sort key (priority, then
+   upstream in catalog section order, then effect, then confidence)?
 4. Does each question have an expected answer?
+5. Is each conflict with the critique context returned?
 
-Done when the 4 answers are yes.
+Done when the 5 answers are yes.
