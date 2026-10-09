@@ -1,0 +1,72 @@
+{
+  "primary_metric": "ndcg5_weighted",
+  "metrics": {
+    "ndcg5_new": 0.2224,
+    "ndcg5_dormant": 0.13,
+    "ndcg5_long_tail": 0.739,
+    "ndcg5_torso": 0.9465,
+    "ndcg5_head": 0.9905,
+    "ndcg5_weighted": 0.8445,
+    "recall5_weighted": 0.8433,
+    "recall_w5_weighted": 0.7421,
+    "hit5_weighted": 0.9163,
+    "item_recall5_new": 0.0573,
+    "item_recall5_long_tail": 0.26,
+    "coverage": 0.0527
+  },
+  "baseline_metrics": {
+    "ndcg5_new": 0.2224,
+    "ndcg5_dormant": 0.13,
+    "ndcg5_long_tail": 0.7326,
+    "ndcg5_torso": 0.9449,
+    "ndcg5_head": 0.9905,
+    "ndcg5_weighted": 0.8407,
+    "recall5_weighted": 0.8389,
+    "recall_w5_weighted": 0.7389,
+    "hit5_weighted": 0.9154,
+    "item_recall5_new": 0.0602,
+    "item_recall5_long_tail": 0.2572,
+    "coverage": 0.0471
+  },
+  "floor_metrics": {
+    "ndcg5_new": 0.0,
+    "ndcg5_dormant": 0.0,
+    "ndcg5_long_tail": 0.0,
+    "ndcg5_torso": 0.0,
+    "ndcg5_head": 0.0009,
+    "ndcg5_weighted": 0.0001,
+    "recall5_weighted": 0.0002,
+    "recall_w5_weighted": 0.0001,
+    "hit5_weighted": 0.0007,
+    "item_recall5_new": 0.0,
+    "item_recall5_long_tail": 0.0,
+    "coverage": 0.0
+  },
+  "model_only_metrics": {
+    "ndcg5_new": 0.2229,
+    "ndcg5_dormant": 0.1301,
+    "ndcg5_long_tail": 0.739,
+    "ndcg5_torso": 0.9465,
+    "ndcg5_head": 0.9894,
+    "ndcg5_weighted": 0.8443,
+    "recall5_weighted": 0.8435,
+    "recall_w5_weighted": 0.7418,
+    "hit5_weighted": 0.9163,
+    "item_recall5_new": 0.0462,
+    "item_recall5_long_tail": 0.26,
+    "coverage": 0.0532
+  },
+  "overfit_gap": {
+    "train": 0.8284,
+    "test": 0.8443
+  },
+  "lift_ci95": [
+    0.0037,
+    0.0033,
+    0.0042
+  ],
+  "success_bar": "V1 gate (design/high-level.md): per query slice, beat V0 with a 95% CI above 0; not worse overall; new pages also judged on candidate recall. The PRD has no numeric bar.",
+  "verdict": "Partial: the per-slice hybrid beats V0 overall (+0.0037 nDCG@5, CI [+0.0033, +0.0042]) and on long_tail and torso, but not on new pages, and the model alone shows fewer new pages on the item side; on the proxy the new-page gain must come from page content and structure sources.",
+  "verdict_status": "partial",
+  "backtest": "cutoff split: features 2026-08, labels 2026-09 (not a random hold-out)"
+}

@@ -1,5 +1,5 @@
 prd-hash: 84910b6cbe81b1d298fc7edd2b36912fc35b0076
-high-level-hash: e59b078bc58d7dae95819fbb50651d71fa43f029
+high-level-hash: 77588966467d33c483d34839e212884eb7cdf134
 
 # Spec: Riot wiki article recommender
 
@@ -44,9 +44,10 @@ time spent looking for docs and faster onboarding for new hires.
 - **Phasing.** V0 baseline rule (no ML) -> V1 GBDT graded reranker -> V2
   session context + exploration bandit -> V3 group personalization -> V4
   per-user (stretch).
-- **Complexity gate for V1.** It must beat V0 on the cold and long-tail
-  slices with a CI that excludes 0, and must not lose overall. Otherwise:
-  V0 for warm pages, model for cold and long-tail pages (hybrid).
+- **Complexity gate for V1.** Per-slice routing: the model ranks a query
+  slice only where it beats V0 with a 95% CI above 0; V0 ranks the rest;
+  not worse overall than V0 alone. New pages are also judged on candidate
+  recall. Guardrail: item-side recall@5 on new pages not below V0.
 - **Source tables (Riot, assumed).** `wiki.pages`, `wiki.links`,
   `wiki.permissions`, `wiki.page_views`, `recs.impressions`, `recs.clicks`,
   entity dictionaries, `hr.directory` (V3 only).
@@ -64,9 +65,14 @@ time spent looking for docs and faster onboarding for new hires.
   candidate source. The proxy POC has no text, links or tree, so these are
   designed (`modeling/02-features.md`) but not measured; getting proxy
   data is deferred (`research/page-content.md`).
-- **Label sweep.** `log1p(r)` is the V1 default. The modeling step sweeps
-  raw r (Poisson loss), sqrt(r), share of A's readers, and 0-4 grades
-  (LambdaMART). The model and the loss follow each label.
+- **Label sweep.** Done in `ml-modeling-train`: `log1p(r)` kept. sqrt(r)
+  and share-of-A's-readers did not win on both new and long_tail; raw r
+  with Poisson loss underfit (untuned); LambdaMART not run (LightGBM needs
+  the system `libomp`). Details: `modeling/03-train.md`.
+- **V1 model.** `HistGradientBoostingRegressor` on `log1p(r)`. On the
+  proxy it beats V0 overall and on long_tail, not on new, and is slightly
+  worse on head: ship with the hybrid (V0 on head) and the gate on Riot
+  data with the text and structure features.
 - **ADRs.** None yet. Candidate: nightly batch precompute plus serve-time
   permission filtering.
 

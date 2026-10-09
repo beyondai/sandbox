@@ -223,12 +223,26 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
     to measure them).
 - **Complexity gate** (`../../.agents/skills/personal/ml-design-principles.md`,
   Principle 1):
-  - It must beat V0 on the new and long-tail slices, query side and item
-    side, with a CI that excludes 0.
-  - It must not be worse overall.
-  - If it fails on warm pages, keep the V0 rule for warm pages and use the
-    model only for new and long-tail pages (the monkey-mode hybrid
-    pattern).
+  - **Per-slice routing.** Decide for each query slice (new, dormant,
+    long_tail, torso, head) on its own. The model ranks a slice only if it
+    beats V0 there with a 95% CI above 0. V0 ranks every other slice. The
+    slice is known at scoring time (page age and history), so routing is a
+    lookup, not a model.
+  - It must not be worse overall than V0 alone.
+  - **New pages are judged on two numbers:** candidate recall (does the
+    right page reach the candidates?) and nDCG@5 against the full truth.
+    nDCG over the candidates alone hides a candidate miss.
+  - **Item-side guardrail.** The shipped ranker must not show new pages
+    less often than V0 (item-side recall@5 on new pages, CI not below 0).
+    On the proxy, the model alone fails it (-1.4 points); the hybrid
+    loses 0.3 points (`modeling/04-evaluate.md`).
+  - V1 counts as a success if it wins on long_tail, and on new pages once
+    the structure and text candidate sources are live. Content and
+    structure are necessary for new pages; the size of their gain is not
+    measured yet (`research/page-content.md`, "Conclusions").
+  - Proxy status (`modeling/03-train.md`): the model wins on long_tail and
+    torso, ties on new and dormant, and loses slightly on head. Routing:
+    model for long_tail and torso, V0 for the rest.
 
 ### V2 - session context and exploration for new pages
 
@@ -324,3 +338,8 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
 - 2026-10-09: V1 now assumes the text, embedding and structure features
   and candidate sources (user decision), with the pipeline, model and
   cost. The proxy can't measure them yet.
+- 2026-10-09: complexity gate changed to per-slice routing (user decision
+  after the train step): the model ranks only the slices where it beats V0
+  with a CI above 0; new pages are also judged on candidate recall.
+- 2026-10-09: added the item-side new-page guardrail after the test
+  evaluation (a click-trained model shows new pages less often than V0).

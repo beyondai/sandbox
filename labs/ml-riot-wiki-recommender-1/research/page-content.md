@@ -7,6 +7,80 @@ Purpose: get Wikipedia page text (and the link and category structure) so
 the POC can test the Riot text, embedding and structure features on the
 proxy (`modeling/02-features.md`, "Text and embedding features").
 
+## Conclusions: how much does page content matter for new pages?
+
+Short answer. It is safe to say that page content and structure are
+**necessary** for new pages: they are the only signals a new page has,
+and the click signals measurably fail. It is **not yet safe** to say how
+large the gain is, or which content signal matters most. The proxy has no
+text, links or tree, so that part is unmeasured.
+
+```
+                       new pages               long-tail pages (contrast)
+candidate recall       0.19  (query side)      0.73
+nDCG@5 (full truth)    0.22  V0 = model        0.73 -> 0.74 with the model
+item-side recall@5     0.060 V0, 0.046 model   0.257 -> 0.260
+                               ^ model is worse
+```
+
+Evidence (test split, `modeling/04-evaluate.md`; build,
+`modeling/01-data.md`):
+
+1. **Clicks can't find the right page for a new page.** Query-side
+   candidate recall is 0.19 for new pages and 0.04 for dormant pages,
+   against 0.73 for long-tail pages. For 55% of new pages (train), no candidate
+   is a true next page. A ranker can't fix a page that isn't in the list.
+2. **More ML on clicks doesn't help, and can hurt.** The GBDT gains
+   nothing on new pages on the query side (+0.0006, inside the noise). On
+   the item side it shows new pages **less often** than the V0 rule
+   (recall@5 0.046 vs 0.060, CI [-0.018, -0.010]): a click-trained model
+   learns "pages with traffic get clicked" and pushes down pages with no
+   history.
+3. **At creation, content and structure are all a page has.** A new Riot
+   page has its text, its own links, its place in the page tree, its
+   author, owner team, labels and template, and the entities it names. It
+   has no clicks. So any gain on new pages must come from these signals.
+   This follows from the setup; it does not need a measurement.
+
+What is not shown yet:
+
+4. **The size of the gain.** The upper bound is the long-tail level:
+   about nDCG@5 0.73 and item-side recall@5 0.26, against 0.22 and 0.06
+   for new pages today. The real gain is somewhere below that. The
+   deferred proxy experiment (below) measures it.
+5. **Which content signal matters most.** For Riot, structure (own
+   out-links, page tree, shared entities) is expected to beat plain text
+   similarity: structure encodes logical connection, while text
+   similarity also promotes near-duplicates (PRD, scope). Text is still
+   needed: for the embedding candidate source (with near-duplicate
+   collapse), for borrowed clicks, and as a feature.
+6. **The overall metric barely moves.** New pages are about 0.3% of
+   source pages in the proxy, and about 100 of 40k pages a week in Riot.
+   A large new-page gain is a small change in weighted nDCG@5. So the
+   value must be judged on the new-page slice, the item-side new-page
+   recall, and the online "days to first useful click", not on the
+   overall number.
+
+Suggested wording for the design and for stakeholders:
+
+- "Page content and structure are required for new pages. Click-based
+  methods find the right page for only 19% of new pages, and a
+  click-trained model shows new pages less often than a simple rule."
+- "The expected gain is up to the long-tail level for new pages; the
+  exact size will be measured on Riot data (or on the proxy with the link
+  and text dumps)."
+- Do not say "text embeddings will give a large gain" until it is
+  measured.
+
+What this changes in the design (`design/high-level.md`):
+
+- V1 keeps the content and structure candidate sources and features
+  (already assumed).
+- The V1 gate gets an item-side guardrail: the shipped ranker must not
+  show new pages less often than V0.
+- The V2 exploration slot stays: it is the item-side fix that does not
+  depend on the ranker learning to trust new pages.
+
 ## Scope
 
 - Pages that matter: every page that is a query, a candidate or a true
@@ -144,3 +218,6 @@ Total: about one working day, mostly unattended download and parse time.
 
 - 2026-10-09: created; deferred by the user. The design assumes the
   features anyway.
+- 2026-10-09: added "Conclusions" from the test evaluation: content and
+  structure are necessary for new pages; the size of the gain is not
+  measured yet.
