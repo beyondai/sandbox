@@ -46,6 +46,12 @@ grilling rounds, and nothing is written to `design/`.
   availability, the explainability need (hard or soft), and the cost
   sensitivity. A level (`low`/`medium`/`high`) or `unknown` is a valid
   cost answer. See `../ml-design-principles.md`, Principle 1.
+  - Give a back-of-envelope estimate at the start: peak QPS (users x
+    actions in the peak window), data size, and the order of magnitude
+    of the serving and training cost. Mark each assumption. Reason: a
+    design that looks cheap is not known to be cheap until it is
+    estimated. The deep dive refines the numbers; a full analysis needs
+    the full design.
 - **Baseline:** the simple approach that the ML system must beat. It is
   often not ML. It is a design decision: the build can wait.
   - **Status quo:** what users do today without the system.

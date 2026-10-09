@@ -83,7 +83,7 @@ T8 Coverage, planted gaps ---------> copy of ml-riot-wiki-recommender-1
   1. Both lenses run (the file has design and results content).
   2. The item-to-item playbook variant is used: at least K1 and K3 cite
      it.
-  3. K1, K2, and K3 are P1 and are in the top 3 or in part 2. K4 and K5
+  3. K1, K2, and K3 are P1 and are in the top changes. K4 and K5
      are found (part 2, part 3, or Appendix).
   4. Findings are sorted with the sort key: no P2 before a P1.
   5. The file has Summary (view "fresh", context named), Context, the 4

@@ -55,6 +55,12 @@ The scope and the constraints of the system.
   - Availability. Example: "99.99% availability".
   - Explainability: hard (each decision needs a reason) or soft.
   - Cost sensitivity: an exact budget, low, medium, high, or unknown.
+- Back-of-envelope estimate: do it at the start, also when the design
+  looks cheap.
+  - Peak QPS: users x actions in the peak window.
+  - Data size, and the order of magnitude of the serving and training
+    cost.
+  - Mark each assumption. The deep dive refines the numbers.
 
 ### Baseline
 

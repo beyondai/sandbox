@@ -80,7 +80,7 @@ importance.
 
 | Priority | The finding is... | Examples |
 |---|---|---|
-| **P1** | **Vague or wrong at the core.** It makes the work after it uncertain or invalid. | The problem or goal is not clear. Wrong problem, wrong label, wrong metric, wrong model family, no real baseline, leakage, a split unlike production. |
+| **P1** | **Vague or wrong at the core.** It makes the work after it uncertain or invalid. | The problem or goal is not clear. Wrong problem, wrong label, wrong metric, wrong model family, no real baseline, leakage, a split unlike production. No back-of-envelope estimate of the requirements and the cost at the start. |
 | **P2** | **A large gain.** The change gives a large improvement. | Model performance, cost, time saved, a stronger baseline, a simpler design that gives the same result, complexity that does not pass the gate. |
 | **P3** | **A small gain or a polish.** | Naming, small gaps, extra slices, documentation. |
 
@@ -103,9 +103,12 @@ Also:
   hygiene (train and test both reported, a stated cleaning rule).
   Maximum 5. Put first the strength that is most costly to lose. Reason:
   filler strengths read as encouragement and hide the ones to keep.
-- **Top 3.** The summary starts with the **top 3 changes**, selected across
-  all parts with the sort key. Each one is a single change. Do not put
-  several changes in one item.
+- **Top changes.** The summary starts with the **top changes**: every P1
+  item across the parts, sorted with the sort key. With no P1, the top 3
+  P2 items. Each one is a single change. Do not put several changes in one
+  item. Do not cut a P1 to make a short list. Reason: after a merge there
+  can be more than 3 P1 items, all important. Only
+  `ml-critique-share-out` selects a fixed number, for time.
 
 ## Steps
 
@@ -113,7 +116,7 @@ Progress (copy into your reply, tick each line):
 
 ```
 [ ] 1 Select: view, context (ask and wait), lens, problem type
-[ ] 2 Critique: lens subagents, merge, top 3
+[ ] 2 Critique: lens subagents, merge, top changes
 [ ] 3 Converge: rounds until no item is open (or Deferred)
 [ ] 4 Document: critique/<date>-<lens>.md
 [ ] 5 Check
@@ -179,7 +182,7 @@ Progress (copy into your reply, tick each line):
    reports only if it passes the log filter ("Skill improvement log" in
    `../ml-system-design/SKILL.md`).
 4. If the view is "With my design", run the reference pass now.
-5. Show the top 3 changes, then the 4 parts. Show each context conflict
+5. Show the top changes, then the 4 parts. Show each context conflict
    in one line.
 
 ### 3. Converge
@@ -206,7 +209,7 @@ reader must see who found what.
    write it. Never write in `notes/`: it holds only what the user typed or
    pasted. Use "Output docs" in `../ml-system-design/SKILL.md`.
 2. Sections: Summary (the view, the context source or "none", the count
-   of `[user]` items, and the top 3 changes), Context, Done well, Change
+   of `[user]` items, and the top changes), Context, Done well, Change
    or fix, Missing, Questions, Decisions and trade-offs, Deferred,
    Conclusion.
    - **Context:** the context source, or "none (general rules)". Then one
@@ -217,7 +220,7 @@ reader must see who found what.
    - **Deferred entry:** the item, the reason, the owner, the unblock
      condition, and the risk.
    - **Conclusion:** `ready`, `ready with changes`, or `needs rework`, and
-     the top 3 changes from the Summary, in the same order (updated only
+     the top changes from the Summary, in the same order (updated only
      if a decision changed one).
 3. Do not edit the write-up. In the Check, run `check_doc.py` with:
 
@@ -236,7 +239,8 @@ reader must see who found what.
 
 Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 1. Does each P1 and P2 item have evidence and an alternative?
-2. Are the top 3 changes single changes, sorted with the sort key?
+2. Do the top changes hold every P1 (or, with no P1, the top 3 P2), each a
+   single change, sorted with the sort key?
 3. Does each item have a resolution or a Deferred entry with its reason,
    owner, unblock condition, and risk?
 4. Does the verdict follow from the decisions? Is the write-up unchanged?
@@ -260,10 +264,13 @@ brief that asks for 4 specific parts, a time limit, and sketches.
 - **Note each conflict, each time.** Say it in chat when it changes what
   you do. Write it in the Context section: the rule, the context
   requirement, and what was done.
-- **A time limit is not a conflict.** A limit such as "prepare in less
-  than 2 hours" is the user's share-out time, not the critique's. Run the
-  full critique. Record the limit in the Context section for
-  `ml-critique-share-out`.
+- **Most of the context is for the share-out.** The critique uses the
+  context only for the required parts and the scope. The time limit, the
+  format, the sketches, the audience, and the topic order shape what to
+  say, not what is wrong with the design. Record them in the Context
+  section for `ml-critique-share-out`, with no conflict entry. Run the
+  full critique. Example: "prepare in less than 2 hours" is share-out
+  time.
 - **The lenses get the context.** Reason: it says what to cover, not what
   the answer is, so it does not spoil the fresh view.
 

@@ -7,6 +7,7 @@ parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
 estimates | tag user findings | Done well filter | share-out and merge
 skills | skill-check fixes | intended behavior and change cadence |
+no top-3 cap | context for the share-out | requirements and cost is P1 |
 Principle 2 skill-check fixes | Principle 3 and Retraining item
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
@@ -472,6 +473,57 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   user asked for general ML wording, with no domain words from the
   source and no names.
 - **Suggested change**: as applied (ADR 0022).
+
+## 2026-10-09 - ml-critique-merge, ml-critique (no top-3 cap: sort, do not cut)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user correction
+- **Status**: adopted (2026-10-09): "Top changes" in `ml-critique`;
+  merge Propose, Write, Check; share-out Summary (ADR 0024).
+- **Finding**: the merge proposal asked which item is "item 3" of the top
+  3 (metric or label). The user: "this merge outcome doesn't limit to Top
+  3 anyways. It is totally possible that after merging, there are top
+  K>3 and they are all important. don't cut. Sort." A fixed top 3 hides
+  P1 items of equal weight, and the cut belongs to the share-out.
+- **Suggested change**: in `ml-critique-merge` (Propose, Write, Check)
+  and `ml-critique` ("Top 3", step 2, step 4, Check): replace "top 3
+  changes" with "top changes: every P1 item across the 4 parts, sorted
+  with the sort key, each a single change". Only `ml-critique-share-out`
+  selects a fixed number for time.
+
+## 2026-10-09 - ml-critique, ml-critique-merge (context is mostly for the share-out)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user correction
+- **Status**: adopted (2026-10-09): "Critique context" in `ml-critique`;
+  merge step 1 and Propose; lens step 7 and 6 (ADR 0024).
+- **Finding**: on the merged Context section the user said: "you can keep
+  the context. but note that context is mostly applied when create the
+  share out, not critique or merge." The interview brief (time,
+  sketches, audience, topic order) shapes what to say, not what is wrong
+  with the design.
+- **Suggested change**: in "Critique context" (`ml-critique`) and merge
+  step 1: "The critique and the merge use the context only for the
+  required parts and the scope. The time limit, the format, and the
+  audience go to `ml-critique-share-out`. Record them in the Context
+  section without a conflict entry."
+
+## 2026-10-09 - ml-critique (requirements and cost analysis is P1)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user correction
+- **Status**: adopted with a change (2026-10-09). The user: "do a quick
+  back of envelope analysis of reqs and cost analysis. Full one isn't
+  possible without full design." Applied: system C2 `[C]` is a
+  back-of-envelope estimate at the start; P1 example in `ml-critique`;
+  Definition checklist and template (ADR 0024).
+- **Finding**: the merge proposed P3 for "no stated latency, QPS, and
+  cost", because the precompute makes latency trivial. The user: "No,
+  beginning requirements analysis and cost is critical for industrial
+  practice, may not be trivial after analysis, but always need analysis
+  at the beginning." The reviewer cannot know the result is trivial
+  until the analysis is done.
+- **Suggested change**: in the `ml-critique` Priority table, P1 examples:
+  add "no requirements and cost analysis at the start (scale, latency,
+  cost)". In `ml-critique-system` catalog: mark the requirements item
+  `[C]`. Do not lower it because the design looks cheap.
 
 ## 2026-10-09 - ml-system-design-prd, ml-critique, routers (Principle 2 skill-check fixes)
 - **Project**: none (skill checks on the `ml-*` design and critique skills)

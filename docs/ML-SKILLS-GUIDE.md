@@ -512,6 +512,11 @@ in parentheses.
   costly to lose (0020).
 - **A share-out never cuts a P1.** A required topic gets a point only
   if the P1 points leave time; the user is told if not (0021).
+- **The critique sorts and does not cut; the context is for the
+  share-out.** The top changes hold every P1. The critique and the merge
+  use only the required parts and the scope of a context. A missing
+  back-of-envelope estimate of the requirements and the cost is a P1
+  (0024).
 - **One folder for each project.** All generated files go in
   `<parent>/<project>/`, never in `notes/` (0010).
 - **Each skill checks its own output.** Intent questions, a format script,

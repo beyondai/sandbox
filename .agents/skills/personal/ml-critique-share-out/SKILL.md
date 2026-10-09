@@ -111,7 +111,7 @@ Progress (copy into your reply, tick each line):
 3. Sections, in this order: Summary, Context, Timeline, Talking points,
    Questions to ask, Backup, Cut list, How to deliver.
    - **Summary:** the critique file, the context source, the limit, and
-     the top 3 messages.
+     the top 3 messages (selected from the critique's top changes).
    - **Context:** the limit, the format, the required topics, the
      audience, and the context type.
    - **Timeline:** an ASCII timeline with a block for each topic and the

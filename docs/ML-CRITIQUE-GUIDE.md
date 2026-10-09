@@ -138,7 +138,8 @@ Use a different skill for these tasks:
    verdict: `ready`, `ready with changes`, or `needs rework`.
 5. **Check.** The skill reads the file again:
    - Does each P1 and P2 item have evidence and an alternative?
-   - Are the top 3 changes single changes, sorted by importance?
+   - Do the top changes hold every P1, each a single change, sorted by
+     importance?
    - Does each item have a decision or a Deferred entry?
    - Does the verdict follow from the decisions?
    - Is each context conflict in the Context section?
@@ -152,7 +153,8 @@ Use a different skill for these tasks:
 
 - **P1: vague or wrong at the core.** Examples: the problem is not clear;
   a wrong label, metric, or model family; no real baseline; leakage; a
-  split that is not like production.
+  split that is not like production; no back-of-envelope estimate of the
+  requirements and the cost at the start (0024).
 - **P2: a large gain.** Examples: better performance, lower cost, a
   stronger baseline, a simpler design with the same result.
 - **P3: a small gain.** Examples: polish, small gaps.
@@ -166,8 +168,10 @@ The skill sorts findings with one key, in this order:
 
 The skill also checks in importance order: the playbook's classic
 mistakes first, then the catalog sections in order. Inside a section, the
-classic-mistake items come first. The summary starts with the top 3
-changes. Each one is a single change.
+classic-mistake items come first. The summary starts with the top
+changes: every P1 item, sorted. With no P1, the top 3 P2 items. Each one
+is a single change. The list has no fixed length: only the share-out
+selects a fixed number, for time (0024).
 
 The review applies Principle 1: simple by default, complex only with
 evidence. A complex model that wins by less than the noise, or that costs
@@ -213,9 +217,11 @@ interview brief with required topics, a review for a launch decision.
 - The skill notes each conflict, each time: in chat when it happens, and
   in the "Context" section of the critique file (the rule, the context
   requirement, and what was done).
-- A time limit ("prepare in less than 2 hours") is not a conflict. It is
-  your share-out time. The critique runs in full and records the limit
-  for `ml-critique-share-out`.
+- Most of the context is for the share-out. The critique and the merge
+  use only its required parts and its scope. The time limit, the format,
+  the sketches, the audience, and the topic order go to
+  `ml-critique-share-out`. The Context section records them, with no
+  conflict entry (0024).
 - The lenses get the context. It says what to cover, not what the answer
   is, so the view stays fresh.
 
@@ -263,7 +269,7 @@ What happens:
 1. The skill says: "Lenses: system and modeling. Problem type: churn and
    retention." It asks: "View: fresh, or with your design? Critique
    context: a path, text, or none?" You answer "fresh, none".
-2. The 2 lenses run in parallel. You get the top 3 changes and the 4
+2. The 2 lenses run in parallel. You get the top changes and the 4
    parts.
 3. Round 1 has the P1 items. Round 2 has the P2 items. A question looks
    like this:

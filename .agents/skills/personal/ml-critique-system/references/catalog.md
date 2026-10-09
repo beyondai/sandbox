@@ -112,10 +112,17 @@ check.**
 - Remedies: list the tempting adjacent features that this version does not
   do.
 
-**C2. Latency, throughput, availability, and freshness are given.**
-- Mistakes: no numbers, so the architecture cannot be judged.
-- Remedies: p99 latency, peak QPS, availability target, and data freshness,
-  scaled to the system.
+**C2 [C]. A back-of-envelope estimate of the requirements and the cost
+is made at the start.**
+- Mistakes: no numbers, so the architecture cannot be judged. The
+  estimate is skipped because the design "looks cheap" (a precompute, a
+  small model). Nobody knows it is cheap until the estimate is done.
+- Remedies: a quick estimate before the design: peak QPS (users x actions
+  in the peak window), p99 latency, availability, data freshness, data
+  size, and the order of magnitude of the training and serving cost. Mark
+  each assumption. A full analysis needs the full design, so do not ask
+  for it here: the deep dive refines the estimate (F4a, C5). Keep this a
+  P1 also when the result looks trivial.
 
 **C3. The numbers agree with the model class and the serving mode.**
 - Mistakes: a large deep model in a 20 ms budget. A 1-hour freshness need

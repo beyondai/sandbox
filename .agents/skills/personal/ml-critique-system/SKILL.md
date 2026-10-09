@@ -44,7 +44,8 @@ dispatch you, run it first.
    answer changes (the core's part 4).
 6. Do the cross-section checks (section K, the `[C]` items first).
    Errors across sections are often P1.
-7. If a critique context is given, apply it. On a conflict with this lens,
+7. If a critique context is given, apply its required parts and scope
+   (the rest is for the share-out). On a conflict with this lens,
    follow the context, and return the conflict: the rule, the context
    requirement, and what you did.
 

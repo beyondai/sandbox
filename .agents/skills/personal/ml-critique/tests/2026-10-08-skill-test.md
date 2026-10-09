@@ -36,7 +36,7 @@ Date: 2026-10-08. Skills under test: `ml-critique`, `ml-critique-system`,
   3. Only P1 and P2 findings. Maximum 3 strengths, and maximum 5 items in
      each of parts 2, 3, and 4.
   4. Each part is in priority order. Upstream items come first.
-  5. The output starts with the top 3 changes.
+  5. The output starts with the top changes: every P1, sorted.
   6. Each part-2 and part-3 item has evidence (`file:line` or a quote) and
      an alternative.
   7. Part 4 has playbook questions, each with an expected answer.
@@ -84,7 +84,7 @@ Date: 2026-10-08. Skills under test: `ml-critique`, `ml-critique-system`,
   - Round 2: accept all.
 - Pass criteria:
   1. Maximum 2 rounds of 6 or fewer questions, P1 first.
-  2. The output file has the sections in order: Summary (top 3 changes,
+  2. The output file has the sections in order: Summary (top changes,
      reference named), Done well, Change or fix, Missing, Questions,
      Decisions and trade-offs, Deferred, Conclusion.
   3. Each decision has a trade-off. Each deferred item has a reason, owner,

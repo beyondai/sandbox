@@ -43,7 +43,8 @@ dispatch you, run it first.
 5. Add the playbook's questions that the report did not answer. Give each
    question the expected answer, why it matters, and what each likely
    answer changes (the core's part 4).
-6. If a critique context is given, apply it. On a conflict with this lens,
+6. If a critique context is given, apply its required parts and scope
+   (the rest is for the share-out). On a conflict with this lens,
    follow the context, and return the conflict: the rule, the context
    requirement, and what you did.
 

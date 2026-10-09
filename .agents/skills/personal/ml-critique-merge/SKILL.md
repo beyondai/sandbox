@@ -41,7 +41,7 @@ Progress (copy into your reply, tick each line):
 ```
 [ ] 1 Select: source files, critique context (ask and wait)
 [ ] 2 Merge: join, evidence, disagreements, tags, decisions
-[ ] 3 Propose: merged critique, top 3, disagreement questions
+[ ] 3 Propose: merged critique, top changes, disagreement questions
 [ ] 4 Discuss: rounds until the user says to write
 [ ] 5 Write: critique/<date>-final.md
 [ ] 6 Check
@@ -56,7 +56,8 @@ Progress (copy into your reply, tick each line):
    the evidence. Do not run a new critique.
 3. Ask for the critique context (path, text, or "none"), unless the user
    gave one or a source names one. Use the rules in "Critique context" in
-   `../ml-critique/SKILL.md`. Wait for the answer.
+   `../ml-critique/SKILL.md`: the merge uses only the required parts and
+   the scope, and records the rest for the share-out. Wait for the answer.
 
 ### 2. Merge
 
@@ -67,15 +68,16 @@ disagreement, rejected).
 ### 3. Propose
 
 Show in chat:
-1. The top 3 changes, selected with the sort key.
+1. The top changes ("Top changes" in `../ml-critique/SKILL.md`): every P1,
+   sorted with the sort key. Do not cut to 3.
 2. The 4 parts (Done well, Change or fix, Missing, Questions), sorted with
    the sort key. Give each item a new ID and its source IDs.
 3. The Rejected list (one line each).
 4. Each disagreement as a numbered question with your recommended
    answer and the reason. Disagreements first, P1 first.
 
-Fit the text to the critique context (required topics, format). Do not
-cut items to fit a time limit: that is the share-out's job.
+Cover the required parts of the critique context. Do not fit the format,
+and do not cut items to fit a time limit: that is the share-out's job.
 
 ### 4. Discuss
 
@@ -99,7 +101,7 @@ cut items to fit a time limit: that is the share-out's job.
    fix, Missing, Questions, Decisions and trade-offs, Deferred, Rejected,
    Conclusion.
    - **Summary:** the write-up, each source file, the context, the counts
-     (merged items, joined, `[user]`, rejected), and the top 3 changes.
+     (merged items, joined, `[user]`, rejected), and the top changes.
    - **Sources:** one line per source: file, view (fresh or reference),
      date, and verdict.
    - **Decisions and trade-offs:** each source decision that the merge
@@ -108,7 +110,7 @@ cut items to fit a time limit: that is the share-out's job.
    - **Rejected:** each rejected item: the item, the source, and the
      reason.
    - **Conclusion:** the verdict (`ready`, `ready with changes`, `needs
-     rework`) and the top 3 changes. If the sources gave different
+     rework`) and the top changes. If the sources gave different
      verdicts, say which one the merge keeps and why.
 4. In the Check, run `check_doc.py` with:
 
@@ -125,7 +127,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    Rejected? (Count the source items and the mapped items.)
 2. Is each disagreement resolved in Decisions, or in Deferred with its
    reason?
-3. Are the top 3 changes single changes, sorted with the sort key?
+3. Do the top changes hold every P1 (or, with no P1, the top 3 P2), each a
+   single change, sorted with the sort key?
 4. Are the `[user]` and `[ref]` tags kept, and is each new user item
    tagged?
 5. Does the verdict follow from the decisions? Are the sources and the

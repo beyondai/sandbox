@@ -209,3 +209,4 @@ edits stay on `main` regardless.
 | 0021 | Critique: share-out never cuts a P1, one meaning for `[C]`, Done well and context in the Checks |
 | 0022 | Principle 2 (the intended behavior, not the metric), retrain fits the change cadence, fuller phase gates |
 | 0023 | Principle 2 skill-check fixes (the PRD keeps no checklist copy), Principle 3, delivery Retraining item, markdown template |
+| 0024 | Critique: top changes not capped at 3, the context is for the share-out, an early back-of-envelope estimate is P1 |
