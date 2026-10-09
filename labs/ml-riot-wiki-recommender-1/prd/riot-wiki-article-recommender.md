@@ -65,7 +65,7 @@ is currently viewing, recommends 5 other articles they might find useful."
     topic similarity (embeddings)     --+
   ```
 
-- **Clicks when they exist.** Add co-view click features in a graded
+- **Clicks when they exist.** Add opened-next click features in a graded
   reranker (trained on click volume, not "clicked or not"; see the
   monkey-mode result).
 - **Permissions.** Filter every recommendation by the viewer's access
@@ -139,12 +139,14 @@ decided later.
     tree.
   - Rank them by page views over the last 30 days. Show the top 5.
   - Drop archived pages and pages the viewer can't access.
-- **Recommended baseline, after logs exist (no ML).** Co-view click
-  popularity: rank pages by how many readers of page A opened them next.
-  Fill empty slots from the day-one baseline.
+- **Recommended baseline, after logs exist (no ML).** Opened-next click
+  popularity: rank pages by how many distinct readers opened them right
+  after page A, in the same session. Count each reader once per pair, and
+  keep a pair only if at least 3 readers made it. Fill empty slots from the
+  day-one baseline.
 - **Floor.** The 5 most-read pages in the same space. It shows whether the
   offline metric means anything.
-- **Build decision.** Later. A stand-in for the floor and the co-view
+- **Build decision.** Later. A stand-in for the floor and the opened-next
   baseline was already scored on the Wikipedia proxy in monkey mode (B0 and
   B1).
 
@@ -240,3 +242,5 @@ real Riot stack.
 - 2026-10-08: offline metrics changed from @10 to @5 to match the 5-page
   panel. Added recall@100 for the candidate stage.
 - 2026-10-08: added the Baseline section (new Definition checklist item).
+- 2026-10-08: renamed "co-view" to "opened-next" (B came right after A in
+  the same session), with distinct-reader counting and a 3-reader minimum.
