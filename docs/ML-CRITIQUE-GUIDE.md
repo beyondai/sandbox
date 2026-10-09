@@ -224,6 +224,9 @@ runs, a run and a colleague's review).
   audience from the context.
 - It proposes a timeline with about 20% free time, talking points in
   priority order, the questions to ask, a backup list, and a cut list.
+- It never cuts a P1. Each required topic gets a point if the P1 points
+  leave time. If not, the skill tells you which topic has no point
+  (0021).
 - Each talking point has a claim, the evidence, the alternative, a sketch
   when it helps, and the likely follow-up questions with answers.
 - It adds delivery notes for the context type: a working-session
@@ -403,8 +406,8 @@ required topics, and "be ready to sketch". It selects the type
 "working-session interview" and proposes a timeline:
 
 ```
- 0      2          12            25          33        36    45
- |-top3-|-change P1-|-change P2+M-|-questions-|-credit-|-free-|
+ 0      2        5          15            28          36    45
+ |-top3-|-credit-|-change P1-|-change P2+M-|-questions-|-free-|
 ```
 
 Change the order or the points in rounds. Say "write" when you are done.

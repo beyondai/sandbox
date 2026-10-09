@@ -30,7 +30,8 @@ dispatch you, run it first.
 3. Do the checks in [references/catalog.md](references/catalog.md). The
    sections A (goal), B (metrics), and D (framing and labels) hold most P1
    findings. Do them first. Inside a section, check the `[C]` items first
-   (the most likely P1), then the others in ID order. Check all items.
+   (classic mistakes: the most likely P1 or P2), then the others in ID
+   order. Check all items.
 4. Put each result in one part: done well, change or fix, missing, or
    question. Give each finding a priority with the remedy from the
    catalog. List a strength only if losing it would make the result
@@ -66,5 +67,7 @@ Reason: a gap that the playbook covered anyway adds noise to the log.
 4. Does each question have an expected answer, why it matters, and what
    each answer changes?
 5. Is each conflict with the critique context returned?
+6. Does each strength say what breaks if it is lost, with no basic hygiene
+   and at most 5?
 
-Done when the 5 answers are yes.
+Done when the 6 answers are yes.

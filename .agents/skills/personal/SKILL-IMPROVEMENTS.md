@@ -6,7 +6,7 @@ metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
 estimates | tag user findings | Done well filter | share-out and merge
-skills
+skills | skill-check fixes
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -443,3 +443,17 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   to write; `critique/<date>-final.md` out. `ml-critique-share-out`: a
   final critique and a share-out context in (limit, format, topics,
   audience); discuss until "write"; `critique/<date>-share-out.md` out.
+
+## 2026-10-09 - ml-critique* (skill-check fixes)
+- **Project**: none (skill checks on the `ml-critique*` skills)
+- **Source**: user-requested
+- **Status**: adopted (2026-10-09): `ml-critique-share-out` step 2,
+  Check, and Done when; `[C]` in `ml-critique` and both lenses; lens
+  Check question 6; merge Check question 6; docs timeline (ADR 0021).
+- **Finding**: the manual checklist found 5 problems: the docs timeline
+  put credit after criticism; the share-out did not say whether a P1 or
+  a required topic wins on a short limit; `[C]` had 2 meanings; the lens
+  Checks did not test Done well; the merge Check did not test Context.
+  The user decided: "credit before criticism", "don't cut p1", fix the
+  rest.
+- **Suggested change**: as applied (ADR 0021).

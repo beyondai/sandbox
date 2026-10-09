@@ -75,8 +75,14 @@ Progress (copy into your reply, tick each line):
 
 1. Budget the time. Keep about 20% free for follow-up questions. Reason:
    in a discussion the other side asks, and a full plan has no room.
-2. Select the talking points in sort-key order. Each required topic gets
-   at least one point. A P1 is never cut while a P2 or P3 is in.
+2. Select the talking points in sort-key order.
+   - A P1 is never cut. Reason: a P1 makes later work invalid, so it
+     matters more than topic coverage.
+   - Then give each required topic at least one point. If the P1 points
+     leave no time for a topic, the topic gets no point. Tell the user
+     which topic has none.
+   - Done well items have no priority. Select them in the Done well
+     order (the most costly to lose first).
 3. Make each talking point (see "Talking point").
 4. Put the rest in Backup (if time is left) or in the Cut list (with the
    reason: time, low priority, rejected in the critique).
@@ -126,11 +132,11 @@ Progress (copy into your reply, tick each line):
 Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 1. Does the timeline fit the share-out limit, with free time for
    follow-up questions?
-2. Does each required topic of the context have at least one point?
+2. Are all P1 points in? Does each required topic have at least one
+   point, or is the user told which topic the P1 points left out?
 3. Does each talking point have the claim, the evidence, and the
    alternative? Does each P1 point have its follow-up answers?
-4. Does each Cut list item have a reason? Is no P1 cut while a P2 or P3
-   is in?
+4. Does each Cut list item have a reason? Is no P1 in the Cut list?
 5. Are the `[user]` and `[ref]` tags kept? Are the critique and the
    write-up unchanged?
 
@@ -148,7 +154,8 @@ Each talking point has:
 
 ## Done when
 
-1. The plan fits the share-out limit and covers each required topic.
+1. The plan fits the share-out limit, keeps each P1, and covers each
+   required topic that the P1 points leave time for.
 2. The user said to write, and the file is written.
 3. The Check passed (5 yes answers, `check_doc.py` prints `OK`), or the
    open items are reported.

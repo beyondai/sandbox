@@ -448,6 +448,8 @@ in parentheses.
   `ml-critique-share-out` plans what to discuss in a fixed time. New
   user findings get `[user]`. Done well lists only strengths that are
   costly to lose (0020).
+- **A share-out never cuts a P1.** A required topic gets a point only
+  if the P1 points leave time; the user is told if not (0021).
 - **One folder for each project.** All generated files go in
   `<parent>/<project>/`, never in `notes/` (0010).
 - **Each skill checks its own output.** Intent questions, a format script,

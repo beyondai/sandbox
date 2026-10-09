@@ -94,7 +94,8 @@ Also:
 - **What to check first.** The lenses check in the same importance order:
   the playbook's classic mistakes, then the sections in the order that
   the lens names (the sections with most P1 findings first). Inside a
-  section, the `[C]` items (the most likely P1) come first.
+  section, the `[C]` items (classic mistakes: the most likely P1 or P2)
+  come first.
 - **Done well.** List a strength only if losing it in a rewrite would make
   the result worse. Say what breaks if it is lost. Do not list basic
   hygiene (train and test both reported, a stated cleaning rule).

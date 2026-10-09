@@ -130,6 +130,8 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
    tagged?
 5. Does the verdict follow from the decisions? Are the sources and the
    write-up unchanged?
+6. Is each conflict between the context and the general rules in the
+   Context section, with what was done?
 
 ## Merge rules
 
@@ -167,6 +169,6 @@ Do "Check the output" in `../ml-system-design/SKILL.md`. Intent questions:
 1. Each source item is mapped (merged, single source, or Rejected).
 2. Each disagreement is resolved or in Deferred.
 3. The user said to write, and the file is written.
-4. The Check passed (5 yes answers, `check_doc.py` prints `OK`), or the
+4. The Check passed (6 yes answers, `check_doc.py` prints `OK`), or the
    open items are reported.
 5. The user confirms.

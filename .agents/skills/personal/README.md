@@ -191,3 +191,4 @@ edits stay on `main` regardless.
 | 0018 | Critique: full coverage, sort key, Quick mode (2 hours), critique context, view asked each run |
 | 0019 | Critique questions give why and what changes; log only issues with evidence |
 | 0020 | Critique: one mode, `ml-critique-merge`, `ml-critique-share-out`, `[user]` tag, Done well rule |
+| 0021 | Critique: share-out never cuts a P1, one meaning for `[C]`, Done well and context in the Checks |
