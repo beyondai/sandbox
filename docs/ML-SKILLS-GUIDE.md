@@ -314,7 +314,7 @@ in parentheses.
   holds negative sampling, architecture (shallow or deep, MLP, cross
   network, attention), the neural network training setup, and tree
   hyperparameters. Deep-dive, train, and the critique lenses check that a
-  write-up states them.
+  write-up states them (0012).
 - **Simple by default, complex only with evidence.** The complexity gate
   in `ml-design-principles.md` applies to design, training, and critique.
 - **Critique is different from Review mode.** It is a review by a reader

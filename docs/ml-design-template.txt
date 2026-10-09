@@ -4,13 +4,14 @@ The template has 5 sections:
 
   1 Definition -> 2 High-level -> 3 Deep dive -> 4 Delivery -> 5 Post delivery
   (why, what,     (framing,       (data,         (ship, run,   (learn, grow)
-   who)            architecture)   model)         protect)
+   who)            architecture)   model,         protect)
+                                   serving)
 
 Contents
 
   1. Definition ........ Problem, Requirements, Metrics, Team
   2. High-level Design . ML framing, Architecture diagrams, Delivery phases
-  3. Design Deep Dive .. Data, Features, Models, Training
+  3. Design Deep Dive .. Data, Features, Models, Training, Serving
   4. Delivery .......... Execution; Deployment, rollout, and testing;
                          Evaluation; Monitoring; Fallback
   5. Post Delivery ..... Analysis, Explainability, Iteration, Democratize
@@ -97,7 +98,7 @@ Delivery phases
   This shows a practical, iterative plan.
 
 
-3. Design Deep Dive: Data, Features, Models, Training
+3. Design Deep Dive: Data, Features, Models, Training, Serving
 
 This section is the technical core of the design. It gives the details of
 the ML system.
@@ -133,6 +134,16 @@ Training
     - Sampling: the strategy for problems such as class imbalance, if
       the data needs one.
 
+Serving
+  - Inference mode, latency, scaling, and cost:
+    - Mode: batch (scores computed in advance) or online (scores for
+      each request).
+    - Latency: divide the p99 target from section 1 between the stages.
+      Example: retrieval, then ranking.
+    - Scaling: how the system meets the scale target from section 1.
+      Example: autoscaled replicas for the peak QPS.
+    - Cost: the hardware (CPU or GPU) and the cost at peak load.
+
 
 4. Delivery: Execution, Deployment, Evaluation, Monitoring, Fallback
 
@@ -152,6 +163,7 @@ Deployment, rollout, and testing
     weeks".
   - Testing plan: unit tests, integration tests, load tests.
   - CI/CD strategy.
+  The serving design is in section 3, Serving.
 
 Evaluation
   - Detailed online and offline evaluation:
