@@ -35,8 +35,9 @@ actually answered, not just headed; flag gaps, don't rewrite what's solid.
   flag here. Name the concrete sources; "user data" is not a source.
 - **Phasing**: crawl-walk-run sequence (V0/V1/V2). Per phase: features shipped,
   model class (baseline / first real model / stretch), rough timeline,
-  headcount. V0 is a rule or a simple model. Each later phase names the
-  gain that justifies its added complexity (`../ml-design-principles.md`,
+  headcount. V0 is the PRD's recommended baseline (Definition, "Baseline"),
+  or the doc says why not. Each later phase names its expected gain over that
+  baseline: the gain that justifies its added complexity (`../ml-design-principles.md`,
   Principle 1).
 
 Done when the ML framing is one precise sentence backed by target, label +

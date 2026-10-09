@@ -32,7 +32,9 @@ actually answered, not just headed; flag gaps, don't rewrite what's solid.
 - **Monitoring**: system-health metrics (latency, error rate) and model-health
   metrics (prediction distribution, feature drift) on a live dashboard.
 - **Fallback**: what happens when the new model/service fails or degrades —
-  revert to prior model, or drop to a simple heuristic. Most-skipped item in
+  revert to prior model, or drop to a simple heuristic. The default
+  heuristic is the PRD's recommended baseline (Definition, "Baseline"). Name
+  it, or say why it can't serve. Most-skipped item in
   review — check it first; a doc without one is incomplete.
 
 Done when the rollout has a concrete ramp schedule, the fallback trigger and

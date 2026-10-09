@@ -60,9 +60,12 @@ def evaluate_regressor(y_true, y_pred):
 
 ## Required checks
 
-- **Baseline comparison**: report the model's metrics against a naive baseline
-  (majority class, or mean prediction), not in isolation — a metric with no
-  baseline is a number, not evidence.
+- **Baseline comparison**: report the model's metrics against a baseline,
+  not in isolation — a metric with no baseline is a number, not evidence.
+  Use the PRD's recommended baseline (Definition, "Baseline") if it is built
+  and scored on this split. If it is not built, use its floor (majority
+  class, mean prediction, or global popularity) and say in `04-evaluate.md`
+  that the recommended baseline was not scored.
 - **Overfit check**: train-vs-test gap on the primary metric. A large gap means
   the reported test number isn't trustworthy even if it looks good.
 - **Class imbalance**: if the target is imbalanced, accuracy alone is misleading

@@ -8,6 +8,8 @@ up in a fresh session by opening the right file.
 
 Operational detail (concurrency, worktrees, autoresearch modes, the skill
 improvement log's mechanics) lives in `.agents/skills/personal/README.md`.
+To review a finished design or modeling report, see
+`docs/ML-CRITIQUE-GUIDE.md`.
 Design rationale lives in `.agents/skills/personal/adr/`.
 
 ## How it works
@@ -113,10 +115,13 @@ stays flagged, not touched (0007).
 
 ## Project folder
 
-Every topic gets one folder, `labs/ml-<topic-slug>-<n>/`:
+Every project gets one folder, `<parent>/<project>/`. The project name is
+the one you give (for example `proj1`), and the parent is `labs/` unless you
+name another. Full rule: `ml-system-design/SKILL.md`, "Project folder"
+(0010).
 
 ```
-labs/ml-<topic>-<n>/
+labs/proj1/
   prd/<topic>.md           Definition (problem, scope, metrics, team)
   design/high-level.md     ML framing, architecture diagrams, phasing
   design/deep-dive.md      Paper deep dive (only on the paper route)
@@ -130,6 +135,8 @@ labs/ml-<topic>-<n>/
     datasets/, build_dataset.py, experiments.json, autoresearch/
   dashboard/               eda.ipynb + app.py (Streamlit), per-project port
   monkey-mode/report.md    Independent fast baseline
+  critique/<date>-<lens>.md  Critiques from ml-critique
+  research/                Research notes for this project
   SKILL-IMPROVEMENTS.md    Proposed fixes to the skills themselves
 ```
 
@@ -157,6 +164,7 @@ run only by command, the rest also trigger from plain language.
 | `mm-multiagent`       | Train N candidates in parallel                |
 | `mm-evaluate`         | Evaluate against a baseline                   |
 | `mm-autoresearch` cmd | Optional auto-improvement loop                |
+| `ml-critique`         | Critique a finished write-up (see critique guide) |
 
 ### Parameters
 
@@ -208,6 +216,12 @@ Each has an ADR in `.agents/skills/personal/adr/`.
   duration, no external scheduler (0003, 0005).
 - **Skill fixes are logged, not applied mid-run** - `SKILL-IMPROVEMENTS.md`
   per project, reviewed on request (0004).
+- **Simple by default, complex only with evidence** - the complexity gate
+  in `ml-design-principles.md` applies to design, training, and critique.
+- **Critique is separate from Review mode** - a cold-reader review with
+  priorities, convergence, and a decisions record (0009).
+- **One folder per project** - all generated files in `<parent>/<project>/`,
+  never in `notes/` (0010).
 - **Cleaning lives inside the data step** - genuine errors get fixed and
   re-profiled there, not left to feature engineering or split into a
   separate step (0007).

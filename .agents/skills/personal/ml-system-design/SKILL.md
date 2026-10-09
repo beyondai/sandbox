@@ -30,10 +30,10 @@ the five in order, using each skill's bullets as the follow-ups an interviewer
 would ask.
 
 Scale depth to system size: a small internal model doesn't need
-10M-req/min-grade detail in every subsection. The two subsections most often
-skipped and most often flagged in review are out-of-scope
+10M-req/min-grade detail in every subsection. The subsections most often
+skipped and most often flagged in review are out-of-scope and the baseline
 (`ml-system-design-definition`) and fallback (`ml-system-design-delivery`) —
-never skip those two regardless of doc size.
+never skip those three regardless of doc size.
 
 Starting a new project: before invoking any section skill, ask two things in
 one message - (a) run `/ml-system-design-monkey-mode <topic>` in parallel as a

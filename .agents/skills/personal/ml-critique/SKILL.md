@@ -41,7 +41,7 @@ know the standard solutions. You spend the user's time on the problems that
 change the result most.
 
 1. Identify the problem type. Use its playbook in
-   [references/playbooks.md](references/playbooks.md).
+   [../ml-playbooks.md](../ml-playbooks.md).
 2. Give a proven alternative for each problem you find. Name the method and
    the reason. If you have no alternative, ask a question instead.
 3. Make the demands proportional to the risk. A small internal model does
