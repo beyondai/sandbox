@@ -118,3 +118,18 @@
   by the sandbox `.gitignore`, so they show up as untracked files.
 - **Suggested change 2**: Ask the user once to add `dashboard/.port` and
   `dashboard/.pid` to `.gitignore`, or write them under `data/`.
+
+## 2026-10-09 - ml-modeling-features
+- **Source**: user-requested
+- **Status**: proposed
+- **Finding**: In a POC on a proxy dataset, the skill lists text and
+  embeddings under "not used" with no further record. For the Riot wiki
+  project, text and embeddings are core to the real use case (new pages,
+  near-duplicates), even though the proxy has no text. The user asked to
+  keep them in the discussion.
+- **Suggested change**: In "Embeddings" and "Cheap text signals", add:
+  when the target use case needs text or embedding features that the POC
+  data can't supply, keep them in `02-features.md` as a "not built"
+  design section (features, reason, cost, model choice, how to test), and
+  point to a feasibility note for getting the data. Never list them as
+  dropped.

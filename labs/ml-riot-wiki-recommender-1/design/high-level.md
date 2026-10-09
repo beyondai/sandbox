@@ -186,12 +186,29 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
 ### V1 - first real model: graded reranker
 
 - **Ships.**
-  - More candidate sources from `research/cold-start.md`: shared entities,
-    topic similarity with duplicates removed, and borrowed clicks (where
-    readers of the 10 most similar warm pages went next).
-  - A GBDT regression on `log1p(r)` over all candidate features: opened-next
-    counts, link and tree relations, entity overlap, cosine similarity, page
-    age, counts per day since creation, views, owner team.
+  - More candidate sources from `research/cold-start.md`: the page's own
+    out-links and back-links (`wiki.links`), page-tree siblings, shared
+    entities, embedding nearest pages with duplicates removed, and
+    borrowed clicks (where readers of the 10 most similar warm pages went
+    next).
+  - Text and embedding pipeline (assumed in V1, user decision 2026-10-09):
+    - text: title + headings + lead (about 300 words) per page;
+    - TF-IDF and a small sentence-embedding model (internal service if one
+      exists, else about 30M parameters, 384 dimensions, CPU);
+    - an ANN index for nearest pages, and near-duplicate groups (cosine
+      over about 0.9);
+    - entity extraction against the entity dictionaries.
+  - A GBDT regression on `log1p(r)` over all candidate features (full list
+    in `modeling/02-features.md`):
+    - clicks: opened-next, reverse, two-hop;
+    - structure: is linked from A, back-link, same parent or space;
+    - text: `cos_tfidf`, `cos_emb`, `title_overlap`, `shared_entities`,
+      `borrowed_clicks`, template pair;
+    - page: age, counts per day since creation, views, last edit, owner
+      team;
+    - candidate-rule flags.
+  - Cost: about 40k pages; a full embedding backfill is minutes on CPU;
+    the nightly update covers about 100 new and 1k edited pages a week.
 - **Model class.** First real model.
 - **Timeline** (assumption): 6-8 weeks after V0 has 4 weeks of logs.
 - **Headcount** (assumption): 1-2 MLE.
@@ -200,6 +217,10 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
   - On the Wikipedia proxy, the graded reranker scored cold-page nDCG@5 of
     0.257 against 0.0014. On warm pages it gained only +0.5% over
     opened-next counts.
+  - The proxy has no text, links or tree, so its numbers for new and
+    dormant pages are lower bounds. The text and structure features are
+    designed in, but not measured (`research/page-content.md` has the plan
+    to measure them).
 - **Complexity gate** (`../../.agents/skills/personal/ml-design-principles.md`,
   Principle 1):
   - It must beat V0 on the new and long-tail slices, query side and item
@@ -300,3 +321,6 @@ V0 baseline rule -> V1 reranker -> V2 session + exploration -> V3 group -> V4 pe
   Slices). Complexity gate and label sweep now use new and long-tail. The
   exploration slot is for new pages only. Added per-day counts as a
   feature.
+- 2026-10-09: V1 now assumes the text, embedding and structure features
+  and candidate sources (user decision), with the pipeline, model and
+  cost. The proxy can't measure them yet.

@@ -1,0 +1,159 @@
+{
+  "holdout_queries": 11625,
+  "fit_rows": 2786862,
+  "holdout_rows": 611526,
+  "base_ndcg5": {
+    "all": 0.7724,
+    "new": 0.4159,
+    "long_tail": 0.7756
+  },
+  "permutation_drop": {
+    "log_n_ac": {
+      "all": 0.5361,
+      "new": 0.2814,
+      "long_tail": 0.454
+    },
+    "p_c_given_a": {
+      "all": 0.0007,
+      "new": -0.0009,
+      "long_tail": -0.0004
+    },
+    "rank_ac": {
+      "all": 0.0134,
+      "new": 0.0083,
+      "long_tail": 0.0267
+    },
+    "is_link_ac": {
+      "all": 0.0156,
+      "new": 0.0114,
+      "long_tail": 0.0312
+    },
+    "log_n_ca": {
+      "all": 0.0105,
+      "new": 0.0111,
+      "long_tail": 0.0212
+    },
+    "p_a_given_c": {
+      "all": 0.0144,
+      "new": 0.011,
+      "long_tail": 0.0305
+    },
+    "twohop": {
+      "all": 0.0016,
+      "new": 0.0011,
+      "long_tail": 0.0028
+    },
+    "twohop_paths": {
+      "all": 0.0011,
+      "new": 0.0016,
+      "long_tail": 0.0022
+    },
+    "log_in_c": {
+      "all": 0.0007,
+      "new": 0.0006,
+      "long_tail": 0.0009
+    },
+    "log_out_c": {
+      "all": 0.0023,
+      "new": -0.0004,
+      "long_tail": 0.0012
+    },
+    "log_views_c": {
+      "all": 0.0019,
+      "new": 0.0009,
+      "long_tail": 0.0004
+    },
+    "log_in_c_per_day": {
+      "all": 0.0014,
+      "new": 0.0003,
+      "long_tail": 0.0015
+    },
+    "item_age_days": {
+      "all": -0.0,
+      "new": -0.0001,
+      "long_tail": 0.0
+    },
+    "item_is_new": {
+      "all": -0.0,
+      "new": -0.0013,
+      "long_tail": -0.0001
+    },
+    "log_out_a": {
+      "all": 0.0024,
+      "new": 0.0017,
+      "long_tail": 0.0037
+    },
+    "log_views_a": {
+      "all": 0.001,
+      "new": 0.0043,
+      "long_tail": 0.0009
+    },
+    "q_age_days": {
+      "all": 0.0006,
+      "new": 0.0026,
+      "long_tail": 0.0005
+    },
+    "q_is_new": {
+      "all": 0.0003,
+      "new": -0.0001,
+      "long_tail": 0.0005
+    },
+    "cand_opened_next": {
+      "all": 0.0,
+      "new": 0.0,
+      "long_tail": 0.0
+    },
+    "cand_twohop": {
+      "all": 0.0,
+      "new": 0.0001,
+      "long_tail": 0.0
+    },
+    "cand_reverse": {
+      "all": 0.0001,
+      "new": -0.0001,
+      "long_tail": 0.0001
+    },
+    "cand_popular": {
+      "all": -0.0,
+      "new": 0.0014,
+      "long_tail": 0.0
+    },
+    "n_sources": {
+      "all": 0.0003,
+      "new": 0.0009,
+      "long_tail": 0.0007
+    }
+  },
+  "group_ablation_drop": {
+    "opened_next": {
+      "all": 0.0467,
+      "new": 0.0307,
+      "long_tail": 0.0164
+    },
+    "reverse": {
+      "all": 0.0009,
+      "new": 0.0011,
+      "long_tail": 0.0018
+    },
+    "twohop": {
+      "all": 0.0006,
+      "new": -0.0005,
+      "long_tail": 0.0012
+    },
+    "item": {
+      "all": 0.0001,
+      "new": -0.0008,
+      "long_tail": -0.0001
+    },
+    "query": {
+      "all": 0.0002,
+      "new": -0.0011,
+      "long_tail": -0.0001
+    },
+    "cand_flags": {
+      "all": 0.0,
+      "new": -0.0002,
+      "long_tail": -0.0
+    }
+  }
+}

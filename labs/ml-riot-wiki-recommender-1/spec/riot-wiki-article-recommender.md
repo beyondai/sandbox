@@ -1,5 +1,5 @@
 prd-hash: 84910b6cbe81b1d298fc7edd2b36912fc35b0076
-high-level-hash: be358105f7ff18f9c876e397635397679d401c2d
+high-level-hash: e59b078bc58d7dae95819fbb50651d71fa43f029
 
 # Spec: Riot wiki article recommender
 
@@ -58,6 +58,12 @@ time spent looking for docs and faster onboarding for new hires.
 - **Proxy rule.** Wikipedia is evidence, not the target. Every proxy
   finding is translated into a Riot design input ("For Riot" lines in
   `modeling/0N-*.md`). When the two differ, the Riot design wins.
+- **Text, embedding and structure features.** Assumed in V1 (user
+  decision 2026-10-09): links, page tree, entities, TF-IDF and embedding
+  similarity, borrowed clicks, near-duplicate groups, and an embedding
+  candidate source. The proxy POC has no text, links or tree, so these are
+  designed (`modeling/02-features.md`) but not measured; getting proxy
+  data is deferred (`research/page-content.md`).
 - **Label sweep.** `log1p(r)` is the V1 default. The modeling step sweeps
   raw r (Poisson loss), sqrt(r), share of A's readers, and 0-4 grades
   (LambdaMART). The model and the loss follow each label.
