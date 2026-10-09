@@ -14,6 +14,8 @@ What's good:
 1: Overal structure. considered full cycle
 2: removed noises
 3: considered negative sampling
+4: documented details of the training setting, repeatable. for future check of
+running variance.
 
 
 What's bad
