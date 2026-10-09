@@ -6,6 +6,19 @@
     "truth_test": "../../../data/wikipedia-clickstream/modeling/truth_test.parquet",
     "queries_train": "../../../data/wikipedia-clickstream/modeling/queries_train.parquet",
     "queries_test": "../../../data/wikipedia-clickstream/modeling/queries_test.parquet",
+    "pages_train": "../../../data/wikipedia-clickstream/modeling/pages_train.parquet",
+    "pages_test": "../../../data/wikipedia-clickstream/modeling/pages_test.parquet",
+    "slices": {
+      "query_side": "q_slice",
+      "item_side": "item_slice",
+      "values": [
+        "new",
+        "dormant",
+        "long_tail",
+        "torso",
+        "head"
+      ]
+    },
     "months": "../../../data/wikipedia-clickstream/modeling/months/",
     "label": "label",
     "id": [
@@ -33,12 +46,20 @@
       "pairs with n < 10 a month (upstream Wikimedia filter; min n = 10)",
       "bot traffic (upstream Wikimedia filter, user agents)"
     ],
+    "negatives": {
+      "types": [
+        "hard (candidate-generator)"
+      ],
+      "ratio": "about 6.7 label-0 pairs per positive (train)",
+      "pool": "label-0 pairs among each query's rule candidates (opened-next, two-hop, reverse, popular), same generators at train and test, so test negatives follow the production distribution",
+      "correction": "none (no down-sampling; graded label)"
+    },
     "built_by": "modeling/build_dataset.py"
   },
   "shape": {
-    "rows": 5664045,
-    "columns": 9,
-    "memory_mb": 156.9
+    "rows": 6185251,
+    "columns": 10,
+    "memory_mb": 206.4
   },
   "nulls": {
     "q": 0.0,
@@ -49,143 +70,241 @@
     "cand_popular": 0.0,
     "r": 0.0,
     "label": 0.0,
-    "bucket": 0.0
+    "q_slice": 0.0,
+    "item_slice": 0.0
   },
   "target": {
     "column": "label",
     "type": "regression",
     "class_balance": {
-      "label > 0": 0.1342,
-      "label = 0": 0.8658
+      "label > 0": 0.1295,
+      "label = 0": 0.8705
     },
     "distribution": {
       "label": {
         "min": 0.0,
-        "max": 11.8502,
-        "mean": 0.4972,
+        "max": 12.822,
+        "mean": 0.4809,
         "median": 0.0,
-        "std": 1.3272,
-        "skew": 2.6411
+        "std": 1.3095,
+        "skew": 2.7045
       },
       "label_where_positive": {
         "min": 2.3979,
-        "max": 11.8502,
-        "mean": 3.7055,
+        "max": 12.822,
+        "mean": 3.7127,
         "median": 3.434,
-        "std": 1.1134,
-        "skew": 1.343
+        "std": 1.1138,
+        "skew": 1.3392
       },
       "r_where_positive": {
         "min": 10.0,
-        "max": 140110.0,
-        "mean": 118.6268,
+        "max": 370264.0,
+        "mean": 121.9542,
         "median": 30.0,
-        "std": 711.8387,
-        "skew": 56.5006
+        "std": 1064.244,
+        "skew": 180.101
       },
       "r_quantiles_positive": {
         "0.5": 30.0,
         "0.9": 190.0,
-        "0.99": 1493.0,
-        "0.999": 7559.0
+        "0.99": 1483.0,
+        "0.999": 7587.0
       },
-      "positive_rate_by_bucket": {
-        "head": 0.3271,
-        "torso": 0.1018,
-        "tail": 0.0409,
-        "cold": 0.0144
+      "positive_rate_by_slice": {
+        "q_slice": {
+          "long_tail": 0.0414,
+          "dormant": 0.0065,
+          "new": 0.0924,
+          "head": 0.3501,
+          "torso": 0.1204
+        },
+        "item_slice": {
+          "long_tail": 0.2303,
+          "new": 0.1752,
+          "dormant": 0.0769,
+          "head": 0.0961,
+          "torso": 0.2107
+        }
       }
     }
   },
   "numeric_distributions": {
     "candidates_per_query": {
       "min": 20.0,
-      "max": 138.0,
-      "mean": 56.6405,
-      "median": 55.0,
-      "std": 27.9481,
-      "skew": 0.289
+      "max": 137.0,
+      "mean": 52.5997,
+      "median": 46.0,
+      "std": 28.7261,
+      "skew": 0.4432
     },
     "positives_per_query": {
       "min": 0.0,
-      "max": 84.0,
-      "mean": 7.5993,
-      "median": 3.0,
-      "std": 11.7364,
-      "skew": 2.6316
+      "max": 85.0,
+      "mean": 6.8127,
+      "median": 2.0,
+      "std": 11.3928,
+      "skew": 2.7793
     },
     "src_out_f (query, feature month)": {
       "min": 0.0,
-      "max": 754032.0,
-      "mean": 968.0572,
-      "median": 76.0,
-      "std": 7866.4703,
-      "skew": 46.6319
+      "max": 1309703.0,
+      "mean": 871.4805,
+      "median": 56.0,
+      "std": 9095.2586,
+      "skew": 74.3612
     }
   },
   "categorical_distributions": {
-    "bucket (pairs)": {
-      "cardinality": 4,
+    "q_slice (pairs)": {
+      "cardinality": 5,
       "top_values": {
-        "torso": 3122223,
-        "head": 1205146,
-        "tail": 1087850,
-        "cold": 248826
+        "dormant": 216619,
+        "torso": 2824415,
+        "new": 301486,
+        "long_tail": 1825266,
+        "head": 1017465
+      }
+    },
+    "item_slice (pairs)": {
+      "cardinality": 5,
+      "top_values": {
+        "dormant": 104,
+        "new": 12127,
+        "torso": 1392988,
+        "head": 4435245,
+        "long_tail": 344787
       }
     },
     "candidate source (share of pairs)": {
       "cardinality": 4,
       "top_values": {
-        "cand_opened_next": 0.1449,
-        "cand_twohop": 0.4958,
-        "cand_reverse": 0.1102,
-        "cand_popular": 0.3531
+        "cand_opened_next": 0.1395,
+        "cand_twohop": 0.475,
+        "cand_reverse": 0.1054,
+        "cand_popular": 0.3802
       }
     },
     "candidate source (positive rate)": {
       "cardinality": 4,
       "top_values": {
-        "cand_opened_next": 0.8543,
-        "cand_twohop": 0.093,
-        "cand_reverse": 0.4454,
+        "cand_opened_next": 0.8552,
+        "cand_twohop": 0.0941,
+        "cand_reverse": 0.4478,
         "cand_popular": 0.0002
       }
     }
   },
   "candidate_recall_train": {
-    "cold": {
-      "recall": 0.1829,
-      "recall_w": 0.0624
+    "query_side": {
+      "new": {
+        "truth_pairs": 80067,
+        "recall": 0.3479,
+        "recall_w": 0.3527
+      },
+      "torso": {
+        "truth_pairs": 396913,
+        "recall": 0.8566,
+        "recall_w": 0.9427
+      },
+      "long_tail": {
+        "truth_pairs": 107350,
+        "recall": 0.7043,
+        "recall_w": 0.7591
+      },
+      "dormant": {
+        "truth_pairs": 35954,
+        "recall": 0.0392,
+        "recall_w": 0.0059
+      },
+      "head": {
+        "truth_pairs": 553737,
+        "recall": 0.6433,
+        "recall_w": 0.902
+      }
     },
-    "torso": {
-      "recall": 0.8512,
-      "recall_w": 0.9327
-    },
-    "head": {
-      "recall": 0.6713,
-      "recall_w": 0.9185
-    },
-    "tail": {
-      "recall": 0.7601,
-      "recall_w": 0.7982
+    "item_side": {
+      "torso": {
+        "truth_pairs": 413687,
+        "recall": 0.7093,
+        "recall_w": 0.7886
+      },
+      "new": {
+        "truth_pairs": 8731,
+        "recall": 0.2434,
+        "recall_w": 0.2415
+      },
+      "head": {
+        "truth_pairs": 604906,
+        "recall": 0.7044,
+        "recall_w": 0.8485
+      },
+      "long_tail": {
+        "truth_pairs": 140558,
+        "recall": 0.565,
+        "recall_w": 0.5354
+      },
+      "dormant": {
+        "truth_pairs": 6139,
+        "recall": 0.0013,
+        "recall_w": 0.0001
+      }
     }
   },
   "candidate_recall_test": {
-    "tail": {
-      "recall": 0.7823,
-      "recall_w": 0.7895
+    "query_side": {
+      "dormant": {
+        "truth_pairs": 16514,
+        "recall": 0.0429,
+        "recall_w": 0.0096
+      },
+      "head": {
+        "truth_pairs": 276008,
+        "recall": 0.6445,
+        "recall_w": 0.9159
+      },
+      "new": {
+        "truth_pairs": 49783,
+        "recall": 0.1879,
+        "recall_w": 0.2523
+      },
+      "torso": {
+        "truth_pairs": 190248,
+        "recall": 0.883,
+        "recall_w": 0.9502
+      },
+      "long_tail": {
+        "truth_pairs": 48045,
+        "recall": 0.7341,
+        "recall_w": 0.7829
+      }
     },
-    "torso": {
-      "recall": 0.8727,
-      "recall_w": 0.9386
-    },
-    "cold": {
-      "recall": 0.1707,
-      "recall_w": 0.0465
-    },
-    "head": {
-      "recall": 0.6807,
-      "recall_w": 0.9255
+    "item_side": {
+      "new": {
+        "truth_pairs": 5214,
+        "recall": 0.1095,
+        "recall_w": 0.1436
+      },
+      "head": {
+        "truth_pairs": 301449,
+        "recall": 0.6945,
+        "recall_w": 0.8189
+      },
+      "dormant": {
+        "truth_pairs": 3358,
+        "recall": 0.0003,
+        "recall_w": 0.0
+      },
+      "long_tail": {
+        "truth_pairs": 65182,
+        "recall": 0.5693,
+        "recall_w": 0.5304
+      },
+      "torso": {
+        "truth_pairs": 205395,
+        "recall": 0.702,
+        "recall_w": 0.7532
+      }
     }
   },
   "build_stats": {
@@ -213,100 +332,237 @@
       }
     },
     "catalog_pages": 3776397,
+    "catalog_without_page_id": 19860,
     "train": {
       "feature_month": "2026-07",
       "label_month": "2026-08",
+      "cutoff": "2026-08-01",
+      "new_page_id_from": 83719019,
+      "born_after_T_page_id_from": 83836459,
+      "traffic_thresholds": {
+        "query": {
+          "p50": 82.0,
+          "p90": 1344.0
+        },
+        "item": {
+          "p50": 79.0,
+          "p90": 1101.0
+        }
+      },
+      "catalog_by_age": {
+        "established": 3731392,
+        "born_after_T": 21254,
+        "new_lt14d": 3891,
+        "unknown": 19860
+      },
+      "catalog_by_item_slice": {
+        "new": 25145,
+        "dormant": 64683,
+        "long_tail": 2109989,
+        "torso": 1259737,
+        "head": 316843
+      },
       "population": {
-        "cold": 252403,
-        "tail": 653509,
-        "torso": 1003205,
-        "head": 264047
+        "new": 8252,
+        "dormant": 11438,
+        "long_tail": 1101579,
+        "torso": 839897,
+        "head": 211998
       },
       "population_total": 2173164,
       "queries": {
-        "head": 12150,
-        "cold": 11615,
-        "tail": 30072,
-        "torso": 46163
+        "new": 8252,
+        "dormant": 10000,
+        "long_tail": 50690,
+        "torso": 38649,
+        "head": 10000
       },
-      "queries_total": 100000,
-      "queries_share_of_population": 0.04601585522307566,
-      "cold_never_seen": 3526,
-      "candidate_recall": {
-        "cold": {
-          "recall": 0.1829,
-          "recall_w": 0.0624
+      "queries_total": 117591,
+      "queries_share_of_population": 0.0541105043153669,
+      "queries_new_by_age": {
+        "born_after_T": 6219,
+        "new_lt14d": 2033
+      },
+      "candidate_recall_query_side": {
+        "new": {
+          "truth_pairs": 80067,
+          "recall": 0.3479,
+          "recall_w": 0.3527
         },
         "torso": {
-          "recall": 0.8512,
-          "recall_w": 0.9327
+          "truth_pairs": 396913,
+          "recall": 0.8566,
+          "recall_w": 0.9427
+        },
+        "long_tail": {
+          "truth_pairs": 107350,
+          "recall": 0.7043,
+          "recall_w": 0.7591
+        },
+        "dormant": {
+          "truth_pairs": 35954,
+          "recall": 0.0392,
+          "recall_w": 0.0059
         },
         "head": {
-          "recall": 0.6713,
-          "recall_w": 0.9185
-        },
-        "tail": {
-          "recall": 0.7601,
-          "recall_w": 0.7982
+          "truth_pairs": 553737,
+          "recall": 0.6433,
+          "recall_w": 0.902
         }
       },
-      "pairs": 5664045,
-      "truth_pairs": 1038457,
-      "positive_rate": 0.1342,
-      "candidates_per_query_mean": 56.6
+      "candidate_recall_item_side": {
+        "torso": {
+          "truth_pairs": 413687,
+          "recall": 0.7093,
+          "recall_w": 0.7886
+        },
+        "new": {
+          "truth_pairs": 8731,
+          "recall": 0.2434,
+          "recall_w": 0.2415
+        },
+        "head": {
+          "truth_pairs": 604906,
+          "recall": 0.7044,
+          "recall_w": 0.8485
+        },
+        "long_tail": {
+          "truth_pairs": 140558,
+          "recall": 0.565,
+          "recall_w": 0.5354
+        },
+        "dormant": {
+          "truth_pairs": 6139,
+          "recall": 0.0013,
+          "recall_w": 0.0001
+        }
+      },
+      "pairs": 6185251,
+      "truth_pairs": 1174021,
+      "positive_rate": 0.1295,
+      "candidates_per_query_mean": 52.6
     },
     "test": {
       "feature_month": "2026-08",
       "label_month": "2026-09",
+      "cutoff": "2026-09-01",
+      "new_page_id_from": 84003333,
+      "born_after_T_page_id_from": 84110899,
+      "traffic_thresholds": {
+        "query": {
+          "p50": 83.0,
+          "p90": 1375.0
+        },
+        "item": {
+          "p50": 80.0,
+          "p90": 1125.0
+        }
+      },
+      "catalog_by_age": {
+        "established": 3741439,
+        "unknown": 19860,
+        "new_lt14d": 5403,
+        "born_after_T": 9695
+      },
+      "catalog_by_item_slice": {
+        "torso": 1282430,
+        "head": 322202,
+        "dormant": 74658,
+        "new": 15098,
+        "long_tail": 2082009
+      },
       "population": {
-        "cold": 202751,
-        "tail": 614668,
-        "torso": 1022308,
-        "head": 272951
+        "new": 5581,
+        "dormant": 10838,
+        "long_tail": 1022618,
+        "torso": 857348,
+        "head": 216293
       },
       "population_total": 2112678,
       "queries": {
-        "head": 6460,
-        "torso": 24195,
-        "cold": 5000,
-        "tail": 14547
+        "new": 5000,
+        "dormant": 5000,
+        "long_tail": 24202,
+        "torso": 20291,
+        "head": 5119
       },
-      "queries_total": 50202,
-      "queries_share_of_population": 0.023762258138722514,
-      "cold_never_seen": 1591,
-      "candidate_recall": {
-        "tail": {
-          "recall": 0.7823,
-          "recall_w": 0.7895
-        },
-        "torso": {
-          "recall": 0.8727,
-          "recall_w": 0.9386
-        },
-        "cold": {
-          "recall": 0.1707,
-          "recall_w": 0.0465
+      "queries_total": 59612,
+      "queries_share_of_population": 0.028216320707651614,
+      "queries_new_by_age": {
+        "born_after_T": 3369,
+        "new_lt14d": 1631
+      },
+      "candidate_recall_query_side": {
+        "dormant": {
+          "truth_pairs": 16514,
+          "recall": 0.0429,
+          "recall_w": 0.0096
         },
         "head": {
-          "recall": 0.6807,
-          "recall_w": 0.9255
+          "truth_pairs": 276008,
+          "recall": 0.6445,
+          "recall_w": 0.9159
+        },
+        "new": {
+          "truth_pairs": 49783,
+          "recall": 0.1879,
+          "recall_w": 0.2523
+        },
+        "torso": {
+          "truth_pairs": 190248,
+          "recall": 0.883,
+          "recall_w": 0.9502
+        },
+        "long_tail": {
+          "truth_pairs": 48045,
+          "recall": 0.7341,
+          "recall_w": 0.7829
         }
       },
-      "pairs": 2910738,
-      "truth_pairs": 513803,
-      "positive_rate": 0.1313,
-      "candidates_per_query_mean": 58.0
+      "candidate_recall_item_side": {
+        "new": {
+          "truth_pairs": 5214,
+          "recall": 0.1095,
+          "recall_w": 0.1436
+        },
+        "head": {
+          "truth_pairs": 301449,
+          "recall": 0.6945,
+          "recall_w": 0.8189
+        },
+        "dormant": {
+          "truth_pairs": 3358,
+          "recall": 0.0003,
+          "recall_w": 0.0
+        },
+        "long_tail": {
+          "truth_pairs": 65182,
+          "recall": 0.5693,
+          "recall_w": 0.5304
+        },
+        "torso": {
+          "truth_pairs": 205395,
+          "recall": 0.702,
+          "recall_w": 0.7532
+        }
+      },
+      "pairs": 3150603,
+      "truth_pairs": 580598,
+      "positive_rate": 0.1242,
+      "candidates_per_query_mean": 52.9
     },
-    "query_overlap_train_test": 2111
+    "query_overlap_train_test": 3718
   },
   "quality_flags": [
     "proxy: monthly click counts, not distinct readers in 14 days",
     "proxy: pairs with fewer than 10 clicks a month are removed upstream, so label 0 means r < 10, not r = 0",
     "proxy: no session ids, no page text, no permissions or archive status",
+    "proxy: page age comes from enwiki page ids calibrated to dates (modeling/page_id_dates.json); 19,860 catalog pages have no page id (renamed or deleted) and are treated as established",
+    "proxy: dormant means 0 recorded views in the feature month, and views below 10 per referrer are not recorded",
     "duplicate (q, item) pairs: 0 (asserted in build_dataset.py)",
     "self pairs (q = item): 0 (asserted)",
-    "label is zero-inflated: 86.6% of pairs have label 0",
-    "queries with no positive candidate: cold 71.9%, head 0.0%, tail 4.0%, torso 0.1% (these queries score 0 nDCG for every model)",
+    "label is zero-inflated: 87.1% of pairs have label 0",
+    "queries with no positive candidate: dormant 86.7%, head 0.0%, long_tail 17.4%, new 55.3%, torso 0.0% (these queries score 0 nDCG for every model)",
     "r is heavy-tailed (unusual, not impossible): kept as is, log1p label"
   ]
 }

@@ -28,16 +28,19 @@ def main() -> None:
     stats = json.loads((HERE / "build_dataset_stats.json").read_text())
     pairs = pl.read_parquet(OUT / "pairs_train.parquet")
     q = pl.read_parquet(OUT / "queries_train.parquet")
-    df = pairs.join(q.select("q", "src_out_f", "seen_f"), on="q")
+    df = pairs.join(q.select("q", "src_out_f", "views_f", "age"), on="q")
     per_q = df.group_by("q").agg(
-        n_cand=pl.len(), n_pos=(pl.col("r") > 0).sum(), bucket=pl.col("bucket").first()
+        n_cand=pl.len(), n_pos=(pl.col("r") > 0).sum(), q_slice=pl.col("q_slice").first()
     )
 
-    pos_by_bucket = {
-        r["bucket"]: round(r["pos"], 4)
-        for r in df.group_by("bucket").agg(pos=(pl.col("r") > 0).mean()).iter_rows(named=True)
+    pos_by_slice = {
+        side: {
+            r[side]: round(r["pos"], 4)
+            for r in df.group_by(side).agg(pos=(pl.col("r") > 0).mean()).iter_rows(named=True)
+        }
+        for side in ("q_slice", "item_slice")
     }
-    no_pos = per_q.group_by("bucket").agg(share=(pl.col("n_pos") == 0).mean())
+    no_pos = per_q.group_by("q_slice").agg(share=(pl.col("n_pos") == 0).mean())
     flags = [c for c in df.columns if c.startswith("cand_")]
     flag_rates = {f: round(float(df[f].mean()), 4) for f in flags}
     flag_pos = {
@@ -49,12 +52,17 @@ def main() -> None:
         "proxy: pairs with fewer than 10 clicks a month are removed upstream, so "
         "label 0 means r < 10, not r = 0",
         "proxy: no session ids, no page text, no permissions or archive status",
+        "proxy: page age comes from enwiki page ids calibrated to dates "
+        "(modeling/page_id_dates.json); 19,860 catalog pages have no page id "
+        "(renamed or deleted) and are treated as established",
+        "proxy: dormant means 0 recorded views in the feature month, and "
+        "views below 10 per referrer are not recorded",
         "duplicate (q, item) pairs: 0 (asserted in build_dataset.py)",
         "self pairs (q = item): 0 (asserted)",
         f"label is zero-inflated: {1 - stats['train']['positive_rate']:.1%} of pairs "
         "have label 0",
         "queries with no positive candidate: "
-        + ", ".join(f"{r['bucket']} {r['share']:.1%}" for r in no_pos.sort("bucket").iter_rows(named=True))
+        + ", ".join(f"{r['q_slice']} {r['share']:.1%}" for r in no_pos.sort("q_slice").iter_rows(named=True))
         + " (these queries score 0 nDCG for every model)",
         "r is heavy-tailed (unusual, not impossible): kept as is, log1p label",
     ]
@@ -67,6 +75,12 @@ def main() -> None:
             "truth_test": f"{REL}/truth_test.parquet",
             "queries_train": f"{REL}/queries_train.parquet",
             "queries_test": f"{REL}/queries_test.parquet",
+            "pages_train": f"{REL}/pages_train.parquet",
+            "pages_test": f"{REL}/pages_test.parquet",
+            "slices": {
+                "query_side": "q_slice", "item_side": "item_slice",
+                "values": ["new", "dormant", "long_tail", "torso", "head"],
+            },
             "months": f"{REL}/months/",
             "label": "label", "id": ["q", "item"], "group": "q", "raw_count": "r",
             "split": {
@@ -83,6 +97,15 @@ def main() -> None:
                 "pairs with n < 10 a month (upstream Wikimedia filter; min n = 10)",
                 "bot traffic (upstream Wikimedia filter, user agents)",
             ],
+            "negatives": {
+                "types": ["hard (candidate-generator)"],
+                "ratio": "about 6.7 label-0 pairs per positive (train)",
+                "pool": "label-0 pairs among each query's rule candidates "
+                        "(opened-next, two-hop, reverse, popular), same "
+                        "generators at train and test, so test negatives "
+                        "follow the production distribution",
+                "correction": "none (no down-sampling; graded label)",
+            },
             "built_by": "modeling/build_dataset.py",
         },
         "shape": {
@@ -102,7 +125,7 @@ def main() -> None:
                     str(p): float(df.filter(pl.col("r") > 0)["r"].quantile(p))
                     for p in (0.5, 0.9, 0.99, 0.999)
                 },
-                "positive_rate_by_bucket": pos_by_bucket,
+                "positive_rate_by_slice": pos_by_slice,
             },
         },
         "numeric_distributions": {
@@ -111,15 +134,25 @@ def main() -> None:
             "src_out_f (query, feature month)": num_profile(q["src_out_f"]),
         },
         "categorical_distributions": {
-            "bucket (pairs)": {
-                "cardinality": df["bucket"].n_unique(),
-                "top_values": {r["bucket"]: r["len"] for r in df.group_by("bucket").len().iter_rows(named=True)},
+            "q_slice (pairs)": {
+                "cardinality": df["q_slice"].n_unique(),
+                "top_values": {r["q_slice"]: r["len"] for r in df.group_by("q_slice").len().iter_rows(named=True)},
+            },
+            "item_slice (pairs)": {
+                "cardinality": df["item_slice"].n_unique(),
+                "top_values": {r["item_slice"]: r["len"] for r in df.group_by("item_slice").len().iter_rows(named=True)},
             },
             "candidate source (share of pairs)": {"cardinality": len(flags), "top_values": flag_rates},
             "candidate source (positive rate)": {"cardinality": len(flags), "top_values": flag_pos},
         },
-        "candidate_recall_train": stats["train"]["candidate_recall"],
-        "candidate_recall_test": stats["test"]["candidate_recall"],
+        "candidate_recall_train": {
+            "query_side": stats["train"]["candidate_recall_query_side"],
+            "item_side": stats["train"]["candidate_recall_item_side"],
+        },
+        "candidate_recall_test": {
+            "query_side": stats["test"]["candidate_recall_query_side"],
+            "item_side": stats["test"]["candidate_recall_item_side"],
+        },
         "build_stats": stats,
         "quality_flags": quality,
     }
