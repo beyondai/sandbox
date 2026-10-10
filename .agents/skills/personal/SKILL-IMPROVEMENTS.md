@@ -6,9 +6,12 @@ metrics | serve bench --full | serving history cache | feature_selector
 parquet | chain mode | spec refresh | gate per slice | age and traffic
 slices | proxy data rule | critique time
 estimates | tag user findings | Done well filter | share-out and merge
+| effect is a failure | question order | share-out screen
 skills | skill-check fixes | intended behavior and change cadence |
 no top-3 cap | context for the share-out | requirements and cost is P1 |
-Principle 2 skill-check fixes | Principle 3 and Retraining item
+Principle 2 skill-check fixes | Principle 3 and Retraining item |
+merge of a merge | disagreement labels | sources under old rules |
+share-out open choices at write
 
 The one shared log of proposed changes to the `ml-*` and `ml-critique*`
 skills. Rules: `ml-system-design/SKILL.md`, "Skill improvement log".
@@ -550,3 +553,98 @@ Reasons: `adr/0004-skill-improvement-log.md`,
   though the coverage map pointed F7 at delivery.
 - **Suggested change**: as applied (ADR 0023). When a catalog item maps
   to a design skill in `coverage.md`, that skill needs a checklist item.
+
+## 2026-10-09 - ml-critique lenses (an effect states a fact, not a failure)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: proposed
+- **Finding**: both lenses gave the C4 effect as a fact: "sigmoid(cos)
+  stays in [0.27, 0.73]". The user had to ask why it matters. The real
+  effect (easy pairs take as much gradient as hard pairs; pairs never
+  saturate) took a second explanation. The skill already says "effect
+  (the failure that can occur)", but the lens Check does not test it.
+- **Suggested change**: add to each lens Check: "Does each effect name
+  the failure in result terms (a wrong number, a worse top-K, a cost),
+  not only a technical fact?"
+
+## 2026-10-09 - ml-critique (question order: upstream data questions)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: proposed
+- **Finding**: the question "What did the stub filter remove?" came 16th
+  of 17. The user moved it up: if the filter removed hubs, the most
+  clicked targets and their clicks leave the data, so every later number
+  changes. The sort key puts upstream first, but the lenses sorted
+  questions by their own feel, not by the section of the item.
+- **Suggested change**: in step 2 part 4, sort questions with the same
+  sort key: a question about the data or the label (what was removed,
+  filtered, or joined) comes before model and serving questions.
+
+## 2026-10-09 - ml-critique-merge (a source that is itself a merge)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found better design
+- **Status**: proposed
+- **Finding**: one source (`final.md`) was a merge of v1 and v2, with
+  IDs like `[v1:C1, v2:C2]`. The skill does not say whether the new
+  file keeps those nested IDs or cites only the merged file. I cited
+  `fin:F1` and added one Summary line that the fin items trace back to
+  v1 and v2 in that file.
+- **Suggested change**: in "Merge rules": "A source that is a merge: cite
+  its own IDs (`fin:F1`), not its source IDs. Say in Summary and Sources
+  where the older IDs are. Its decisions count as source decisions."
+  Reason: nested IDs make each line long and are already in the file.
+
+## 2026-10-09 - ml-critique-merge (label the disagreements)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: proposed
+- **Finding**: the Propose step numbers disagreements 1-16. The user
+  answered with a bullet list that began "1: 'whole life line' use
+  'life cycle'". It was a wording change, not an answer to disagreement
+  1. I had to guess, and I said so in the reply.
+- **Suggested change**: in Propose step 4: "Give each disagreement a
+  label `X1, X2, ...`, distinct from item IDs. Ask the user to answer by
+  label." Reason: plain numbers clash with the user's own list numbers.
+
+## 2026-10-09 - ml-critique-merge (a source written under an older rule)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found better design
+- **Status**: proposed
+- **Finding**: v3 was written before ADR 0020 and 0024. It rated the
+  missing requirements estimate P2 and listed the time limit as a
+  context conflict. Today's rules say P1 and "not a conflict". The
+  merge showed both as disagreements, which cost the user 2 answers
+  with only one possible result.
+- **Suggested change**: in "Merge rules": "If a source used a rule that
+  has changed, apply the current rule. Record it under Sources,
+  'Corrections that the merge kept', with the ADR. It is not a
+  disagreement." Reason: the user should only decide real conflicts.
+
+## 2026-10-09 - ml-critique-share-out (open choices at "write")
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: agent-found bug
+- **Status**: proposed
+- **Finding**: the proposal ended with 3 open choices (top-3 message 3,
+  where to say the goal, the P2 block). The user said "write" with no
+  answer. The merge skill sends open items to Deferred at "write"; the
+  share-out skill has no rule. I used the proposal defaults and said so
+  in the Summary.
+- **Suggested change**: in Discuss: "At the 'write' request, each open
+  choice takes the recommended option. Name each one in the Summary, so
+  the user can change it." Reason: a share-out plan has no Deferred
+  section, and the user must see what was chosen for them.
+
+## 2026-10-09 - ml-critique-share-out (screen-shared file has tech content only)
+- **Project**: `labs/ml-riot-wiki-recommender-1`
+- **Source**: user-requested
+- **Status**: proposed
+- **Finding**: in the interview, the interviewer sees the screen. The
+  share-out file mixed tech content with prep tips (timeline, minutes
+  per block, "say", "follow-ups", "How to deliver", Cut list reasons
+  "time"). The user asked to remove the tips and keep only the tech
+  content. The fixed 8 sections then no longer apply.
+- **Suggested change**: when the format includes screen share, write 2
+  files: `share-out.md` (tech only: Summary with verdict and top 3, the
+  4 required topics, sketches, other changes) and `share-out-prep.md`
+  (Timeline, minutes, follow-up phrasing, Cut list, How to deliver).
+  Run `check_doc.py --sections` on each with its own section list.
